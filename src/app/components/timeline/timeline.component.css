@@ -1,0 +1,127 @@
+.container {
+    width: auto;
+    height: 20%;
+    background-color: snow;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border: 2px solid black;
+}
+
+.header {
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid black;
+}
+
+.controls-panel {
+    display: flex;
+    width: 80%;
+    justify-content: space-between;
+}
+
+.keyframe-controls {
+    display: flex;
+    justify-content: space-between;
+}
+
+button {
+    margin: 5px 5px;
+}
+
+.keyframe-add {
+    background-color: lightgreen;
+}
+
+.keyframe-remove {
+    background-color: lightcoral;
+}
+
+.playback-controls {
+    display: flex;
+    justify-content: space-around;
+}
+
+.playback-pause {
+    background-color: black;
+    color: white;
+}
+
+.playback-play {
+    background-color: black;
+    color: white;
+}
+
+.playback-stop {
+    background-color: black;
+    color: white;
+}
+
+.window-controls {
+    display: flex;
+    justify-content: space-around;
+}
+
+.expand {
+    background-color: red;
+}
+
+.timeline {
+    overflow: auto;
+    height: 80%;
+}
+
+.line {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid black;
+
+}
+
+.part {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    width: 20%;
+    border-left: 1px solid black;
+}
+
+.partname {
+    padding: 2px 3px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.mesh {
+    align-items: center;
+    display: flex;
+    justify-content: left;
+    width: 20%;
+    background-color: bisque;
+    border-left: 1px solid black;
+}
+
+.meshname {
+    padding: 2px 3px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.track {
+    width: 80%;
+    border-left: 1px solid black;
+    padding: 2px 3px;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.keyframe {
+    width: 10px;
+    height: 10px;
+    background: tan;
+    transform: rotate(45deg);
+    position: absolute;
+}
