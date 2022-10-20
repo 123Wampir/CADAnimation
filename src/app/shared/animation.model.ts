@@ -15,6 +15,7 @@ export interface KeyframeTrackModel {
 }
 export interface TimelineModel {
     tracks: KeyframeTrackModel[];
+    duration: number;
     scale: number;
 }
 
@@ -51,20 +52,14 @@ export function CreateKeyframe(time: number, keyframeTrack: KeyframeTrackModel, 
         for (let i = 0; i < track.times.length; i++) {
             if (track.times[i] == time) {
                 //console.log(track.ValueTypeName)
-                if (track.ValueTypeName == "number") {
-                    if (track.name == ".material.opacity") {
-                        keyframe.opacity = track.values[i];
-                    }
+                if (track.name == ".material.opacity") {
+                    keyframe.opacity = track.values[i];
                 }
-                if (track.ValueTypeName == "vector") {
-                    if (track.name == ".position") {
-                        keyframe.position = new THREE.Vector3(track.values[i * 3], track.values[i * 3 + 1], track.values[i * 3 + 2])
-                    }
+                if (track.name == ".position") {
+                    keyframe.position = new THREE.Vector3(track.values[i * 3], track.values[i * 3 + 1], track.values[i * 3 + 2])
                 }
-                if (track.ValueTypeName == "bool") {
-                    if (track.name == ".visible") {
-                        keyframe.visible = Boolean(track.values[i]);
-                    }
+                if (track.name == ".visible") {
+                    keyframe.visible = Boolean(track.values[i]);
                 }
             }
         }
@@ -72,4 +67,9 @@ export function CreateKeyframe(time: number, keyframeTrack: KeyframeTrackModel, 
     if (push)
         keyframeTrack.keyframes.push(keyframe)
     return keyframe;
+}
+
+export function NormalizeClips(obj: THREE.Object3D) {
+    if (obj.animations.length != 0) {
+    }
 }

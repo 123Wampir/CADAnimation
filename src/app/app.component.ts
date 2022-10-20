@@ -21,8 +21,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   renderer!: THREE.WebGLRenderer;
   scene!: THREE.Scene;
   camera: any;
-  mixers: THREE.AnimationMixer[] = [];
   actions: THREE.AnimationAction[] = [];
+  mixers: THREE.AnimationMixer[] = [];
   edgeMixers: THREE.AnimationMixer[] = [];
   mainObject!: THREE.Object3D;
   intersection: any;
@@ -79,8 +79,6 @@ export class AppComponent implements OnInit, AfterViewInit {
   startRenderingLoop() {
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true });
     this.renderer.setSize(window.innerWidth * 0.99, window.innerHeight * 0.99);
-    //this.canvas.appendChild(this.renderer.domElement)
-    //this.renderer.setPixelRatio(devicePixelRatio)
     this.renderer.setClearColor(0xffffff);
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
 
@@ -90,38 +88,38 @@ export class AppComponent implements OnInit, AfterViewInit {
         component.FindIntersection();
       }
       requestAnimationFrame(animate);
-      component.mixers.forEach(mixer => {
-        mixer.update(0.01);
-      })
-      component.edgeMixers.forEach(mixer => {
-        mixer.update(0.01);
-      })
+      //console.log(component.AnimationService.play);
+      if (component.AnimationService.play) {
+        component.mixers.forEach(mixer => {
+          mixer.update(0.01);
+        })
+        component.edgeMixers.forEach(mixer => {
+          mixer.update(0.01);
+        })
+      }
+      if (component.AnimationService.stop) {
+        component.AnimationService.play = false;
+        component.mixers.forEach(mixer => {
+          //mixer.stopAllAction()
+          mixer.setTime(0)
+        })
+        component.edgeMixers.forEach(mixer => {
+          //mixer.stopAllAction()
+          mixer.setTime(0)
+        })
+        component.actions.forEach(action => {
+          action.paused = false;
+        })
+
+        component.AnimationService.stop = false;
+      }
       component.renderer.render(component.scene, component.camera);
     }());
   }
 
   ngOnInit() {
-
-
-    // Создание сцены
-    // Добавление контроля орбиты камеры с помощью мыши
-
-
-    // Создание объекта для хранения загружаемой модели
-    //this.mainObject = new THREE.Object3D();
-    // Массив миксеров(дорожки) анимации для деталей модели
-    // Загрука модели
-    //this.LoadGeometry(this.mainObject);
-    //console.log(this.mainObject);
-    // Добавление модели в сцену
-    //this.scene.add(this.mainObject);
-    //console.log(this.scene)
-    //const axes = new THREE.AxesHelper(100);
-    // Создание объекта для хранения пересечений курсора с деталями модели
-    // Создание объекта рейкастера
-    // Вектор позиция курсора на экране
-    // Добавление обработчиков событий
   }
+
 
   async ngAfterViewInit() {
     this.CreateScene()
@@ -131,7 +129,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.scene.add(this.mainObject)
     await this.LoadGeometry(this.mainObject)
     console.log(this.mainObject)
-    //console.log(this.mixers)
+    console.log(this.mixers)
 
   }
 
@@ -149,6 +147,7 @@ export class AppComponent implements OnInit, AfterViewInit {
           // Добавление модели в контейнер
           targetObject.add(gltf.scene.children[0]);
           // Создание ребер для каждой детали модели
+          component.CreateUniqueMaterial(targetObject);
           component.CreateEdges(targetObject, true, 25);
           console.log(targetObject);
           component.AnimationService.scene = component.scene;
@@ -159,6 +158,7 @@ export class AppComponent implements OnInit, AfterViewInit {
           // Загрузка файла анимации
           component.LoadAnimation(targetObject, component.mixers);
           component.AnimationService.actions = component.actions;
+          //console.log(component.mixers);
         }
       },
       // Вызывается в процессе загрузки
@@ -170,6 +170,16 @@ export class AppComponent implements OnInit, AfterViewInit {
         console.log('An error happened');
       }
     );
+  }
+
+  CreateUniqueMaterial(obj: THREE.Object3D) {
+    let arr: any[] = [];
+    this.FindMeshes(obj, arr);
+    if (arr.length != 0) {
+      arr.forEach(mesh => {
+        mesh.material = mesh.material.clone();
+      })
+    }
   }
 
   async CreateMixers(obj: any) {
@@ -191,36 +201,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
 
-  FindMixer(mixers: THREE.AnimationMixer[], obj: any, mix: any[]) {
-    let meshes: any[] = [];
-    this.FindMeshes(obj, meshes)
-    meshes.forEach(mesh => {
-      mixers.forEach(mixer => {
-        if (mixer.getRoot() == mesh) {
-          mix.push(mixer);
-        }
-      })
-    })
-  }
-
-  FindMeshes(obj: THREE.Object3D, meshes: any[]) {
-    if (obj.children.length != 0) {
-      for (let item of obj.children) {
-        if (item.type == "Object3D") {
-          this.FindMeshes(item, meshes)
-        }
-        else {
-          if (item.type == "Mesh") {
-            meshes.push(item);
-            this.FindMeshes(item, meshes)
-          }
-          if (item.type == "LineSegments") {
-            meshes.push(item);
-          }
-        }
-      }
-    }
-  }
 
   async CreateEdgesForMeshes(obj: any, threshold: number) {
     if (obj.children.length != 0) {
@@ -274,7 +254,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     //перебор шагов анимации
     dom.children[0].childNodes.forEach(step => {
       if (step.nodeName == "Step") {
-        console.log(step)
+        //console.log(step)
         let stepHTML = step as HTMLElement;
         currentStep = Number.parseInt(stepHTML.attributes.getNamedItem("Number")?.nodeValue!);
         // Поиск деталей в шаге
@@ -308,7 +288,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 dx = Number.parseFloat(/[X][=](-?\d+.\d+)/.exec(line!)![1]);
                 dy = Number.parseFloat(/[Y][=](-?\d+.\d+)/.exec(line!)![1]);
                 dz = Number.parseFloat(/[Z][=](-?\d+.\d+)/.exec(line!)![1]);
-                console.log(dx, dy, dz)
+                //console.log(dx, dy, dz)
               }
               // Анимация прозрачности
               if (partNode.nodeName == "Transparency") {
@@ -350,12 +330,8 @@ export class AppComponent implements OnInit, AfterViewInit {
                       const positionKF = new THREE.VectorKeyframeTrack('.position', times, values);
                       const tracks = [positionKF];
                       const length = -1;
-                      const clip = new THREE.AnimationClip('Step1', length, tracks);
-                      const action = mixer.clipAction(clip);
-                      action.setLoop(THREE.LoopPingPong, 1);
-                      action.play();
-                      action.clampWhenFinished = true;
-                      this.actions.push(action)
+                      const clip = new THREE.AnimationClip(`${mixer.getRoot()?.name}`, length, tracks);
+                      mixer.getRoot()?.animations.push(clip);
                     }
                     // Добавление анимации прозрачности в миксер детали
                     if (transparancy) {
@@ -365,12 +341,8 @@ export class AppComponent implements OnInit, AfterViewInit {
                       const visibleKF = new THREE.BooleanKeyframeTrack('.visible', times, [Boolean(start), Boolean(stop)]);
                       const tracks = [transparancyKF, visibleKF];
                       const length = -1;
-                      const clip = new THREE.AnimationClip(`step - ${currentStep}`, length, tracks);
-                      const action: THREE.AnimationAction = mixer.clipAction(clip);
-                      action.setLoop(THREE.LoopPingPong, 1);
-                      action.play();
-                      action.clampWhenFinished = true;
-                      this.actions.push(action)
+                      const clip = new THREE.AnimationClip(`${mixer.getRoot()?.name}`, length, tracks);
+                      mixer.getRoot()?.animations.push(clip);
                     }
                     if (rotation) {
                       let mesh = mixer.getRoot() as THREE.Mesh;
@@ -385,12 +357,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                       const rotationKF = new THREE.QuaternionKeyframeTrack('.quaternion', times, values);
                       const tracks = [rotationKF];
                       const length = -1;
-                      const clip = new THREE.AnimationClip('Step1', length, tracks);
-                      const action = mixer.clipAction(clip);
-                      action.setLoop(THREE.LoopPingPong, 1);
-                      action.play();
-                      action.clampWhenFinished = true;
-                      this.actions.push(action)
+                      const clip = new THREE.AnimationClip(`${mixer.getRoot()?.name}`, length, tracks);
                     }
                   })
                 }
@@ -403,11 +370,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                       const transparancyKF = new THREE.NumberKeyframeTrack('.material.opacity', times, values);
                       const tracks = [transparancyKF];
                       const length = -1;
-                      const clip = new THREE.AnimationClip(`step - ${currentStep}`, length, tracks);
-                      const action = mixer.clipAction(clip);
-                      action.setLoop(THREE.LoopPingPong, 1);
-                      action.play();
-                      action.clampWhenFinished = true;
+                      const clip = new THREE.AnimationClip(`${mixer.getRoot()?.name}`, length, tracks);
                     }
                   })
                 }
@@ -417,8 +380,88 @@ export class AppComponent implements OnInit, AfterViewInit {
         })
       }
     })
+    this.CombineClips(this.scene);
+    this.AppendClips(this.scene)
   }
 
+  CombineClips(obj: THREE.Object3D) {
+    let arr: THREE.Object3D[] = [];
+    this.FindMeshes(obj, arr);
+    if (arr.length != 0) {
+      arr.forEach(item => {
+        if (item.animations.length > 1) {
+          for (let i = 1; i < item.animations.length; i++) {
+            item.animations[0].tracks.forEach(track1 => {
+              item.animations[i].tracks.forEach((track2, index) => {
+                if (track1.name == track2.name) {
+                  let times: any[] = [];
+                  let values: any[] = [];
+                  track1.times.forEach(time => {
+                    times.push(time);
+                  })
+                  track2.times.forEach(time => {
+                    times.push(time);
+                  })
+                  track1.values.forEach(value => {
+                    values.push(value);
+                  })
+                  track2.values.forEach(value => {
+                    values.push(value);
+                  })
+                  switch (track1.name) {
+                    case ".material.opacity":
+                      let transparancyKF = new THREE.NumberKeyframeTrack('.material.opacity', times, values);
+                      track1 = transparancyKF.clone();
+                      item.animations[i].tracks.splice(index, 1);
+                      break;
+                    case ".position":
+                      let positionKF = new THREE.VectorKeyframeTrack('.position', times, values);
+                      track1 = positionKF.clone();
+                      item.animations[i].tracks.splice(index, 1);
+                      break;
+                    case ".visible":
+                      let visibleKF = new THREE.BooleanKeyframeTrack('.visible', times, values);
+                      track1 = visibleKF.clone();
+                      item.animations[i].tracks.splice(index, 1);
+                      break;
+                    default:
+                      break;
+                  }
+                }
+                else {
+                  item.animations[0].tracks.push(track2.clone())
+                  item.animations[0].resetDuration();
+                }
+              })
+            })
+            item.animations.splice(i, 1);
+          }
+        }
+      })
+    }
+  }
+
+  AppendClips(obj: THREE.Object3D) {
+    // let arr: THREE.Object3D[] = [];
+    // this.FindMeshes(obj, arr);
+    let partMixer: THREE.AnimationMixer[] = [];
+    this.FindMixer(this.mixers, obj, partMixer)
+    console.log(partMixer);
+    partMixer.forEach(mixer => {
+      let item = mixer.getRoot() as THREE.Object3D;
+      if (item.animations.length != 0) {
+        item.animations.forEach(clip => {
+          let action = mixer.clipAction(clip);
+          action.setLoop(THREE.LoopOnce, 1);
+          action.play();
+          action.clampWhenFinished = true;
+          this.actions.push(action)
+        })
+      }
+    })
+
+
+  }
 
   FindPartByName(name: string) {
     let arr: THREE.Object3D[] = [];
@@ -431,7 +474,38 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     return arr;
   }
+  FindPartByAction(action: THREE.AnimationAction) {
 
+  }
+  FindMixer(mixers: THREE.AnimationMixer[], obj: any, mix: any[]) {
+    let meshes: any[] = [];
+    this.FindMeshes(obj, meshes)
+    meshes.forEach(mesh => {
+      mixers.forEach(mixer => {
+        if (mixer.getRoot() == mesh) {
+          mix.push(mixer);
+        }
+      })
+    })
+  }
+  FindMeshes(obj: THREE.Object3D, meshes: any[]) {
+    if (obj.children.length != 0) {
+      for (let item of obj.children) {
+        if (item.type == "Object3D") {
+          this.FindMeshes(item, meshes)
+        }
+        else {
+          if (item.type == "Mesh") {
+            meshes.push(item);
+            this.FindMeshes(item, meshes)
+          }
+          if (item.type == "LineSegments") {
+            meshes.push(item);
+          }
+        }
+      }
+    }
+  }
 
   onResize(event: any) {
     this.camera.aspect = this.getAspectRatio();

@@ -1,6 +1,8 @@
 .container {
+    display: flex;
+    flex-direction: column;
     width: auto;
-    height: 20%;
+    height: 30%;
     background-color: snow;
     position: fixed;
     bottom: 0;
@@ -10,11 +12,14 @@
 }
 
 .header {
-    padding: 5px 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-bottom: 2px solid black;
+}
+
+.label {
+    margin: 10px;
 }
 
 .controls-panel {
@@ -29,7 +34,7 @@
 }
 
 button {
-    margin: 5px 5px;
+    margin: 0px 5px;
 }
 
 .keyframe-add {
@@ -71,13 +76,13 @@ button {
 
 .timeline {
     overflow: auto;
-    height: 80%;
+    height: 100%;
 }
 
 .line {
-    display: flex;
-    justify-content: space-between;
-    border: 1px solid black;
+    display: grid;
+    justify-content: left;
+    grid-template-columns: 20% 80%;
 
 }
 
@@ -85,8 +90,9 @@ button {
     align-items: center;
     display: flex;
     justify-content: space-between;
-    width: 20%;
     border-left: 1px solid black;
+    border-bottom: 1px solid black;
+
 }
 
 .partname {
@@ -94,13 +100,15 @@ button {
     white-space: nowrap;
     overflow: hidden;
 }
+
 .mesh {
     align-items: center;
     display: flex;
     justify-content: left;
-    width: 20%;
     background-color: bisque;
     border-left: 1px solid black;
+    border-bottom: 1px solid black;
+
 }
 
 .meshname {
@@ -111,11 +119,14 @@ button {
 
 .track {
     width: 80%;
+    border-bottom: 1px solid black;
     border-left: 1px solid black;
-    padding: 2px 3px;
+    border-right: 1px solid black;
+    /* background-color: antiquewhite; */
     display: flex;
     align-items: center;
     position: relative;
+    overflow: visible;
 }
 
 .keyframe {
@@ -124,4 +135,9 @@ button {
     background: tan;
     transform: rotate(45deg);
     position: absolute;
+}
+.current-time{
+    width: 3px;
+    height: 100px;
+    background-color: red;
 }

@@ -1,5 +1,6 @@
 <router-outlet></router-outlet>
 <canvas #canvas class="canvas" (mousemove)="onPointerMove($event)" (click)="onClick($event)"
     (window:resize)="onResize($event)"></canvas>
-<app-timeline [scene]="AnimationService.scene" [actions]="AnimationService.actions">
+<app-timeline [scene]="AnimationService.scene" [actions]="AnimationService.actions" [mixers]="AnimationService.mixers">
 </app-timeline>
+<app-properties [keyframe]="AnimationService.selectedKeyframe"></app-properties>

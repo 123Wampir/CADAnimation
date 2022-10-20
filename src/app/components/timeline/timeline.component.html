@@ -7,9 +7,8 @@
                 <button class="keyframe-remove">-</button>
             </div>
             <div class="playback-controls">
-                <button class="playback-pause">pause</button>
-                <button class="playback-play">play</button>
-                <button class="playback-stop">stop</button>
+                <button class="playback-play" (click)="OnPlayClick($event)">play</button>
+                <button class="playback-stop" (click)="OnStopClick($event)">stop</button>
             </div>
             <div class="window-controls">
                 <button class="load">load</button>
@@ -20,6 +19,21 @@
     </div>
     <div class="timeline" id="timeline">
         <div #lines class="lines" id="lines">
+            <!-- <div class="nodes">
+                <div class="part">
+                    <button class="expand">></button>
+                    <div class="partname">Part1</div>
+                </div>
+            </div>
+            <div class="tracks">
+                <div class="current-time"></div>
+                <div class="node-tracks">
+                    <div class="track">
+                        <div class="keyframe" style="left: 30%;"></div>
+                        <div class="keyframe" style="left: 50%;"></div>
+                    </div>
+                </div>
+            </div> -->
             <!-- <div class="line">
                 <div class="part">
                     <button class="expand">></button>

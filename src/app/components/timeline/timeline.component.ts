@@ -8,16 +8,14 @@ import * as AnimationModel from 'src/app/shared/animation.model';
   styleUrls: ['./timeline.component.css']
 })
 export class TimelineComponent implements OnInit, OnChanges {
-  //@Input() mixers: THREE.AnimationMixer[] = [];
+  @Input() mixers: THREE.AnimationMixer[] = [];
   @Input() actions!: THREE.AnimationAction[];
   @Input() scene!: THREE.Object3D;
   constructor(public AnimationService: AnimationService, private renderer: Renderer2) { }
-  timeLine: AnimationModel.TimelineModel = { tracks: [], scale: 30 };
+  timeLine: AnimationModel.TimelineModel = { tracks: [], duration: 30, scale: 50 };
   keyframes: AnimationModel.KeyframeModel[] = []
 
   ngOnInit(): void {
-
-    // console.log(document.getElementById("timeline"));
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -81,6 +79,7 @@ export class TimelineComponent implements OnInit, OnChanges {
 
           let track = this.renderer.createElement("div");
           this.renderer.addClass(track, "track")
+          this.renderer.setStyle(track, "width", `${this.timeLine.duration * this.timeLine.scale}px`);
           this.renderer.appendChild(line, track)
           this.renderer.appendChild(ln, line)
 
@@ -116,6 +115,7 @@ export class TimelineComponent implements OnInit, OnChanges {
 
           let track = this.renderer.createElement("div");
           this.renderer.addClass(track, "track")
+          this.renderer.setStyle(track, "width", `${this.timeLine.duration * this.timeLine.scale}px`);
           this.renderer.appendChild(line, track)
           this.renderer.appendChild(ln, line)
 
@@ -134,7 +134,7 @@ export class TimelineComponent implements OnInit, OnChanges {
     }
   }
   FindPartByName(name: string) {
-    //console.log(this.scene.getObjectByName(name));
+    console.log(this.scene.getObjectByName(name));
     return this.scene.getObjectByName(name);
   }
   FindPartLineByName(name: string) {
@@ -170,11 +170,9 @@ export class TimelineComponent implements OnInit, OnChanges {
       this.CreateKeyframes(partline!, track)
     })
     //console.log(this.mixers)
-
   }
 
   CreateKeyframes(partline: HTMLElement, keyframeTrack: AnimationModel.KeyframeTrackModel) {
-
     let trackline = partline.getElementsByClassName("track")
     for (let i = 0; i < keyframeTrack.keyframes.length; i++) {
       let keyframe = this.renderer.createElement("div");
@@ -189,23 +187,21 @@ export class TimelineComponent implements OnInit, OnChanges {
         let track = AnimationModel.FindKeyframeTrack(this.timeLine, name);
         let keyframe = AnimationModel.FindKeyframeByTime(track, time)
         console.log(keyframe);
+        this.AnimationService.selectedKeyframe = keyframe;
       })
     }
-
   }
 
   ShowChildren(name: string, show: boolean) {
     console.log(show);
-
     let arr: any[] = [];
     let obj = this.FindPartByName(name);
     this.SelectChildrenParts(obj!, arr)
     arr.forEach(item => {
       let line = this.FindPartLineByName(item.name);
       let btn = line?.getElementsByClassName("expand");
-
       if (show) {
-        line!.style.display = "flex";
+        line!.style.display = "grid";
         if (btn?.length != 0) {
           btn![0].setAttribute("show", "1");
         }
@@ -217,5 +213,17 @@ export class TimelineComponent implements OnInit, OnChanges {
         }
       }
     })
+  }
+
+  OnStopClick($event: MouseEvent) {
+    this.AnimationService.stop = true;
+    console.log(this.AnimationService.stop);
+
+  }
+  OnPlayClick($event: MouseEvent) {
+    if (this.AnimationService.play)
+      this.AnimationService.play = false;
+    else this.AnimationService.play = true;
+    console.log(this.AnimationService.play,this.AnimationService.stop);
   }
 }
