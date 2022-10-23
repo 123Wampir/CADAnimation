@@ -7,10 +7,13 @@
                 <button class="keyframe-remove">-</button>
             </div>
             <div class="playback-controls">
+                <div class="timer">{{curTime.toPrecision(3)}}</div>
                 <button class="playback-play" (click)="OnPlayClick($event)">play</button>
                 <button class="playback-stop" (click)="OnStopClick($event)">stop</button>
             </div>
             <div class="window-controls">
+                <input type="range" min="1" max="300" step="0.5" [(ngModel)]="timeLine.scale"
+                    (change)="OnResizeTimeline($event)">
                 <button class="load">load</button>
                 <button class="save">save</button>
                 <button class="expand">expand</button>
@@ -18,32 +21,16 @@
         </div>
     </div>
     <div class="timeline" id="timeline">
-        <div #lines class="lines" id="lines">
-            <!-- <div class="nodes">
+        <div #lines class="lines" id="lines" (mousemove)="OnCurrentTimeMouseMove($event)"
+            (mouseup)="OnCurrentTimeMouseUp($event)">
+            <div class="line">
                 <div class="part">
-                    <button class="expand">></button>
-                    <div class="partname">Part1</div>
+                    <div class="partname"></div>
+                </div>
+                <div class="ruler-track" id="rulerTrack">
+                    <div class="current-time" id="curTime" (mousedown)="OnCurrentTimeMouseDown($event)"></div>
                 </div>
             </div>
-            <div class="tracks">
-                <div class="current-time"></div>
-                <div class="node-tracks">
-                    <div class="track">
-                        <div class="keyframe" style="left: 30%;"></div>
-                        <div class="keyframe" style="left: 50%;"></div>
-                    </div>
-                </div>
-            </div> -->
-            <!-- <div class="line">
-                <div class="part">
-                    <button class="expand">></button>
-                    <div class="partname">Part1</div>
-                </div>
-                <div class="track">
-                    <div class="keyframe" style="left: 30%;"></div>
-                    <div class="keyframe" style="left: 50%;"></div>
-                </div>
-            </div> -->
         </div>
     </div>
 </div>

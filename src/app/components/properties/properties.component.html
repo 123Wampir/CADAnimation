@@ -1,41 +1,41 @@
 <div class="container" id="container">
     <div class="header">
         <button class="expand" (click)="OnExpandClick($event)">></button>
-        <div class="label">{{"AAA"}}</div>
+        <div class="label">Свойства</div>
     </div>
     <div class="form">
-        <div class="param">
-            <div class="param-label">Позиция</div>
-            <div class="inputs">
-                <input type="number" class="input-number" placeholder="X" [(ngModel)]="position.x"
-                    (change)="OnPositionChange($event)">
-                <input type="number" class="input-number" placeholder="Y" [(ngModel)]="position.y"
-                    (change)="OnPositionChange($event)">
-                <input type="number" class="input-number" placeholder="Z" [(ngModel)]="position.z"
-                    (change)="OnPositionChange($event)">
+        <div *ngIf="propertiesObject!=undefined">
+            <div class="label">{{propertiesObject.name}}</div>
+            <div class="param">
+                <div class="param-label">Позиция</div>
+                <div class="inputs">
+                    <input type="number" class="input-number" placeholder="X" [(ngModel)]="propertiesObject.position.x">
+                    <input type="number" class="input-number" placeholder="Y" [(ngModel)]="propertiesObject.position.y">
+                    <input type="number" class="input-number" placeholder="Z" [(ngModel)]="propertiesObject.position.z">
+                </div>
             </div>
-        </div>
-        <div class="param">
-            <div class="param-label">Вращение</div>
-            <div class="inputs">
-                <input type="number" class="input-number" placeholder="X" [(ngModel)]="rotation.x">
-                <input type="number" class="input-number" placeholder="Y" [(ngModel)]="rotation.y">
-                <input type="number" class="input-number" placeholder="Z" [(ngModel)]="rotation.z">
+            <div class="param">
+                <div class="param-label">Вращение</div>
+                <div class="inputs">
+                    <input type="number" class="input-number" placeholder="X" [(ngModel)]="propertiesObject.rotation.x">
+                    <input type="number" class="input-number" placeholder="Y" [(ngModel)]="propertiesObject.rotation.y">
+                    <input type="number" class="input-number" placeholder="Z" [(ngModel)]="propertiesObject.rotation.z">
+                </div>
             </div>
-        </div>
-        <div class="param">
-            <div class="param-label">Прозрачность</div>
-            <div class="inputs">
-                <input type="range" min="0" max="1" step="0.01" class="input-range" [(ngModel)]="opacity"
-                    placeholder="0" (change)="OnOpacityChange($event)">
-                <input type="number" class="input-number" min="0" step="0.01" max="1" placeholder="opacity"
-                    [(ngModel)]="opacity" (change)="OnOpacityChange($event)">
+            <div class="param">
+                <div class="param-label">Прозрачность</div>
+                <div class="inputs">
+                    <input type="range" min="0" max="1" step="0.01" class="input-range"
+                        [(ngModel)]="propertiesObject.material.opacity" placeholder="0">
+                    <input type="number" class="input-number" min="0" step="0.01" max="1" placeholder="opacity"
+                        [(ngModel)]="propertiesObject.material.opacity">
+                </div>
             </div>
-        </div>
-        <div class="param">
-            <div class="param-label">Видимость</div>
-            <div class="inputs">
-                <input type="checkbox" [(ngModel)]="visible" class="input-checkbox" (change)="OnVisibleChange($event)">
+            <div class="param">
+                <div class="param-label">Видимость</div>
+                <div class="inputs">
+                    <input type="checkbox" [(ngModel)]="propertiesObject.visible" class="input-checkbox">
+                </div>
             </div>
         </div>
     </div>

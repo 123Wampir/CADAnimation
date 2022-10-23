@@ -48,6 +48,7 @@ button {
 .playback-controls {
     display: flex;
     justify-content: space-around;
+    align-items: center;
 }
 
 .playback-pause {
@@ -77,6 +78,7 @@ button {
 .timeline {
     overflow: auto;
     height: 100%;
+    user-select: none;
 }
 
 .line {
@@ -99,6 +101,7 @@ button {
     padding: 2px 3px;
     white-space: nowrap;
     overflow: hidden;
+    user-select: text;
 }
 
 .mesh {
@@ -117,6 +120,22 @@ button {
     overflow: hidden;
 }
 
+.light {
+    align-items: center;
+    display: flex;
+    justify-content: left;
+    background-color: lightblue;
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+
+}
+
+.lightname {
+    padding: 2px 3px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
 .track {
     width: 80%;
     border-bottom: 1px solid black;
@@ -129,15 +148,32 @@ button {
     overflow: visible;
 }
 
+.ruler-track {
+    background-color: black;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    /* background-color: antiquewhite; */
+    display: flex;
+    /* align-items: center; */
+    position: relative;
+    overflow: visible;
+}
+
 .keyframe {
     width: 10px;
     height: 10px;
     background: tan;
     transform: rotate(45deg);
     position: absolute;
+    z-index: 11;
 }
-.current-time{
-    width: 3px;
-    height: 100px;
+
+.current-time {
+    width: 5px;
     background-color: red;
+    height: 100%;
+    position: absolute;
+    z-index: 10;
+    cursor: e-resize;
 }

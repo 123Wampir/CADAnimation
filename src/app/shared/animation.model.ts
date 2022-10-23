@@ -3,6 +3,7 @@ import THREE = require("three");
 export interface KeyframeModel {
     time: number;
     clip: THREE.AnimationClip;
+    DOMElement?: HTMLElement;
     position?: THREE.Vector3;
     rotation?: THREE.Euler;
     opacity?: number;
@@ -12,6 +13,7 @@ export interface KeyframeModel {
 export interface KeyframeTrackModel {
     keyframes: KeyframeModel[];
     name: string;
+    DOMElement: HTMLElement;
 }
 export interface TimelineModel {
     tracks: KeyframeTrackModel[];
@@ -39,7 +41,6 @@ export function CreateKeyframe(time: number, keyframeTrack: KeyframeTrackModel, 
     let push = false;
     let keyframe: KeyframeModel;
     let a = FindKeyframeByTime(keyframeTrack, time)
-    //console.log(keyframeTrack, time, a)
     if (a != undefined) {
         keyframe = a;
         push = false;
@@ -68,7 +69,11 @@ export function CreateKeyframe(time: number, keyframeTrack: KeyframeTrackModel, 
         keyframeTrack.keyframes.push(keyframe)
     return keyframe;
 }
-
+export function ResizeTimeline(timeline: TimelineModel) {
+    timeline.tracks.forEach(track => {
+        track.name
+    })
+}
 export function NormalizeClips(obj: THREE.Object3D) {
     if (obj.animations.length != 0) {
     }

@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import Stats from 'three/examples/jsm/libs/stats.module'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { exec, execFile } from 'child_process'
 import { AnimationService } from './services/animation.service';
@@ -59,8 +60,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (intersects.length != 0) {
       if (this.intersection != intersects[0].object) {
         if (this.intersection) {
-          if (this.intersection.material.emissive)
-            this.intersection.material.emissive.set(0x000000);
+          if (this.AnimationService.selected.find((item) => (item == this.intersection)) == undefined)
+            if (this.intersection.material.emissive)
+              this.intersection.material.emissive.set(0x000000);
         }
         this.intersection = intersects[0].object;
         if (this.intersection.material.emissive)
@@ -69,8 +71,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     else {
       if (this.intersection) {
-        if (this.intersection.material.emissive)
-          this.intersection.material.emissive.set(0x000000);
+        if (this.AnimationService.selected.find((item) => (item == this.intersection)) == undefined)
+          if (this.intersection.material.emissive)
+            this.intersection.material.emissive.set(0x000000);
         this.intersection = null;
       }
     }
@@ -81,23 +84,43 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.renderer.setSize(window.innerWidth * 0.99, window.innerHeight * 0.99);
     this.renderer.setClearColor(0xffffff);
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
-
+    const stats = Stats();
+    this.canvas.parentElement?.appendChild(stats.dom);
     let component = this;
     (function animate() {
       if (component.mainObject != undefined) {
         component.FindIntersection();
       }
       requestAnimationFrame(animate);
-      //console.log(component.AnimationService.play);
+      stats.update();
       if (component.AnimationService.play) {
+        let delta = 0.01;
+        component.AnimationService.currentTime += delta;
+        if (component.AnimationService.currentTime > component.AnimationService.timeLine.duration) {
+          component.AnimationService.play = false;
+          component.AnimationService.currentTime = component.AnimationService.timeLine.duration;
+        }
         component.mixers.forEach(mixer => {
-          mixer.update(0.01);
+          mixer.update(delta);
         })
         component.edgeMixers.forEach(mixer => {
-          mixer.update(0.01);
+          mixer.update(delta);
+        })
+      }
+      else {
+        component.actions.forEach(action => {
+          let mixer = action.getMixer();
+          mixer.setTime(0);
+          mixer.update(component.AnimationService.currentTime);
+        })
+        component.actions.forEach(action => {
+          let mixer = action.getMixer();
+          mixer.setTime(0);
+          mixer.update(component.AnimationService.currentTime);
         })
       }
       if (component.AnimationService.stop) {
+        component.AnimationService.currentTime = 0;
         component.AnimationService.play = false;
         component.mixers.forEach(mixer => {
           //mixer.stopAllAction()
@@ -108,9 +131,8 @@ export class AppComponent implements OnInit, AfterViewInit {
           mixer.setTime(0)
         })
         component.actions.forEach(action => {
-          action.paused = false;
+          action.reset();
         })
-
         component.AnimationService.stop = false;
       }
       component.renderer.render(component.scene, component.camera);
@@ -147,18 +169,21 @@ export class AppComponent implements OnInit, AfterViewInit {
           // Добавление модели в контейнер
           targetObject.add(gltf.scene.children[0]);
           // Создание ребер для каждой детали модели
+          component.CreateUniqueGeometry(targetObject);
           component.CreateUniqueMaterial(targetObject);
+          component.FixMeshPivot(targetObject.children[0]);
+
           component.CreateEdges(targetObject, true, 25);
           console.log(targetObject);
           component.AnimationService.scene = component.scene;
           // Создание миксеров(дорожек) для модели
           component.CreateMixers(targetObject)
 
-          component.AnimationService.mixers = component.mixers;
+          //component.AnimationService.mixers = component.mixers;
           // Загрузка файла анимации
           component.LoadAnimation(targetObject, component.mixers);
           component.AnimationService.actions = component.actions;
-          //console.log(component.mixers);
+
         }
       },
       // Вызывается в процессе загрузки
@@ -172,12 +197,48 @@ export class AppComponent implements OnInit, AfterViewInit {
     );
   }
 
+  FixMeshPivot(obj: THREE.Object3D) {
+    obj.children.forEach(part => {
+      let arr: any[] = [];
+      this.AnimationService.FindMeshes(part, arr);
+      let vec = new THREE.Vector3(0, 0, 0);
+      arr.forEach(mesh => {
+        let geom = mesh as THREE.Mesh;
+        let vec = new THREE.Vector3(0, 0, 0);
+        var geometry = geom.geometry;
+        geometry.computeBoundingBox();
+        var center = new THREE.Vector3();
+        geometry.boundingBox?.getCenter(center);
+        geom.localToWorld(center);
+        let box = new THREE.BoxHelper(geom, 0xffff00);
+        geometry.center()
+        geom.position.set(center.x, center.y, center.z);
+        //geom.updateWorldMatrix(true, true)
+        // let axes1 = new THREE.AxesHelper(50);
+        // geom.add(axes1);
+      })
+      // let axes = new THREE.AxesHelper(50);
+      // part.add(axes);
+    })
+  }
   CreateUniqueMaterial(obj: THREE.Object3D) {
     let arr: any[] = [];
-    this.FindMeshes(obj, arr);
+    this.AnimationService.FindMeshes(obj, arr);
     if (arr.length != 0) {
       arr.forEach(mesh => {
         mesh.material = mesh.material.clone();
+        mesh.material.transparent = true;
+        mesh.material.alphaToCoverage = true;
+        //mesh.material.dithering = true;
+      })
+    }
+  }
+  CreateUniqueGeometry(obj: THREE.Object3D) {
+    let arr: any[] = [];
+    this.AnimationService.FindMeshes(obj, arr);
+    if (arr.length != 0) {
+      arr.forEach(mesh => {
+        mesh.geometry = mesh.geometry.clone();
       })
     }
   }
@@ -209,9 +270,9 @@ export class AppComponent implements OnInit, AfterViewInit {
           this.CreateEdgesForMeshes(item, threshold);
         }
         else if (item.type == "Mesh") {
-          item.material.transparent = true;
+
           let edges = new THREE.EdgesGeometry(item.geometry, threshold);
-          let line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 1/*, depthTest: false */, transparent: true }));
+          let line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 1/*, depthTest: false */ }));
           item.add(line)
         }
       }
@@ -229,8 +290,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
   onClick(event: MouseEvent) {
-    if (this.intersection != undefined)
-      console.log(this.intersection)
+    if (this.intersection != undefined) {
+      this.AnimationService.Select(this.intersection, this.AnimationService.CTRLPressed);
+    }
+    else this.AnimationService.ClearSelection()
   }
   onPointerMove(event: MouseEvent) {
     // console.log(event)
@@ -288,7 +351,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                 dx = Number.parseFloat(/[X][=](-?\d+.\d+)/.exec(line!)![1]);
                 dy = Number.parseFloat(/[Y][=](-?\d+.\d+)/.exec(line!)![1]);
                 dz = Number.parseFloat(/[Z][=](-?\d+.\d+)/.exec(line!)![1]);
-                //console.log(dx, dy, dz)
+                console.log(dx, dy, dz)
               }
               // Анимация прозрачности
               if (partNode.nodeName == "Transparency") {
@@ -324,7 +387,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                       let vec = new THREE.Vector3(dx, dy, dz);
                       vec.add(part.position)
                       let startPos = mesh.position
-                      mesh.worldToLocal(vec);
+                      part.worldToLocal(vec);
                       const times = [currentStep, currentStep + par];
                       const values = [startPos.x, startPos.y, startPos.z, startPos.x + vec.x * par, startPos.y + vec.y * par, startPos.z + vec.z * par];
                       const positionKF = new THREE.VectorKeyframeTrack('.position', times, values);
@@ -361,19 +424,19 @@ export class AppComponent implements OnInit, AfterViewInit {
                     }
                   })
                 }
-                if (edgeMixer.length != 0) {
-                  edgeMixer.forEach(mixer => {
-                    // Добавление анимации прозрачности в миксер ребер детали
-                    if (transparancy) {
-                      const times = [currentStep, currentStep + par];
-                      const values = [1, 0];
-                      const transparancyKF = new THREE.NumberKeyframeTrack('.material.opacity', times, values);
-                      const tracks = [transparancyKF];
-                      const length = -1;
-                      const clip = new THREE.AnimationClip(`${mixer.getRoot()?.name}`, length, tracks);
-                    }
-                  })
-                }
+                // if (edgeMixer.length != 0) {
+                //   edgeMixer.forEach(mixer => {
+                //     // Добавление анимации прозрачности в миксер ребер детали
+                //     if (transparancy) {
+                //       const times = [currentStep, currentStep + par];
+                //       const values = [1, 0];
+                //       const transparancyKF = new THREE.NumberKeyframeTrack('.material.opacity', times, values);
+                //       const tracks = [transparancyKF];
+                //       const length = -1;
+                //       const clip = new THREE.AnimationClip(`${mixer.getRoot()?.name}`, length, tracks);
+                //     }
+                //   })
+                // }
               })
             })
           }
@@ -386,7 +449,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   CombineClips(obj: THREE.Object3D) {
     let arr: THREE.Object3D[] = [];
-    this.FindMeshes(obj, arr);
+    this.AnimationService.FindMeshes(obj, arr);
     if (arr.length != 0) {
       arr.forEach(item => {
         if (item.animations.length > 1) {
@@ -446,16 +509,21 @@ export class AppComponent implements OnInit, AfterViewInit {
     // this.FindMeshes(obj, arr);
     let partMixer: THREE.AnimationMixer[] = [];
     this.FindMixer(this.mixers, obj, partMixer)
-    console.log(partMixer);
+    //console.log(partMixer);
     partMixer.forEach(mixer => {
       let item = mixer.getRoot() as THREE.Object3D;
       if (item.animations.length != 0) {
         item.animations.forEach(clip => {
           let action = mixer.clipAction(clip);
-          action.setLoop(THREE.LoopOnce, 1);
+          mixer.addEventListener('finished', function (e) {
+
+            let act = e["action"];
+            act.paused = false;
+          });
+          action.setLoop(THREE.LoopRepeat, 1);
           action.play();
           action.clampWhenFinished = true;
-          this.actions.push(action)
+          this.actions.push(action);
         })
       }
     })
@@ -474,12 +542,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     return arr;
   }
-  FindPartByAction(action: THREE.AnimationAction) {
 
-  }
   FindMixer(mixers: THREE.AnimationMixer[], obj: any, mix: any[]) {
     let meshes: any[] = [];
-    this.FindMeshes(obj, meshes)
+    this.AnimationService.FindMeshes(obj, meshes)
     meshes.forEach(mesh => {
       mixers.forEach(mixer => {
         if (mixer.getRoot() == mesh) {
@@ -488,24 +554,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       })
     })
   }
-  FindMeshes(obj: THREE.Object3D, meshes: any[]) {
-    if (obj.children.length != 0) {
-      for (let item of obj.children) {
-        if (item.type == "Object3D") {
-          this.FindMeshes(item, meshes)
-        }
-        else {
-          if (item.type == "Mesh") {
-            meshes.push(item);
-            this.FindMeshes(item, meshes)
-          }
-          if (item.type == "LineSegments") {
-            meshes.push(item);
-          }
-        }
-      }
-    }
-  }
+
 
   onResize(event: any) {
     this.camera.aspect = this.getAspectRatio();
