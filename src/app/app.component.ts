@@ -184,7 +184,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
           //component.AnimationService.mixers = component.mixers;
           // Загрузка файла анимации
-          component.LoadAnimation(targetObject, component.AnimationService.mixers);
+          //component.LoadAnimation(targetObject, component.AnimationService.mixers);
 
 
         }

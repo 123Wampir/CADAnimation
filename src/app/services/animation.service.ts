@@ -103,7 +103,7 @@ export class AnimationService {
     if (track != undefined) {
       let updateTrack = true;
       for (let i = 0; i < track.times.length; i++) {
-        if (Number(track.times[i].toFixed(3)) == keyframe.time) {
+        if (Number(track.times[i].toFixed(3)) == Number(keyframe.time.toFixed(3))) {
           // console.log("change cur values");
           updateTrack = false;
           switch (type) {
@@ -182,7 +182,7 @@ export class AnimationService {
       for (let i = 0; i < track.times.length; i++) {
         // console.log(track.times[i]);
         if (!insert)
-          if (Number(track.times[i].toFixed(3)) > time) {
+          if (Number(track.times[i].toFixed(3)) > Number(time.toFixed(3))) {
             times.push(Number(time.toFixed(3)));
             insert = true;
             switch (track.name) {
@@ -284,6 +284,13 @@ export class AnimationService {
           newAction.clampWhenFinished = true;
           this.actions.splice(index, 1, newAction);
           mixer.setTime(time);
+          if ((mixer as any)._listeners == undefined)
+            mixer.addEventListener('finished', function (e) {
+              let act = e["action"];
+              act.paused = false;
+              console.log(act);
+
+            });
           // console.log(mixer.time);
 
         }
@@ -299,7 +306,7 @@ export class AnimationService {
       let values: any[] = [];
       let index = -1;
       for (let i = 0; i < track.times.length; i++) {
-        if (Number(track.times[i].toFixed(3)) != keyframe.time) {
+        if (Number(track.times[i].toFixed(3)) != Number(keyframe.time.toFixed(3))) {
           times.push(track.times[i]);
           switch (track.name) {
             case ".position":

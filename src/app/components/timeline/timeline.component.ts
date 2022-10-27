@@ -75,7 +75,7 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
         this.renderer.appendChild(ln, line)
         this.renderer.listen(line, "click", (event) => {
           //let part = this.FindPartByName(event.target.attributes["name"].nodeValue)
-          // console.log(item);
+          console.log(item);
           this.AnimationService.Select(item, this.AnimationService.CTRLPressed);
         })
         let keyframeTrack: AnimationModel.KeyframeTrackModel = { DOMElement: track, name: item.name, keyframes: [] };
