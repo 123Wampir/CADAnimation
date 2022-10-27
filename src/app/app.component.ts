@@ -1,9 +1,10 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import * as THREE from 'three'
+import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import Stats from 'three/examples/jsm/libs/stats.module'
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
+import Stats from 'three/examples/jsm/libs/stats.module';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { exec, execFile } from 'child_process'
+import { exec, execFile } from 'child_process';
 import { AnimationService } from './services/animation.service';
 
 @Component({
@@ -22,9 +23,9 @@ export class AppComponent implements OnInit, AfterViewInit {
   renderer!: THREE.WebGLRenderer;
   scene!: THREE.Scene;
   camera: any;
-  actions: THREE.AnimationAction[] = [];
-  mixers: THREE.AnimationMixer[] = [];
-  edgeMixers: THREE.AnimationMixer[] = [];
+  // actions: THREE.AnimationAction[] = [];
+
+  // edgeMixers: THREE.AnimationMixer[] = [];
   mainObject!: THREE.Object3D;
   intersection: any;
   pointer!: THREE.Vector2;
@@ -83,7 +84,20 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true });
     this.renderer.setSize(window.innerWidth * 0.99, window.innerHeight * 0.99);
     this.renderer.setClearColor(0xffffff);
-    const controls = new OrbitControls(this.camera, this.renderer.domElement);
+    const orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.AnimationService.orbit = orbitControls;
+    const transformControls = new TransformControls(this.camera, this.renderer.domElement);
+    transformControls.space = "local";
+    transformControls.addEventListener('dragging-changed', function (event) {
+      orbitControls.enabled = !event["value"];
+    });
+    // transformControls.addEventListener("objectChange", (e) => {
+    //   this.AnimationService.transformChange = !this.AnimationService.transformChange;
+
+    // })
+    transformControls.type = "TransformControls";
+    this.AnimationService.transform = transformControls;
+    this.scene.add(transformControls);
     const stats = Stats();
     this.canvas.parentElement?.appendChild(stats.dom);
     let component = this;
@@ -100,37 +114,28 @@ export class AppComponent implements OnInit, AfterViewInit {
           component.AnimationService.play = false;
           component.AnimationService.currentTime = component.AnimationService.timeLine.duration;
         }
-        component.mixers.forEach(mixer => {
-          mixer.update(delta);
-        })
-        component.edgeMixers.forEach(mixer => {
-          mixer.update(delta);
+        component.AnimationService.actions.forEach(action => {
+          let mixer = action.getMixer();
+          mixer.setTime(0);
+          mixer.update(component.AnimationService.currentTime);
         })
       }
       else {
-        component.actions.forEach(action => {
-          let mixer = action.getMixer();
-          mixer.setTime(0);
-          mixer.update(component.AnimationService.currentTime);
-        })
-        component.actions.forEach(action => {
-          let mixer = action.getMixer();
-          mixer.setTime(0);
-          mixer.update(component.AnimationService.currentTime);
-        })
+        if (component.AnimationService.currentTimeChange) {
+          component.AnimationService.actions.forEach(action => {
+            let mixer = action.getMixer();
+            mixer.setTime(0);
+            mixer.update(component.AnimationService.currentTime);
+          })
+          component.AnimationService.currentTimeChange = false;
+        }
       }
       if (component.AnimationService.stop) {
         component.AnimationService.currentTime = 0;
         component.AnimationService.play = false;
-        component.mixers.forEach(mixer => {
-          //mixer.stopAllAction()
-          mixer.setTime(0)
-        })
-        component.edgeMixers.forEach(mixer => {
-          //mixer.stopAllAction()
-          mixer.setTime(0)
-        })
-        component.actions.forEach(action => {
+        component.AnimationService.actions.forEach(action => {
+          let mixer = action.getMixer();
+          mixer.setTime(0);
           action.reset();
         })
         component.AnimationService.stop = false;
@@ -138,7 +143,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       component.renderer.render(component.scene, component.camera);
     }());
   }
-
   ngOnInit() {
   }
 
@@ -150,9 +154,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.mainObject = new THREE.Object3D();
     this.scene.add(this.mainObject)
     await this.LoadGeometry(this.mainObject)
-    console.log(this.mainObject)
-    console.log(this.mixers)
-
+    console.log(this.AnimationService.mixers)
+    console.log(this.scene);
   }
 
   async LoadGeometry(targetObject: THREE.Object3D) {
@@ -181,8 +184,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
           //component.AnimationService.mixers = component.mixers;
           // Загрузка файла анимации
-          component.LoadAnimation(targetObject, component.mixers);
-          component.AnimationService.actions = component.actions;
+          component.LoadAnimation(targetObject, component.AnimationService.mixers);
+
 
         }
       },
@@ -251,13 +254,13 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
         else if (item.type == "Mesh") {
           let mixer = new THREE.AnimationMixer(item);
-          this.mixers.push(mixer);
+          this.AnimationService.mixers.push(mixer);
           this.CreateMixers(item);
         }
-        else if (item.type == "LineSegments") {
-          let mixer = new THREE.AnimationMixer(item);
-          this.edgeMixers.push(mixer);
-        }
+        // else if (item.type == "LineSegments") {
+        //   let mixer = new THREE.AnimationMixer(item);
+        //   this.edgeMixers.push(mixer);
+        // }
       }
     }
   }
@@ -376,8 +379,8 @@ export class AppComponent implements OnInit, AfterViewInit {
                 let partMixer: any[] = [];
                 let edgeMixer: any[] = [];
                 // Поиск миксеров(дорожек) анимации
-                this.FindMixer(this.mixers, part, partMixer);
-                this.FindMixer(this.edgeMixers, part, edgeMixer);
+                this.AnimationService.FindMixer(this.AnimationService.mixers, part, partMixer);
+                // this.FindMixer(this.edgeMixers, part, edgeMixer);
                 if (partMixer.length != 0) {
                   partMixer.forEach(mixer => {
                     // Добавление анимации перемещения в миксер детали
@@ -482,6 +485,11 @@ export class AppComponent implements OnInit, AfterViewInit {
                       track1 = positionKF.clone();
                       item.animations[i].tracks.splice(index, 1);
                       break;
+                    case ".quaternion":
+                      let rotationKF = new THREE.QuaternionKeyframeTrack('.quaternion', times, values);
+                      track1 = rotationKF.clone();
+                      item.animations[i].tracks.splice(index, 1);
+                      break;
                     case ".visible":
                       let visibleKF = new THREE.BooleanKeyframeTrack('.visible', times, values);
                       track1 = visibleKF.clone();
@@ -508,8 +516,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     // let arr: THREE.Object3D[] = [];
     // this.FindMeshes(obj, arr);
     let partMixer: THREE.AnimationMixer[] = [];
-    this.FindMixer(this.mixers, obj, partMixer)
-    //console.log(partMixer);
+    this.AnimationService.FindMixer(this.AnimationService.mixers, obj, partMixer)
     partMixer.forEach(mixer => {
       let item = mixer.getRoot() as THREE.Object3D;
       if (item.animations.length != 0) {
@@ -523,7 +530,7 @@ export class AppComponent implements OnInit, AfterViewInit {
           action.setLoop(THREE.LoopRepeat, 1);
           action.play();
           action.clampWhenFinished = true;
-          this.actions.push(action);
+          this.AnimationService.actions.push(action);
         })
       }
     })
@@ -543,23 +550,24 @@ export class AppComponent implements OnInit, AfterViewInit {
     return arr;
   }
 
-  FindMixer(mixers: THREE.AnimationMixer[], obj: any, mix: any[]) {
-    let meshes: any[] = [];
-    this.AnimationService.FindMeshes(obj, meshes)
-    meshes.forEach(mesh => {
-      mixers.forEach(mixer => {
-        if (mixer.getRoot() == mesh) {
-          mix.push(mixer);
-        }
-      })
-    })
-  }
+
 
 
   onResize(event: any) {
     this.camera.aspect = this.getAspectRatio();
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(window.innerWidth * 0.99, window.innerHeight * 0.99);
+  }
+  onKeyDown(event: KeyboardEvent) {
+    if (event.key == "Control") {
+      this.AnimationService.CTRLPressed = true;
+    }
+
+  }
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key == "Control") {
+      this.AnimationService.CTRLPressed = false;
+    }
   }
 }
 

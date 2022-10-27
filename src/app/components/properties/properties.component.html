@@ -9,33 +9,46 @@
             <div class="param">
                 <div class="param-label">Позиция</div>
                 <div class="inputs">
-                    <input type="number" class="input-number" placeholder="X" [(ngModel)]="propertiesObject.position.x">
-                    <input type="number" class="input-number" placeholder="Y" [(ngModel)]="propertiesObject.position.y">
-                    <input type="number" class="input-number" placeholder="Z" [(ngModel)]="propertiesObject.position.z">
+                    <input type="number" class="input-number" placeholder="X" [(ngModel)]="propertiesObject.position.x"
+                        (ngModelChange)="OnPositionChange($event)">
+                    <input type="number" class="input-number" placeholder="Y" [(ngModel)]="propertiesObject.position.y"
+                        (ngModelChange)="OnPositionChange($event)">
+                    <input type="number" class="input-number" placeholder="Z" [(ngModel)]="propertiesObject.position.z"
+                        (ngModelChange)="OnPositionChange($event)">
                 </div>
             </div>
             <div class="param">
                 <div class="param-label">Вращение</div>
                 <div class="inputs">
-                    <input type="number" class="input-number" placeholder="X" [(ngModel)]="propertiesObject.rotation.x">
-                    <input type="number" class="input-number" placeholder="Y" [(ngModel)]="propertiesObject.rotation.y">
-                    <input type="number" class="input-number" placeholder="Z" [(ngModel)]="propertiesObject.rotation.z">
+                    <input type="number" class="input-number" placeholder="X" [(ngModel)]="propertiesObject.rotation.x"
+                        (change)="OnRotationChange($event)">
+                    <input type="number" class="input-number" placeholder="Y" [(ngModel)]="propertiesObject.rotation.y"
+                        (change)="OnRotationChange($event)">
+                    <input type="number" class="input-number" placeholder="Z" [(ngModel)]="propertiesObject.rotation.z"
+                        (change)="OnRotationChange($event)">
                 </div>
             </div>
-            <div class="param">
+            <div class="param" *ngIf="propertiesObject.material!=undefined">
                 <div class="param-label">Прозрачность</div>
                 <div class="inputs">
                     <input type="range" min="0" max="1" step="0.01" class="input-range"
-                        [(ngModel)]="propertiesObject.material.opacity" placeholder="0">
+                        [(ngModel)]="propertiesObject.material.opacity" placeholder="0"
+                        (change)="OnOpacityChange($event)">
                     <input type="number" class="input-number" min="0" step="0.01" max="1" placeholder="opacity"
-                        [(ngModel)]="propertiesObject.material.opacity">
+                        [(ngModel)]="propertiesObject.material.opacity" (change)="OnOpacityChange($event)">
                 </div>
             </div>
             <div class="param">
                 <div class="param-label">Видимость</div>
                 <div class="inputs">
-                    <input type="checkbox" [(ngModel)]="propertiesObject.visible" class="input-checkbox">
+                    <input type="checkbox" [(ngModel)]="propertiesObject.visible" class="input-checkbox"
+                        (change)="OnVisibleChange($event)">
                 </div>
+            </div>
+            <div class="controls" *ngIf="AnimationService.selectedKeyframe!=undefined">
+                <button class="delete"
+                    (click)="AnimationService.DeleteKeyframe(AnimationService.selectedKeyframe)">Удалить ключевой
+                    кадр</button>
             </div>
         </div>
     </div>

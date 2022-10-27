@@ -5,7 +5,7 @@ export interface KeyframeModel {
     clip: THREE.AnimationClip;
     DOMElement?: HTMLElement;
     position?: THREE.Vector3;
-    rotation?: THREE.Euler;
+    quaternion?: THREE.Euler;
     opacity?: number;
     visible?: boolean;
     material?: THREE.Material;
@@ -49,32 +49,25 @@ export function CreateKeyframe(time: number, keyframeTrack: KeyframeTrackModel, 
         keyframe = { time: time, clip: clip }
         push = true;
     }
-    clip.tracks.forEach(track => {
-        for (let i = 0; i < track.times.length; i++) {
-            if (track.times[i] == time) {
-                //console.log(track.ValueTypeName)
-                if (track.name == ".material.opacity") {
-                    keyframe.opacity = track.values[i];
-                }
-                if (track.name == ".position") {
-                    keyframe.position = new THREE.Vector3(track.values[i * 3], track.values[i * 3 + 1], track.values[i * 3 + 2])
-                }
-                if (track.name == ".visible") {
-                    keyframe.visible = Boolean(track.values[i]);
+    if (clip.tracks.length != 0)
+        clip.tracks.forEach(track => {
+            for (let i = 0; i < track.times.length; i++) {
+                if (track.times[i] == time) {
+                    //console.log(track.ValueTypeName)
+                    if (track.name == ".material.opacity") {
+                        keyframe.opacity = track.values[i];
+                    }
+                    if (track.name == ".position") {
+                        keyframe.position = new THREE.Vector3(track.values[i * 3], track.values[i * 3 + 1], track.values[i * 3 + 2])
+                    }
+                    if (track.name == ".visible") {
+                        keyframe.visible = Boolean(track.values[i]);
+                    }
                 }
             }
-        }
-    })
+        })
     if (push)
         keyframeTrack.keyframes.push(keyframe)
     return keyframe;
 }
-export function ResizeTimeline(timeline: TimelineModel) {
-    timeline.tracks.forEach(track => {
-        track.name
-    })
-}
-export function NormalizeClips(obj: THREE.Object3D) {
-    if (obj.animations.length != 0) {
-    }
-}
+

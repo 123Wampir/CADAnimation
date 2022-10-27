@@ -1,8 +1,9 @@
 <router-outlet></router-outlet>
 <canvas #canvas class="canvas" (mousemove)="onPointerMove($event)" (click)="onClick($event)"
-    (window:resize)="onResize($event)"></canvas>
+    (window:resize)="onResize($event)" (window:keydown)="onKeyDown($event)" (window:keyup)="onKeyUp($event)"></canvas>
 <app-timeline [scene]="AnimationService.scene" [actions]="AnimationService.actions"
     [curTime]="AnimationService.currentTime">
 </app-timeline>
-<app-properties [selected]="AnimationService.selectionChange" [curTime]="AnimationService.currentTime">
+<app-properties [selected]="AnimationService.selectionChange" [curTime]="AnimationService.currentTime"
+    [transformed]="AnimationService.transformChange">
 </app-properties>
