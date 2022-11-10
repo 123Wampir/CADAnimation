@@ -6,6 +6,7 @@ import Stats from 'three/examples/jsm/libs/stats.module';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { exec, execFile } from 'child_process';
 import { AnimationService } from './services/animation.service';
+import { degToRad } from 'three/src/math/MathUtils';
 
 @Component({
   selector: 'app-root',
@@ -23,13 +24,16 @@ export class AppComponent implements OnInit, AfterViewInit {
   renderer!: THREE.WebGLRenderer;
   scene!: THREE.Scene;
   camera: any;
-  // actions: THREE.AnimationAction[] = [];
-
-  // edgeMixers: THREE.AnimationMixer[] = [];
+  firstClick = false;
   mainObject!: THREE.Object3D;
   intersection: any;
   pointer!: THREE.Vector2;
   raycaster!: THREE.Raycaster;
+  orbitControls!: OrbitControls;
+  transformControls!: TransformControls;
+  meshArr: THREE.Mesh[] = [];
+  geomArr: THREE.BufferGeometry[] = [];
+  counter = 0;
 
   CreateScene() {
     this.scene = new THREE.Scene();
@@ -38,15 +42,44 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.camera.position.set(50.0, 150.0, 100.0);
     this.camera.up.set(0.0, 0.0, 1.0);
     this.camera.lookAt(new THREE.Vector3(0.0, 0.0, 0.0));
+    let CamerasContainer = new THREE.Object3D();
+    CamerasContainer.name = "Cameras";
+    CamerasContainer.type = "Container";
+    this.scene.add(CamerasContainer);
+    CamerasContainer.add(this.camera);
+    this.AnimationService.currentCamera = this.camera;
+
+
     // Добавление глобального освещения
     const ambientLight = new THREE.AmbientLight(0x444444);
     this.scene.add(ambientLight);
     // Добавление направленного света
     const directionalLight = new THREE.DirectionalLight(0x888888);
+    var lightHelper = new THREE.DirectionalLightHelper(directionalLight, 10, directionalLight.color);
+    lightHelper.matrixWorld = directionalLight.matrixWorld;
+    directionalLight.add(lightHelper);
     directionalLight.position.set(this.camera.position.x, this.camera.position.y, this.camera.position.z);
+    this.AnimationService.helpers.push(lightHelper);
+    let cameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
+    directionalLight.add(cameraHelper);
+    cameraHelper.matrixWorld = directionalLight.shadow.camera.matrixWorld;
     this.scene.add(directionalLight);
     this.raycaster = new THREE.Raycaster();
     this.pointer = new THREE.Vector2();
+
+    const planeGeometry = new THREE.PlaneGeometry(10000, 10000, 32, 32);
+    const planeMaterial = new THREE.ShadowMaterial({ color: ambientLight.color })
+    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    plane.name = "Zero Plane";
+    plane.type = "zeroPlane";
+    const planeHelper = new THREE.GridHelper(1000, 100, 0x000000, 0xaaaaaa);
+    plane.add(planeHelper.rotateX(degToRad(90)));
+    planeHelper.visible = false;
+    plane.receiveShadow = true;
+    this.scene.add(plane);
+    this.AnimationService.planeHelpers.type = "Container";
+    this.AnimationService.planeHelpers.name = "CuttingPlanes";
+    this.scene.add(this.AnimationService.planeHelpers);
   }
 
   getAspectRatio() {
@@ -81,32 +114,54 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   startRenderingLoop() {
-    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true });
+    this.renderer = new THREE.WebGL1Renderer({ canvas: this.canvas, antialias: true });
+    this.AnimationService.renderer = this.renderer;
+    this.renderer.shadowMap.enabled = true;
+    // this.renderer.localClippingEnabled = true;
+    //this.renderer.physicallyCorrectLights = true;
+    console.log(this.renderer);
     this.renderer.setSize(window.innerWidth * 0.99, window.innerHeight * 0.99);
     this.renderer.setClearColor(0xffffff);
-    const orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
-    this.AnimationService.orbit = orbitControls;
-    const transformControls = new TransformControls(this.camera, this.renderer.domElement);
-    transformControls.space = "local";
-    transformControls.addEventListener('dragging-changed', function (event) {
-      orbitControls.enabled = !event["value"];
+    this.orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.orbitControls.enableDamping = false;
+    this.orbitControls.dampingFactor = 0.1;
+    this.orbitControls.autoRotate = false;
+    this.AnimationService.orbit = this.orbitControls;
+    this.orbitControls.addEventListener('change', (event) => {
+      this.firstClick = true;
+    })
+    this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
+    this.transformControls.space = "local";
+    this.transformControls.type = "TransformControls";
+    this.transformControls.addEventListener('dragging-changed', (event) => {
+      this.orbitControls.enabled = !event["value"];
     });
-    // transformControls.addEventListener("objectChange", (e) => {
-    //   this.AnimationService.transformChange = !this.AnimationService.transformChange;
-
-    // })
-    transformControls.type = "TransformControls";
-    this.AnimationService.transform = transformControls;
-    this.scene.add(transformControls);
+    this.transformControls.addEventListener('mouseUp', (event) => {
+      this.firstClick = true;
+    });
+    this.AnimationService.transform = this.transformControls;
+    this.scene.add(this.transformControls);
     const stats = Stats();
     this.canvas.parentElement?.appendChild(stats.dom);
     let component = this;
     (function animate() {
       if (component.mainObject != undefined) {
         component.FindIntersection();
+        if (component.AnimationService.stencilNeedUpdate)
+          if (component.meshArr.length != 0) {
+            for (let i = 0; i < component.AnimationService.stencilGroups.children.length; i++) {
+              component.AnimationService.UpdateStencilGeometry(component.meshArr, component.AnimationService.stencilGroups.children[i])
+            }
+            component.AnimationService.stencilNeedUpdate = false;
+          }
       }
+      //component.renderer.shadowMap.needsUpdate = true;
+      //component.orbitControls.update()
       requestAnimationFrame(animate);
       stats.update();
+      component.AnimationService.helpers.forEach(helper => {
+        helper.update()
+      })
       if (component.AnimationService.play) {
         let delta = 0.01;
         component.AnimationService.currentTime += delta;
@@ -140,6 +195,11 @@ export class AppComponent implements OnInit, AfterViewInit {
         })
         component.AnimationService.stop = false;
       }
+      component.counter++;
+      if (component.counter == 60) {
+        component.AnimationService.stencilNeedUpdate = true;
+        component.counter = 0;
+      }
       component.renderer.render(component.scene, component.camera);
     }());
   }
@@ -154,8 +214,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.mainObject = new THREE.Object3D();
     this.scene.add(this.mainObject)
     await this.LoadGeometry(this.mainObject)
-    console.log(this.AnimationService.mixers)
+    //console.log(this.AnimationService.mixers)
     console.log(this.scene);
+    console.log();
+
   }
 
   async LoadGeometry(targetObject: THREE.Object3D) {
@@ -176,15 +238,20 @@ export class AppComponent implements OnInit, AfterViewInit {
           component.CreateUniqueMaterial(targetObject);
           component.FixMeshPivot(targetObject.children[0]);
 
-          component.CreateEdges(targetObject, true, 25);
+          //component.CreateEdges(targetObject, true, 25);
           console.log(targetObject);
           component.AnimationService.scene = component.scene;
+          component.AnimationService.FindMeshes(targetObject, component.meshArr);
+          //console.log(component.meshArr);
+          let arr: any[] = [];
+          component.AnimationService.FindMeshes(targetObject, arr);
+          component.AnimationService.CreateClippingPlanes(arr);
           // Создание миксеров(дорожек) для модели
           component.CreateMixers(targetObject)
 
           //component.AnimationService.mixers = component.mixers;
           // Загрузка файла анимации
-          //component.LoadAnimation(targetObject, component.AnimationService.mixers);
+          component.LoadAnimation(targetObject, component.AnimationService.mixers);
 
 
         }
@@ -226,13 +293,18 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
   CreateUniqueMaterial(obj: THREE.Object3D) {
     let arr: any[] = [];
+    obj.receiveShadow = true;
+    obj.castShadow = true;
     this.AnimationService.FindMeshes(obj, arr);
     if (arr.length != 0) {
       arr.forEach(mesh => {
+        mesh.material.side = THREE.FrontSide;
         mesh.material = mesh.material.clone();
         mesh.material.transparent = true;
-        mesh.material.alphaToCoverage = true;
-        //mesh.material.dithering = true;
+        //mesh.material.alphaToCoverage = true;
+        mesh.receiveShadow = true;
+        mesh.castShadow = true;
+        mesh.material.clipIntersection = true;
       })
     }
   }
@@ -257,10 +329,6 @@ export class AppComponent implements OnInit, AfterViewInit {
           this.AnimationService.mixers.push(mixer);
           this.CreateMixers(item);
         }
-        // else if (item.type == "LineSegments") {
-        //   let mixer = new THREE.AnimationMixer(item);
-        //   this.edgeMixers.push(mixer);
-        // }
       }
     }
   }
@@ -293,10 +361,15 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
   onClick(event: MouseEvent) {
-    if (this.intersection != undefined) {
-      this.AnimationService.Select(this.intersection, this.AnimationService.CTRLPressed);
+    if (!this.firstClick) {
+      if (this.intersection != undefined) {
+        this.AnimationService.Select(this.intersection, this.AnimationService.CTRLPressed);
+      }
+      else {
+        this.AnimationService.ClearSelection()
+      }
     }
-    else this.AnimationService.ClearSelection()
+    else { this.firstClick = false }
   }
   onPointerMove(event: MouseEvent) {
     // console.log(event)
@@ -570,22 +643,3 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

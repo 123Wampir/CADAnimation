@@ -1,0 +1,51 @@
+<div class="container" #container id="container" (mousemove)="OnMouseMove($event)" (mouseup)="OnMouseUp($event)">
+    <div class="header" (mousedown)="OnMouseDown($event)">
+        <div class="label">Диалоговое окно</div>
+    </div>
+    <div class="form" [ngSwitch]="type">
+        <div *ngSwitchCase="'CameraRotation'">
+            <!--Лучше вывести в отдельный компонент-->
+            <div class="param">
+                <div class="param-label">
+                    <div class="label">Начало анимации</div>
+                </div>
+                <div class="inputs">
+                    <input type="number" class="input-number" min="0" [max]="AnimationService.timeLine.duration"
+                        placeholder="Start time" [(ngModel)]="AnimationService.currentTime">
+                </div>
+            </div>
+            <div class="param">
+                <div class="param-label">
+                    <div class="label">Конец анимации</div>
+                </div>
+                <div class="inputs">
+                    <input type="number" class="input-number" [min]="AnimationService.currentTime"
+                        [max]="AnimationService.timeLine.duration" placeholder="End time" [(ngModel)]="endTime">
+                </div>
+            </div>
+            <div class="param">
+                <div class="param-label">
+                    <div class="label">Угол</div>
+                </div>
+                <div class="inputs">
+                    <input type="number" class="input-number" placeholder="Angle" [(ngModel)]="rotAngle">
+                </div>
+            </div>
+            <div class="param">
+                <div class="param-label">
+                    <div class="label">По часовой</div>
+                </div>
+                <div class="inputs">
+                    <input type="checkbox" class="input-number" placeholder="direction" [(ngModel)]="rotDirection">
+                </div>
+            </div>
+            <button (click)="OnCameraRotationCreate($event)">Создать</button>
+        </div>
+        <div *ngSwitchCase="'Settings'"></div>
+        <div *ngSwitchCase="'Render'"></div>
+    </div>
+    <div class="footer">
+        <button class="accept" (click)="AcceptClick($event)">OK</button>
+        <button class="cancel" (click)="CancelClick($event)">Cancel</button>
+    </div>
+</div>

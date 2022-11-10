@@ -11,17 +11,25 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() actions!: THREE.AnimationAction[];
   @Input() scene!: THREE.Object3D;
   @Input() curTime = 0;
-  // @Input() appendKeyframe = false;
   constructor(public AnimationService: AnimationService, private renderer: Renderer2) { }
   timeLine: AnimationModel.TimelineModel = { tracks: [], duration: 20, scale: 50 };
-  keyframes: AnimationModel.KeyframeModel[] = [];
   onCurrentTimeMove = false;
+  onTimeLineExpand = true;
   startPos = 0;
 
+
+  OnSceneColorChange(event: Event) {
+    let e = event as any;
+    this.AnimationService.renderer.setClearColor(e.target.value);
+  }
+  CLIPPINGTEST(event: Event) {
+    let idk = event?.target as any;
+    this.AnimationService.EnableClipping(idk.checked)
+  }
   ngOnInit(): void {
   }
   ngAfterViewInit(): void {
-    this.AnimationService.renderer = this.renderer;
+    this.AnimationService.angRenderer = this.renderer;
     this.AnimationService.timeLine = this.timeLine;
     const ro = new ResizeObserver(entries => {
       for (let entry of entries) {
@@ -53,7 +61,7 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     if (obj.children.length != 0) {
       let ln = document.getElementById("lines")
       for (let item of obj.children) {
-        if (item.type == "TransformControls") {
+        if (item.type == "TransformControls" || item.type == "Group" || item.type == "Stencil") {
           continue;
         }
         let line = this.renderer.createElement("div");
@@ -65,7 +73,7 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
           item.name = item.type + " " + item.id.toString();
           partname.innerText = item.name
         }
-        partname.innerText = `${"╠" + "═".repeat(tabIndex) + item.name}`;
+        partname.innerText = `${"  " + "  ".repeat(tabIndex) + item.name}`;
         this.renderer.appendChild(part, partname)
         this.renderer.setAttribute(partname, "name", item.name)
         let track = this.renderer.createElement("div");
@@ -81,11 +89,11 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
         let keyframeTrack: AnimationModel.KeyframeTrackModel = { DOMElement: track, name: item.name, keyframes: [] };
         this.timeLine.tracks.push(keyframeTrack);
 
-        if (item.type == "Object3D") {
+        if (item.type == "Object3D" || item.type == "Container") {
           this.renderer.addClass(part, "part");
           this.renderer.addClass(partname, "partname")
           let button = this.renderer.createElement("button");
-          this.renderer.addClass(button, "expand");
+          this.renderer.addClass(button, "expand-first");
           button.innerText = "▼";
           this.renderer.setAttribute(button, "show", "1")
           this.renderer.appendChild(part, button);
@@ -98,9 +106,16 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
             let name = a.parentElement?.getElementsByClassName("partname")[0].getAttribute("name");
             console.log(name, a.getAttribute("show"), show);
             this.ShowChildren(name!, show);
-            if (show)
+            if (show) {
               a.setAttribute("show", "1")
-            else a.setAttribute("show", "0");
+              this.renderer.removeClass(a, "expand-second");
+              this.renderer.addClass(a, "expand-first");
+            }
+            else {
+              a.setAttribute("show", "0");
+              this.renderer.removeClass(a, "expand-first");
+              this.renderer.addClass(a, "expand-second");
+            }
           })
           if (item.children.length != 0) {
             tabIndex++
@@ -108,17 +123,25 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
             tabIndex--;
           }
         }
-        if (item.type == "Mesh") {
+        else if (item.type == "Mesh") {
           this.renderer.addClass(part, "mesh");
           this.renderer.addClass(partname, "meshname")
         }
-        if (item.type == "Camera") {
-          this.renderer.addClass(part, "mesh");
-          this.renderer.addClass(partname, "meshname")
+        else if (/(Camera)/g.exec(item.type) != undefined) {
+          this.renderer.addClass(part, "camera");
+          this.renderer.addClass(partname, "cameraname")
         }
-        if (/(Light)/g.exec(item.type) != undefined) {
+        else if (/(Light)/g.exec(item.type) != undefined) {
           this.renderer.addClass(part, "light");
           this.renderer.addClass(partname, "lightname")
+        }
+        else if (item.type == "zeroPlane") {
+          this.renderer.addClass(part, "camera");
+          this.renderer.addClass(partname, "cameraname")
+        }
+        else if (item.type == "PlaneHelper") {
+          this.renderer.addClass(part, "camera");
+          this.renderer.addClass(partname, "cameraname")
         }
       }
     }
@@ -135,8 +158,13 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     if (obj.children.length != 0) {
       obj.children.forEach(item => {
         if (item.type != "LineSegments") {
-          arr.push(item);
-          this.SelectChildrenParts(item, arr);
+          if (item.type == "PlaneHelper") {
+            arr.push(item);
+          }
+          else {
+            arr.push(item);
+            this.SelectChildrenParts(item, arr);
+          }
         }
       })
     }
@@ -186,13 +214,13 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
 
   //UI
   ShowChildren(name: string, show: boolean) {
-    console.log(show);
+    // console.log(show);
     let arr: any[] = [];
     let obj = this.FindPartByName(name);
     this.SelectChildrenParts(obj!, arr)
     arr.forEach(item => {
       let line = this.FindPartLineByName(item.name);
-      let btn = line?.getElementsByClassName("expand");
+      let btn = line?.getElementsByTagName("button");
       if (show) {
         line!.style.display = "grid";
         if (btn?.length != 0) {
@@ -206,6 +234,21 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
         }
       }
     })
+  }
+  OnTimelineExpand(event: MouseEvent) {
+    let container = document.getElementById("timeline-container");
+    if (this.onTimeLineExpand) {
+      this.renderer.removeClass(event.target, "expand-first");
+      this.renderer.addClass(event.target, "expand-second");
+      container!.style.height = "40px";
+      this.onTimeLineExpand = false;
+    }
+    else {
+      this.renderer.removeClass(event.target, "expand-second");
+      this.renderer.addClass(event.target, "expand-first");
+      container!.style.height = "30%";
+      this.onTimeLineExpand = true;
+    }
   }
   OnStopClick($event: MouseEvent) {
     this.AnimationService.stop = true;

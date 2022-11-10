@@ -7,3 +7,5 @@
 <app-properties [selected]="AnimationService.selectionChange" [curTime]="AnimationService.currentTime"
     [transformed]="AnimationService.transformChange">
 </app-properties>
+<app-dialog [show]="AnimationService.dialogShow" [modal]="AnimationService.dialogModal"
+    [type]="AnimationService.dialogType"></app-dialog>

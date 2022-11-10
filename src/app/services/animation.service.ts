@@ -3,6 +3,7 @@ import THREE = require('three');
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import * as AnimationModel from 'src/app/shared/animation.model';
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 @Injectable({
   providedIn: 'root'
@@ -16,36 +17,47 @@ export class AnimationService {
   currentTimeChange: boolean = false;
   transformChange: boolean = false;
   CTRLPressed: boolean = false;
+  stencilNeedUpdate = false;
 
+  renderer!: THREE.WebGLRenderer;
   scene!: THREE.Scene;
   group: THREE.Mesh = new THREE.Mesh();
+  stencilGroups = new THREE.Group();
+  planes: any[] = [];
+  planeHelpers = new THREE.Object3D();
   startPos: THREE.Vector3[] = [];
   selected: THREE.Object3D[] = [];
   selectedKeyframe!: AnimationModel.KeyframeModel;
   actions: THREE.AnimationAction[] = [];
   mixers: THREE.AnimationMixer[] = [];
+  helpers: any[] = [];
   timeLine!: AnimationModel.TimelineModel;
-
   transform!: TransformControls;
   orbit!: OrbitControls;
-  renderer!: Renderer2;
+  angRenderer!: Renderer2;
+  currentCamera!: THREE.Camera;
+  boundingBoxSize!: THREE.Vector3;
+
+  dialogShow = false;
+  dialogModal = false;
+  dialogType = "";
 
   CreateKeyframeDOM(track: AnimationModel.KeyframeTrackModel, keyframe: AnimationModel.KeyframeModel) {
     let trackline = track.DOMElement;
-    let keyframeDOM = this.renderer.createElement("div");
+    let keyframeDOM = this.angRenderer.createElement("div");
     keyframe.DOMElement = keyframeDOM;
-    this.renderer.addClass(keyframeDOM, "keyframe")
-    this.renderer.setStyle(keyframeDOM, "left", `${keyframe.time * this.timeLine.scale}px`)
-    this.renderer.setAttribute(keyframeDOM, "time", keyframe.time.toString())
-    this.renderer.setAttribute(keyframeDOM, "part", track.name)
-    this.renderer.appendChild(trackline, keyframeDOM)
-    this.renderer.listen(keyframeDOM, "click", (event) => {
+    this.angRenderer.addClass(keyframeDOM, "keyframe")
+    this.angRenderer.setStyle(keyframeDOM, "left", `${keyframe.time * this.timeLine.scale}px`)
+    this.angRenderer.setAttribute(keyframeDOM, "time", keyframe.time.toString())
+    this.angRenderer.setAttribute(keyframeDOM, "part", track.name)
+    this.angRenderer.appendChild(trackline, keyframeDOM)
+    this.angRenderer.listen(keyframeDOM, "click", (event) => {
       let time = Number.parseFloat(event.target.attributes["time"].nodeValue);
       let name = event.target.attributes["part"].nodeValue;
       let track = AnimationModel.FindKeyframeTrack(this.timeLine, name);
       let keyframe = AnimationModel.FindKeyframeByTime(track, time);
-      //console.log(keyframe);
-      //this.AnimationService.selectedKeyframe = keyframe;
+      console.log(keyframe);
+      this.selectedKeyframe = keyframe;
       this.currentTime = time;
       this.currentTimeChange = true;
     })
@@ -75,14 +87,25 @@ export class AnimationService {
       case ".visible":
         keyframe.visible = value;
         break;
+      case ".color":
+        keyframe.color = value;
+        break;
+      case ".plane.constant":
+        keyframe.constant = value;
+        break;
       default:
         break;
     }
     this.ChangeKeyframe(keyframe, type, value);
     let mixers: any[] = [];
     this.FindMixer(this.mixers, obj, mixers);
-    // console.log(obj, mixers);
-    let mixer = mixers[0] as THREE.AnimationMixer;
+    let mixer!: THREE.AnimationMixer;
+    if (mixers.length != 0)
+      mixer = mixers[0] as THREE.AnimationMixer;
+    else {
+      mixer = new THREE.AnimationMixer(obj);
+      this.mixers.push(mixer);
+    }
     let action = mixer.clipAction(clip);
     // console.log((mixer as any)._listeners);
     if ((mixer as any)._listeners == undefined)
@@ -91,6 +114,14 @@ export class AnimationService {
         act.paused = false;
       });
     this.actions.push(action);
+    // console.log(action);
+    if (type == ".plane.constant") {
+      let act = action as any;
+      act._propertyBindings[0].binding.propertyName = "constant";
+      let pl = obj as any;
+      act._propertyBindings[0].binding.parsedPath.objectName = "plane";
+      act._propertyBindings[0].binding.targetObject = pl.plane;
+    }
     action.setLoop(THREE.LoopRepeat, 1);
     action.play();
     action.clampWhenFinished = true;
@@ -98,7 +129,32 @@ export class AnimationService {
     this.CreateKeyframeDOM(track, keyframe)
   }
   ChangeKeyframe(keyframe: AnimationModel.KeyframeModel, type: string, value: any) {
-    // console.log(keyframe.time);
+    // console.log(keyframe);
+    switch (type) {
+      case ".position":
+        keyframe.position = value;
+        break;
+      case ".quaternion":
+        keyframe.quaternion = value;
+        break;
+      case ".material.opacity":
+        keyframe.opacity = value;
+        break;
+      case ".visible":
+        keyframe.visible = value;
+        break;
+      case ".color":
+        keyframe.color = value;
+        break;
+      case ".color":
+        keyframe.color = value;
+        break;
+      case ".plane.constant":
+        keyframe.constant = value;
+        break;
+      default:
+        break;
+    }
     let track = keyframe.clip.tracks.find(track => (track.name == type))
     if (track != undefined) {
       let updateTrack = true;
@@ -122,6 +178,14 @@ export class AnimationService {
               track.values[i] = value;
               break;
             case ".visible":
+              track.values[i] = value;
+              break;
+            case ".color":
+              track.values[i * 3] = value.r;
+              track.values[i * 3 + 1] = value.g;
+              track.values[i * 3 + 2] = value.b;
+              break;
+            case ".plane.constant":
               track.values[i] = value;
               break;
             default:
@@ -166,6 +230,12 @@ export class AnimationService {
       case ".visible":
         newTrack = new THREE.BooleanKeyframeTrack('.visible', [time], [value]);
         break;
+      case ".color":
+        newTrack = new THREE.ColorKeyframeTrack('.color', [time], [value.r, value.g, value.b]);
+        break;
+      case ".plane.constant":
+        newTrack = new THREE.NumberKeyframeTrack('.plane.constant', [time], [value]);
+        break;
     }
     clip.tracks.push(newTrack);
     clip.resetDuration();
@@ -203,6 +273,14 @@ export class AnimationService {
               case ".visible":
                 values.push(value);
                 break;
+              case ".color":
+                values.push(value.r);
+                values.push(value.g);
+                values.push(value.b);
+                break;
+              case ".plane.constant":
+                values.push(value);
+                break;
             }
           }
         times.push(track.times[i]);
@@ -222,6 +300,14 @@ export class AnimationService {
             values.push(track.values[i]);
             break;
           case ".visible":
+            values.push(track.values[i]);
+            break;
+          case ".color":
+            values.push(track.values[i * 3]);
+            values.push(track.values[i * 3 + 1]);
+            values.push(track.values[i * 3 + 2]);
+            break;
+          case ".plane.constant":
             values.push(track.values[i]);
             break;
         }
@@ -248,6 +334,14 @@ export class AnimationService {
           case ".visible":
             values.push(value);
             break;
+          case ".color":
+            values.push(value.r);
+            values.push(value.g);
+            values.push(value.b);
+            break;
+          case ".plane.constant":
+            values.push(value);
+            break;
         }
       }
       // console.log(times);
@@ -266,6 +360,12 @@ export class AnimationService {
         case ".visible":
           newTrack = new THREE.BooleanKeyframeTrack('.visible', times, values);
           break;
+        case ".color":
+          newTrack = new THREE.ColorKeyframeTrack('.color', times, values);
+          break;
+        case ".plane.constant":
+          newTrack = new THREE.NumberKeyframeTrack('.plane.constant', times, values);
+          break;
       }
       clip.tracks.find((tr, index) => {
         if (tr.name == newTrack.name)
@@ -279,6 +379,13 @@ export class AnimationService {
           let mixer = action.getMixer();
           mixer.uncacheAction(clip);
           let newAction = mixer.clipAction(clip);
+          if (type == ".plane.constant") {
+            let act = newAction as any;
+            act._propertyBindings[0].binding.propertyName = "constant";
+            let pl = newAction.getRoot() as any;
+            act._propertyBindings[0].binding.parsedPath.objectName = "plane";
+            act._propertyBindings[0].binding.targetObject = pl.plane;
+          }
           newAction.setLoop(THREE.LoopRepeat, 1);
           newAction.play();
           newAction.clampWhenFinished = true;
@@ -301,10 +408,10 @@ export class AnimationService {
 
   DeleteKeyframe(keyframe: AnimationModel.KeyframeModel) {
     keyframe.DOMElement?.remove();
-    keyframe.clip.tracks.forEach(track => {
+    (this.selectedKeyframe as any) = undefined;
+    keyframe.clip.tracks.forEach((track, index) => {
       let times: any[] = [];
       let values: any[] = [];
-      let index = -1;
       for (let i = 0; i < track.times.length; i++) {
         if (Number(track.times[i].toFixed(3)) != Number(keyframe.time.toFixed(3))) {
           times.push(track.times[i]);
@@ -326,28 +433,46 @@ export class AnimationService {
             case ".visible":
               values.push(track.values[i]);
               break;
+            case ".color":
+              values.push(track.values[i * 3]);
+              values.push(track.values[i * 3 + 1]);
+              values.push(track.values[i * 3 + 2]);
+              break;
+            case ".plane.constant":
+              values.push(track.values[i]);
+              break;
           }
         }
       }
       let newTrack: any;
-      switch (track.name) {
-        case ".position":
-          newTrack = new THREE.VectorKeyframeTrack('.position', times, values);
-          break;
-        case ".quaternion":
-          newTrack = new THREE.QuaternionKeyframeTrack('.quaternion', times, values);
-          break;
-        case ".material.opacity":
-          newTrack = new THREE.NumberKeyframeTrack('.material.opacity', times, values);
-          break;
-        case ".visible":
-          newTrack = new THREE.BooleanKeyframeTrack('.visible', times, values);
-          break;
+      if (times.length != 0) {
+        switch (track.name) {
+          case ".position":
+            newTrack = new THREE.VectorKeyframeTrack('.position', times, values);
+            break;
+          case ".quaternion":
+            newTrack = new THREE.QuaternionKeyframeTrack('.quaternion', times, values);
+            break;
+          case ".material.opacity":
+            newTrack = new THREE.NumberKeyframeTrack('.material.opacity', times, values);
+            break;
+          case ".visible":
+            newTrack = new THREE.BooleanKeyframeTrack('.visible', times, values);
+            break;
+          case ".color":
+            newTrack = new THREE.ColorKeyframeTrack('.color', times, values);
+            break;
+          case ".plane.constant":
+            newTrack = new THREE.NumberKeyframeTrack('.plane.constant', times, values);
+            break;
+        }
+        keyframe.clip.tracks.splice(index, 1, newTrack);
+
       }
-      keyframe.clip.tracks.find((tr, index) => {
-        if (tr.name == newTrack.name)
-          keyframe.clip.tracks.splice(index, 1, newTrack);
-      })
+      else {
+        keyframe.clip.tracks.splice(index, 1);
+        console.log(keyframe.clip.tracks);
+      }
       keyframe.clip.resetDuration();
       this.actions.find((action, index) => {
         if (action.getClip() == keyframe.clip) {
@@ -356,6 +481,16 @@ export class AnimationService {
           let mixer = action.getMixer();
           mixer.uncacheAction(keyframe.clip);
           let newAction = mixer.clipAction(keyframe.clip);
+          keyframe.clip.tracks.forEach(track => {
+            if (track.name == ".plane.constant") {
+              // console.log(keyframe.clip);
+              let act = newAction as any;
+              act._propertyBindings[0].binding.propertyName = "constant";
+              let pl = newAction.getRoot() as any;
+              act._propertyBindings[0].binding.parsedPath.objectName = "plane";
+              act._propertyBindings[0].binding.targetObject = pl.plane;
+            }
+          })
           newAction.setLoop(THREE.LoopRepeat, 1);
           newAction.play();
           newAction.clampWhenFinished = true;
@@ -366,6 +501,128 @@ export class AnimationService {
       })
     })
   }
+  createPlaneStencilGroup(geometry: any, plane: THREE.Plane, renderOrder: number) {
+    const group = new THREE.Group();
+    const baseMat = new THREE.MeshBasicMaterial();
+    baseMat.depthWrite = false;
+    baseMat.depthTest = false;
+    baseMat.colorWrite = false;
+    baseMat.stencilWrite = true;
+    baseMat.stencilFunc = THREE.AlwaysStencilFunc;
+    baseMat.clipIntersection = false;
+    // back faces
+    const mat0 = baseMat.clone();
+    mat0.side = THREE.BackSide;
+    mat0.clippingPlanes = [plane];
+    mat0.stencilFail = THREE.IncrementWrapStencilOp;
+    mat0.stencilZFail = THREE.IncrementWrapStencilOp;
+    mat0.stencilZPass = THREE.IncrementWrapStencilOp;
+    const mesh0 = new THREE.Mesh(geometry, mat0);
+    mesh0.renderOrder = renderOrder;
+    group.add(mesh0);
+    // front faces
+    const mat1 = baseMat.clone();
+    mat1.side = THREE.FrontSide;
+    mat1.clippingPlanes = [plane];
+    mat1.stencilFail = THREE.DecrementWrapStencilOp;
+    mat1.stencilZFail = THREE.DecrementWrapStencilOp;
+    mat1.stencilZPass = THREE.DecrementWrapStencilOp;
+    const mesh1 = new THREE.Mesh(geometry, mat1);
+    mesh1.renderOrder = renderOrder;
+    group.add(mesh1);
+    return group;
+  }
+  UpdateStencilGeometry(arr: any[], group: THREE.Object3D) {
+    let geomArr: THREE.BufferGeometry[] = [];
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].visible) {
+        if (arr[i].type == "Mesh") {
+          arr[i].updateWorldMatrix(true, true);
+          let newGeom = arr[i].geometry.clone().applyMatrix4(arr[i].matrixWorld);
+          geomArr.push(newGeom);
+        }
+      }
+    }
+    let mergedGeom = BufferGeometryUtils.mergeBufferGeometries(geomArr);
+    for (let i = 0; i < geomArr.length; i++) {
+      geomArr[i].dispose();
+    }
+    for (let i = 0; i < group.children.length; i++) {
+      let mesh = group.children[i] as any;
+      mesh.geometry.dispose();
+      mesh.geometry = mergedGeom.clone();
+    }
+  }
+
+  EnableClipping(enabled: boolean) {
+    this.renderer.localClippingEnabled = enabled;
+  }
+
+  CreateClippingPlanes(arr: any[]) {
+    this.planes = [
+      new THREE.Plane(new THREE.Vector3(1, 0, 0), 0),
+      new THREE.Plane(new THREE.Vector3(0, 1, 0), 0),
+      new THREE.Plane(new THREE.Vector3(0, 0, 1), 0)
+    ];
+    let x = new THREE.PlaneHelper(this.planes[0], 100, 0xff0000);
+    x.name = "X";
+    let y = new THREE.PlaneHelper(this.planes[1], 100, 0x00ff00);
+    y.name = "Y";
+    let z = new THREE.PlaneHelper(this.planes[2], 100, 0x0000ff);
+    z.name = "Z";
+    this.planeHelpers.add(x);
+    this.planeHelpers.add(y);
+    this.planeHelpers.add(z);
+    arr.forEach(item => {
+      if (item.type == "Mesh") {
+        item.material.clippingPlanes = this.planes;
+        item.material.clipShadows = true;
+      }
+    })
+    let geomArr: THREE.BufferGeometry[] = [];
+    arr.forEach((obj) => {
+      if (obj.type == "Mesh") {
+        if (obj.visible) {
+          let item = (obj as any)
+          item.updateWorldMatrix(true, true);
+          let newGeom = item.geometry.clone().applyMatrix4(item.matrixWorld);
+          geomArr.push(newGeom);
+        }
+      }
+    })
+    let mergedGeom = BufferGeometryUtils.mergeBufferGeometries(geomArr);
+    geomArr.forEach(geo => {
+      geo.dispose();
+    })
+    const planeGeom = new THREE.PlaneGeometry(1000, 1000);
+    for (let i = 0; i < 3; i++) {
+      let stencilGroup = this.createPlaneStencilGroup(mergedGeom.clone(), this.planes[i], i + 1);
+      const planeMat =
+        new THREE.MeshBasicMaterial({
+          color: 0x555555,
+          // clippingPlanes: this.planes.filter(p => p !== this.planes[i]),
+          stencilWrite: true,
+          stencilRef: 0,
+          stencilFunc: THREE.NotEqualStencilFunc,
+          stencilFail: THREE.ReplaceStencilOp,
+          stencilZFail: THREE.ReplaceStencilOp,
+          stencilZPass: THREE.ReplaceStencilOp,
+          side: THREE.DoubleSide,
+          clipIntersection: true
+
+        });
+      const po = new THREE.Mesh(planeGeom, planeMat);
+      po.type = "Stencil";
+      po.onAfterRender = function (angRenderer) {
+        angRenderer.clearStencil();
+      };
+      po.renderOrder = i + 1.1;
+      this.stencilGroups.add(stencilGroup);
+      this.planeHelpers.children[i].add(po);
+    }
+    this.scene.add(this.stencilGroups)
+    this.stencilNeedUpdate = true;
+  }
 
   ClearSelection() {
     if (this.selected.length != 0) {
@@ -373,7 +630,8 @@ export class AnimationService {
       this.selected.forEach(item => {
         let mesh = item as any;
         if (mesh.material != undefined)
-          mesh.material.emissive.set(0x000000);
+          if (mesh.material.emissive != undefined)
+            mesh.material.emissive.set(0x000000);
       })
       this.selected = [];
     }
@@ -387,28 +645,34 @@ export class AnimationService {
       this.ClearSelection();
     }
     if (obj.type == "Mesh") {
-      obj.material.emissive.set(0x004400);
+      if (obj.material.emissive)
+        obj.material.emissive.set(0x004400);
       this.selected.push(obj);
       this.transform.attach(obj);
-      // console.log(this.transform);
-
     }
     else if (obj.type == "Object3D") {
       let arr: any[] = [];
       this.FindMeshes(obj, arr);
       arr.forEach(mesh => {
-        mesh.material.emissive.set(0x004400);
+        if (mesh.material.emissive != undefined)
+          mesh.material.emissive.set(0x004400);
         this.selected.push(mesh);
       })
     }
     else if (/(Light)/g.exec(obj.type) != undefined) {
-      //obj.material.emissive.set(0x004400);
       this.selected.push(obj);
       this.transform.attach(obj);
-      console.log(obj);
-
     }
-    //console.log(this.selected.length);
+    else if (/(Camera)/g.exec(obj.type) != undefined) {
+      this.selected.push(obj);
+    }
+    else if (obj.type == "Container") {
+      this.selected.push(obj);
+    }
+    else if (obj.type == "PlaneHelper") {
+      this.selected.push(obj);
+      // this.transform.attach(obj);
+    }
     if (this.selected.length > 1) {
       this.startPos = [];
       this.group.position.set(0, 0, 0);
@@ -439,8 +703,6 @@ export class AnimationService {
       })
     }
     this.selectionChange = !this.selectionChange;
-    // console.log(this.transformChange);
-
   }
 
   FindMixer(mixers: THREE.AnimationMixer[], obj: any, mix: any[]) {
@@ -455,6 +717,17 @@ export class AnimationService {
           mix.push(mixer);
         }
       })
+    })
+  }
+
+  FindGeometry(meshes: THREE.Mesh[], geomArr: any[]) {
+    meshes.forEach((obj) => {
+      if (obj.visible) {
+        let item = (obj as any)
+        item.updateWorldMatrix(true, true);
+        let newGeom = item.geometry.clone().applyMatrix4(item.matrixWorld);
+        geomArr.push(newGeom);
+      }
     })
   }
 

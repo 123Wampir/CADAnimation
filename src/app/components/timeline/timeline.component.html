@@ -1,22 +1,24 @@
-<div class="container">
+<div class="container" id="timeline-container">
     <div class="header">
         <div class="label">CADAnimation</div>
         <div class="controls-panel">
             <div class="keyframe-controls">
-                <button class="keyframe-add">+</button>
-                <button class="keyframe-remove">-</button>
+                <div class="label">Разрез</div>
+                <input type="checkbox" name="" (change)="CLIPPINGTEST($event)" id="">
+                <div class="label">Цвет сцены</div>
+                <input type="color" name="" (change)="OnSceneColorChange($event)" id="">
             </div>
             <div class="playback-controls">
+                <button class="playback-play" (click)="OnPlayClick($event)">▶</button>
+                <button class="playback-stop" (click)="OnStopClick($event)">⏹</button>
                 <div class="timer">{{curTime.toPrecision(3)}}</div>
-                <button class="playback-play" (click)="OnPlayClick($event)">play</button>
-                <button class="playback-stop" (click)="OnStopClick($event)">stop</button>
             </div>
             <div class="window-controls">
                 <input type="range" min="1" max="300" step="0.5" [(ngModel)]="timeLine.scale"
                     (change)="OnResizeTimeline($event)">
                 <button class="load">load</button>
                 <button class="save">save</button>
-                <button class="expand">expand</button>
+                <button class="expand-first" (click)="OnTimelineExpand($event)">▼</button>
             </div>
         </div>
     </div>
@@ -32,5 +34,23 @@
                 </div>
             </div>
         </div>
+        <!-- <div class="line">
+            <div class="mesh">
+                <div name="Оболочка_30" class="meshname">╠════Оболочка_30</div>
+                <button class="expand" show="1">▼</button>
+            </div>
+            <div class="track" style="width: 1000px;">
+                <div class="action"></div>
+                <div class="keyframe" time="4" part="Оболочка_30" style="left: 200px;"></div>
+                <div class="keyframe" time="7" part="Оболочка_30" style="left: 350px;"></div>
+                <div class="keyframe" time="5" part="Оболочка_30" style="left: 250px;"></div>
+            </div>
+            <div class="track" style="width: 1000px;">
+                <div class="action"></div>
+                <div class="keyframe" time="4" part="Оболочка_30" style="left: 200px;"></div>
+                <div class="keyframe" time="7" part="Оболочка_30" style="left: 350px;"></div>
+                <div class="keyframe" time="5" part="Оболочка_30" style="left: 250px;"></div>
+            </div>
+        </div> -->
     </div>
 </div>

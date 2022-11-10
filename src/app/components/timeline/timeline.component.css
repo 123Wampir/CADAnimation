@@ -1,21 +1,19 @@
 .container {
-    display: flex;
-    flex-direction: column;
     width: auto;
     height: 30%;
-    background-color: snow;
-    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    border: 2px solid black;
+    transition: height 1s;
 }
 
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 2px solid black;
+    /* border-bottom: 1px solid gray; */
+    box-shadow: 0px 2px 4px 0 gray;
+    z-index: 1;
 }
 
 .label {
@@ -35,6 +33,12 @@
 
 button {
     margin: 0px 5px;
+    /* border: none;
+    background: #bfbfbf;
+    border-radius: 13px;
+    height: 25px;
+    text-shadow: 1px 1px 2px grey;
+    box-shadow: 1px 1px 5px -1px grey; */
 }
 
 .keyframe-add {
@@ -51,28 +55,38 @@ button {
     align-items: center;
 }
 
-.playback-pause {
-    background-color: black;
-    color: white;
-}
 
 .playback-play {
-    background-color: black;
-    color: white;
+    /* background-color: black;
+    color: white; */
 }
 
 .playback-stop {
-    background-color: black;
-    color: white;
+    /* background-color: black;
+    color: white; */
 }
-
+.timer{
+    margin: 0px 5px;
+}
 .window-controls {
     display: flex;
     justify-content: space-around;
 }
 
-.expand {
-    background-color: red;
+.expand-first {
+    background: none;
+    box-shadow: none;
+    color: red;
+    transition: transform 1s;
+    font-size: 100%;
+}
+.expand-second {
+    background: none;
+    box-shadow: none;
+    color: red;
+    transform: rotate(180deg);
+    transition: transform 1s;
+    font-size: 100%;
 }
 
 .timeline {
@@ -85,21 +99,21 @@ button {
     display: grid;
     justify-content: left;
     grid-template-columns: 20% 80%;
-
 }
 
 .part {
     align-items: center;
     display: flex;
     justify-content: space-between;
-    border-left: 1px solid black;
-    border-bottom: 1px solid black;
-
+    border-left: 1px solid gray;
+    border-bottom: 1px solid gray;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
 }
 
 .partname {
     padding: 2px 3px;
-    white-space: nowrap;
+    white-space: pre;
     overflow: hidden;
     user-select: text;
 }
@@ -107,16 +121,18 @@ button {
 .mesh {
     align-items: center;
     display: flex;
-    justify-content: left;
+    /* justify-content: left; */
+    justify-content: space-between;
     background-color: bisque;
-    border-left: 1px solid black;
-    border-bottom: 1px solid black;
-
+    border-left: 1px solid gray;
+    border-bottom: 1px solid gray;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
 }
 
 .meshname {
     padding: 2px 3px;
-    white-space: nowrap;
+    white-space: pre;
     overflow: hidden;
 }
 
@@ -125,39 +141,72 @@ button {
     display: flex;
     justify-content: left;
     background-color: lightblue;
-    border-left: 1px solid black;
-    border-bottom: 1px solid black;
-
+    border-left: 1px solid gray;
+    border-bottom: 1px solid gray;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
 }
 
 .lightname {
     padding: 2px 3px;
-    white-space: nowrap;
+    white-space: pre;
+    overflow: hidden;
+}
+
+.camera {
+    align-items: center;
+    display: flex;
+    justify-content: left;
+    background-color: rgb(173, 230, 182);
+    border-left: 1px solid gray;
+    border-bottom: 1px solid gray;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.cameraname {
+    padding: 2px 3px;
+    white-space: pre;
     overflow: hidden;
 }
 
 .track {
     width: 80%;
-    border-bottom: 1px solid black;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
+    border-bottom: 1px solid gray;
+    border-left: 1px solid gray;
+    border-right: 1px solid gray;
     /* background-color: antiquewhite; */
     display: flex;
     align-items: center;
     position: relative;
     overflow: visible;
+    grid-column-start: 2;
+    grid-column-end: -1;
+    height: 25px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    transition: width 0.5s;
+}
+
+.track:hover {
+    background-color: lightgray;
+}
+
+.track:active {
+    background-color: lightcyan;
 }
 
 .ruler-track {
     background-color: black;
-    border-bottom: 1px solid black;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
+    border-bottom: 1px solid gray;
+    border-left: 1px solid gray;
+    border-right: 1px solid gray;
     /* background-color: antiquewhite; */
     display: flex;
     /* align-items: center; */
     position: relative;
     overflow: visible;
+    transition: width 0.5s;
 }
 
 .keyframe {
@@ -167,6 +216,7 @@ button {
     transform: rotate(45deg);
     position: absolute;
     z-index: 11;
+    cursor: pointer;
 }
 
 .current-time {
@@ -176,4 +226,10 @@ button {
     position: absolute;
     z-index: 10;
     cursor: e-resize;
+}
+
+.action {
+    width: 100px;
+    height: 2px;
+    background-color: aquamarine;
 }

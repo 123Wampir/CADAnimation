@@ -9,6 +9,8 @@ export interface KeyframeModel {
     opacity?: number;
     visible?: boolean;
     material?: THREE.Material;
+    color?: THREE.Color;
+    constant?: number;
 }
 export interface KeyframeTrackModel {
     keyframes: KeyframeModel[];

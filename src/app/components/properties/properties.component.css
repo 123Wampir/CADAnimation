@@ -1,24 +1,28 @@
 .container {
-    display: flex;
-    flex-direction: column;
+
     width: 300px;
     height: 400px;
-    background-color: snow;
-    position: fixed;
     top: 50px;
     right: 0;
-    border: 2px solid black;
+    transition: width 1s;
 }
-.header{
+
+.header {
     display: flex;
     flex-direction: row;
-    border-bottom: 2px solid black;
+    border-bottom: 1px solid gray;
     align-items: center;
 }
-.label {
+
+.object-label {
     padding: 10px;
 }
-.expand{
+
+button {
+    text-shadow: none;
+}
+
+.expand {
     color: white;
     width: auto;
     height: 100%;
@@ -29,36 +33,17 @@
     /* border-color: lightblue; */
     border-bottom-left-radius: 15px;
     border-top-left-radius: 15px;
+    background: #ff000055;
 }
+
 .form {
     display: flex;
     flex-direction: column;
-
+    overflow: auto;
+    padding-bottom: 5px;
 }
 
-.param {
+.controls {
     display: flex;
-    width: 100%;
-    justify-content: space-between;
     flex-direction: column;
-}
-
-.param-label {
-    width: 100px;
-    margin: 2px 10px;
-}
-
-.inputs {
-    display: flex;
-    width: 100%;
-}
-
-input {
-    margin: 2px 4px;
-}
-
-.input-number {
-    width: inherit;
-}
-.input-range{
 }

@@ -1,6 +1,7 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { AnimationCreatorService } from 'src/app/services/animation.creator.service';
 import { AnimationService } from 'src/app/services/animation.service';
-import { FindKeyframeByTime, FindKeyframeTrack, KeyframeModel } from 'src/app/shared/animation.model';
+import * as AnimationModel from 'src/app/shared/animation.model';
 import THREE = require('three');
 
 @Component({
@@ -9,18 +10,26 @@ import THREE = require('three');
   styleUrls: ['./properties.component.css']
 })
 export class PropertiesComponent implements OnInit, OnChanges {
-
   @Input() curTime = 0;
-  @Input() keyframe!: KeyframeModel;
+  @Input() keyframe!: AnimationModel.KeyframeModel;
   @Input() selected: boolean = false;
   @Input() transformed: boolean = false;
   propertiesObject!: any;
   expanded = true;
   group = false;
+  camera = false;
+  light = false;
+  dirLight = false;
+  ambLight = false;
+  cutPlane = false;
+  shadowWidth = 5;
+  shadowHeight = 5;
+  shadowDist = 300;
   width = 300;
   height = 300;
   opacity = 1;
-  constructor(public AnimationService: AnimationService) { }
+  hex = "";
+  constructor(public AnimationService: AnimationService, public AnimationCreatorService: AnimationCreatorService) { }
 
   ngOnInit(): void {
   }
@@ -31,181 +40,119 @@ export class PropertiesComponent implements OnInit, OnChanges {
         if (this.AnimationService.selected.length == 1) {
           this.group = false;
           this.propertiesObject = this.AnimationService.selected[0];
+          if (/(Camera)/g.exec(this.propertiesObject.type) != undefined)
+            this.camera = true;
+          else this.camera = false;
+          if (/(Light)/g.exec(this.propertiesObject.type) != undefined) {
+            this.light = true;
+            this.hex = "#" + this.propertiesObject.color.getHexString();
+            if (this.propertiesObject.type == "DirectionalLight") {
+              this.dirLight = true;
+              this.shadowWidth = -this.propertiesObject.shadow.camera.left + this.propertiesObject.shadow.camera.right;
+              this.shadowHeight = -this.propertiesObject.shadow.camera.bottom + this.propertiesObject.shadow.camera.top;
+              this.shadowDist = this.propertiesObject.shadow.camera.far;
+            }
+            else this.dirLight = false;
+            if (this.propertiesObject.type == "AmbientLight")
+              this.ambLight = true;
+            else this.ambLight = false;
+          }
+          else this.light = false;
+          if (this.propertiesObject.type == "PlaneHelper") {
+            this.cutPlane = true;
+          }
+          else this.cutPlane = false;
         }
         else {
-          //console.log(this.AnimationService.selected);
           this.propertiesObject = new THREE.Mesh();
-          // console.log(this.AnimationService.group);
-
           this.propertiesObject.type = "Group";
           this.propertiesObject.name = "Group";
-          //console.log(this.propertiesObject);
           this.group = true;
+          this.cutPlane = false;
+          this.light = false;
+          this.camera = false;
         }
       }
       else {
         this.propertiesObject = undefined;
+        this.light = false;
+        this.camera = false;
+        this.group = false;
       }
     }
     if (changes["transformed"] != undefined) {
       this.OnPositionChange(new Event(""));
     }
     if (changes["curTime"] != undefined) {
-      // console.log(this.AnimationService.currentTime);
       if (this.propertiesObject != undefined) {
         if (this.propertiesObject.type == "Mesh") {
-          let track = FindKeyframeTrack(this.AnimationService.timeLine, this.propertiesObject.name);
-          let keyframe = FindKeyframeByTime(track, this.curTime);
+          let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, this.propertiesObject.name);
+          let keyframe = AnimationModel.FindKeyframeByTime(track, this.curTime);
           if (keyframe != undefined) {
             this.AnimationService.selectedKeyframe = keyframe;
-            // console.log(this.propertiesObject);
           }
           else { (this.AnimationService.selectedKeyframe as any) = undefined; }
         }
+        if (this.propertiesObject.color != undefined) {
+          this.hex = "#" + this.propertiesObject.color.getHexString();
+        }
       }
     }
-    // if (changes["keyframe"] != undefined)
-    //   if (changes["keyframe"].currentValue != undefined) {
-    //     if (this.keyframe.position != undefined)
-    //       this.position = this.keyframe.position;
-    //     if (this.keyframe.rotation != undefined)
-    //       this.rotation = this.keyframe.rotation;
-    //     if (this.keyframe.opacity != undefined)
-    //       this.opacity = this.keyframe.opacity;
-    //     if (this.keyframe.visible != undefined)
-    //       this.visible = this.keyframe.visible;
-    //   }
   }
 
   OnPositionChange(event: Event) {
-    if (this.propertiesObject != undefined) {
-      if (this.propertiesObject.type == "Mesh" || /(Light)/g.exec(this.propertiesObject.type) != undefined) {
-        let track = FindKeyframeTrack(this.AnimationService.timeLine, this.propertiesObject.name);
-        let keyframe = FindKeyframeByTime(track, this.curTime);
-        if (keyframe != undefined) {
-          this.AnimationService.ChangeKeyframe(keyframe, ".position", this.propertiesObject.position);
-        }
-        else {
-          this.AnimationService.CreateKeyframe(track, this.curTime, this.propertiesObject, ".position", this.propertiesObject.position);
-        }
-      }
-      else if (this.propertiesObject.type == "Group") {
-        //console.log(this.AnimationService.selected);
-        this.AnimationService.selected.forEach((item, index) => {
-          let track = FindKeyframeTrack(this.AnimationService.timeLine, item.name);
-          let keyframe = FindKeyframeByTime(track, this.curTime);
-          // console.log(keyframe);
-          let q = new THREE.Quaternion();
-          item.getWorldQuaternion(q);
-          let position = this.propertiesObject.position.clone().applyQuaternion(q.invert()).add(this.AnimationService.startPos[index]);
-          if (keyframe != undefined) {
-            this.AnimationService.ChangeKeyframe(keyframe, ".position", position);
-          }
-          else {
-            this.AnimationService.CreateKeyframe(track, this.curTime, item, ".position", position);
-          }
-        })
-        let vec = this.AnimationService.group.position;
-        this.propertiesObject.position.set(vec.x, vec.y, vec.z)
-      }
-    }
+    this.AnimationCreatorService.OnPositionChange(this.propertiesObject);
   }
   OnRotationChange(event: Event) {
-    if (this.propertiesObject != undefined) {
-      if (this.propertiesObject.type == "Mesh" || /(Light)/g.exec(this.propertiesObject.type) != undefined) {
-        let track = FindKeyframeTrack(this.AnimationService.timeLine, this.propertiesObject.name);
-        let keyframe = FindKeyframeByTime(track, this.curTime);
-        if (keyframe != undefined) {
-          this.AnimationService.ChangeKeyframe(keyframe, ".quaternion", this.propertiesObject.quaternion);
-        }
-        else {
-          this.AnimationService.CreateKeyframe(track, this.curTime, this.propertiesObject, ".quaternion", this.propertiesObject.quaternion);
-        }
-      }
-      else if (this.propertiesObject.type == "Group") {
-        //console.log(this.AnimationService.selected);
-        this.AnimationService.selected.forEach((item, index) => {
-          let track = FindKeyframeTrack(this.AnimationService.timeLine, item.name);
-          let keyframe = FindKeyframeByTime(track, this.curTime);
-          // console.log(keyframe);
-          let q = new THREE.Quaternion();
-          item.getWorldQuaternion(q);
-          // let position = this.propertiesObject.position.clone().applyQuaternion(q.invert()).add(this.AnimationService.startPos[index]);
-          if (keyframe != undefined) {
-            this.AnimationService.ChangeKeyframe(keyframe, ".quaternion", this.propertiesObject.quaternion);
-          }
-          else {
-            this.AnimationService.CreateKeyframe(track, this.curTime, item, ".quaternion", this.propertiesObject.quaternion);
-          }
-        })
-        let quat = this.AnimationService.group.quaternion;
-        this.propertiesObject.quaternion.set(quat.x, quat.y, quat.z, quat.w)
-      }
-    }
+    this.AnimationCreatorService.OnRotationChange(this.propertiesObject);
   }
   OnOpacityChange(event: Event) {
-    if (this.propertiesObject != undefined) {
-      if (this.propertiesObject.type == "Mesh" || /(Light)/g.exec(this.propertiesObject.type) != undefined) {
-        let track = FindKeyframeTrack(this.AnimationService.timeLine, this.propertiesObject.name);
-        let keyframe = FindKeyframeByTime(track, this.curTime);
-        if (keyframe != undefined) {
-          this.AnimationService.ChangeKeyframe(keyframe, ".material.opacity", this.propertiesObject.material.opacity);
-        }
-        else {
-          this.AnimationService.CreateKeyframe(track, this.curTime, this.propertiesObject, ".material.opacity", this.propertiesObject.material.opacity);
-        }
-      }
-      else if (this.propertiesObject.type == "Group") {
-        //console.log(this.AnimationService.selected);
-
-        this.AnimationService.selected.forEach((item, index) => {
-          let track = FindKeyframeTrack(this.AnimationService.timeLine, item.name);
-          let keyframe = FindKeyframeByTime(track, this.curTime);
-          // console.log(keyframe);
-          if (keyframe != undefined) {
-            this.AnimationService.ChangeKeyframe(keyframe, ".material.opacity", this.propertiesObject.material.opacity);
-          }
-          else {
-            this.AnimationService.CreateKeyframe(track, this.curTime, item, ".material.opacity", this.propertiesObject.material.opacity);
-          }
-        })
-        this.propertiesObject.material.opacity = (this.AnimationService.group as any).material.opacity;
-      }
-    }
+    this.AnimationCreatorService.OnOpacityChange(this.propertiesObject);
   }
   OnVisibleChange(event: Event) {
-    if (this.propertiesObject != undefined) {
-      if (this.propertiesObject.type == "Mesh" || /(Light)/g.exec(this.propertiesObject.type) != undefined) {
-        let track = FindKeyframeTrack(this.AnimationService.timeLine, this.propertiesObject.name);
-        let keyframe = FindKeyframeByTime(track, this.curTime);
-        if (keyframe != undefined) {
-          this.AnimationService.ChangeKeyframe(keyframe, ".visible", this.propertiesObject.visible);
-        }
-        else {
-          this.AnimationService.CreateKeyframe(track, this.curTime, this.propertiesObject, ".visible", this.propertiesObject.visible);
-        }
-      }
-      else if (this.propertiesObject.type == "Group") {
-        //console.log(this.AnimationService.selected);
-
-        this.AnimationService.selected.forEach((item, index) => {
-          let track = FindKeyframeTrack(this.AnimationService.timeLine, item.name);
-          let keyframe = FindKeyframeByTime(track, this.curTime);
-          // console.log(keyframe);
-          if (keyframe != undefined) {
-            this.AnimationService.ChangeKeyframe(keyframe, ".visible", this.propertiesObject.visible);
-          }
-          else {
-            this.AnimationService.CreateKeyframe(track, this.curTime, item, ".visible", this.propertiesObject.visible);
-          }
-        })
-        this.propertiesObject.visible = this.AnimationService.group.visible;
-      }
-    }
+    this.AnimationCreatorService.OnVisibleChange(this.propertiesObject);
+  }
+  OnColorChange(event: Event) {
+    this.AnimationCreatorService.OnColorChange(this.propertiesObject, this.hex);
+  }
+  OnConstantChange(event: Event) {
+    this.AnimationCreatorService.OnConstantChange(this.propertiesObject);
   }
 
+  DeleteKeyframe(event: MouseEvent) {
+    this.AnimationCreatorService.DeleteKeyframe(this.propertiesObject);
+  }
+
+  OnCameraChange($event: MouseEvent) {
+    this.AnimationCreatorService.OnCameraChange(this.propertiesObject);
+  }
+  OnCameraRotation($event: MouseEvent) {
+    console.log(this.AnimationService.currentCamera.rotation);
+    console.log(this.AnimationService.scene.position);
+
+    this.AnimationService.currentCamera.lookAt(this.AnimationService.scene.position);
+    console.log(this.AnimationService.currentCamera.rotation);
+    this.AnimationService.dialogType = "CameraRotation";
+    this.AnimationService.dialogShow = true;
+  }
+  OnShadowChange($event: Event) {
+  }
+  OnShadowCameraChange(event: Event) {
+    this.propertiesObject.shadow.camera.left = -this.shadowWidth / 2;
+    this.propertiesObject.shadow.camera.right = this.shadowWidth / 2;
+    this.propertiesObject.shadow.camera.top = this.shadowHeight / 2;
+    this.propertiesObject.shadow.camera.bottom = -this.shadowHeight / 2;
+    this.propertiesObject.shadow.camera.far = this.shadowDist;
+    // this.propertiesObject.target.updateMatrixWorld();
+    this.propertiesObject.shadow.camera.updateProjectionMatrix();
+    this.propertiesObject.children[1].update();
+  }
+
+  OnFOVChange($event: Event) {
+    this.propertiesObject.updateProjectionMatrix();
+  }
   OnExpandClick(event: MouseEvent) {
-    let container = document.getElementById("container")!;
+    let container = document.getElementById("properties-container")!;
     if (container != undefined) {
       if (this.expanded) {
         container.style.width = "0";

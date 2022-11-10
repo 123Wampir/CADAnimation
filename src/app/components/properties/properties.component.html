@@ -1,13 +1,16 @@
-<div class="container" id="container">
+<div class="container" id="properties-container">
     <div class="header">
         <button class="expand" (click)="OnExpandClick($event)">></button>
         <div class="label">Свойства</div>
     </div>
     <div class="form">
         <div *ngIf="propertiesObject!=undefined">
-            <div class="label">{{propertiesObject.name}}</div>
+            <div class="object-label">{{propertiesObject.name}}</div>
             <div class="param">
-                <div class="param-label">Позиция</div>
+                <div class="param-label">
+                    <div class="label">Позиция</div>
+                    <button *ngIf="!camera" class="save-param" (click)="OnPositionChange($event)">Запомнить</button>
+                </div>
                 <div class="inputs">
                     <input type="number" class="input-number" placeholder="X" [(ngModel)]="propertiesObject.position.x"
                         (ngModelChange)="OnPositionChange($event)">
@@ -18,7 +21,10 @@
                 </div>
             </div>
             <div class="param">
-                <div class="param-label">Вращение</div>
+                <div class="param-label">
+                    <div class="label">Вращение</div>
+                    <button class="save-param" *ngIf="!camera" (click)="OnRotationChange($event)">Запомнить</button>
+                </div>
                 <div class="inputs">
                     <input type="number" class="input-number" placeholder="X" [(ngModel)]="propertiesObject.rotation.x"
                         (change)="OnRotationChange($event)">
@@ -28,8 +34,11 @@
                         (change)="OnRotationChange($event)">
                 </div>
             </div>
-            <div class="param" *ngIf="propertiesObject.material!=undefined">
-                <div class="param-label">Прозрачность</div>
+            <div class="param" *ngIf="propertiesObject.material!=undefined && !light && !camera">
+                <div class="param-label">
+                    <div class="label">Прозрачность</div>
+                    <button class="save-param" *ngIf="!camera" (click)="OnOpacityChange($event)">Запомнить</button>
+                </div>
                 <div class="inputs">
                     <input type="range" min="0" max="1" step="0.01" class="input-range"
                         [(ngModel)]="propertiesObject.material.opacity" placeholder="0"
@@ -38,16 +47,112 @@
                         [(ngModel)]="propertiesObject.material.opacity" (change)="OnOpacityChange($event)">
                 </div>
             </div>
-            <div class="param">
-                <div class="param-label">Видимость</div>
+            <div class="param" *ngIf="cutPlane">
+                <div class="param-label">
+                    <div class="label">Смещение</div>
+                    <!-- <button class="save-param" *ngIf="!camera" (click)="OnCu($event)">Запомнить</button> -->
+                </div>
+                <div class="inputs">
+                    <input type="range" min="-1000" max="1000" step="1" class="input-range"
+                        [(ngModel)]="propertiesObject.plane.constant" placeholder="0"
+                        (change)="OnConstantChange($event)">
+                    <input type="number" class="input-number" min="-1000" max="1000" step="1" placeholder="offset"
+                        [(ngModel)]="propertiesObject.plane.constant" (change)="OnConstantChange($event)">
+                </div>
+            </div>
+            <div class="param" *ngIf="camera && true">
+                <div class="param-label">
+                    <div class="label">FOV</div>
+                    <!-- <button class="save-param" *ngIf="!camera" (click)="OnOpacityChange($event)">Запомнить</button> -->
+                </div>
+                <div class="inputs">
+                    <input type="range" min="10" max="170" step="1" class="input-range"
+                        [(ngModel)]="propertiesObject.fov" placeholder="0" (change)="OnFOVChange($event)">
+                    <input type="number" class="input-number" min="10" max="170" step="1" placeholder="opacity"
+                        [(ngModel)]="propertiesObject.fov" (change)="OnFOVChange($event)">
+                </div>
+            </div>
+            <div class="param" *ngIf="light && !group">
+                <div class="param-label">
+                    <div class="label">Цвет</div>
+                    <button class="save-param" *ngIf="!camera" (click)="OnColorChange($event)">Запомнить</button>
+                </div>
+                <div class="inputs">
+                    <input type="color" class="input-color" [(ngModel)]="hex" (change)="OnColorChange($event)">
+                </div>
+            </div>
+            <div class="param" *ngIf="!camera && !cutPlane">
+                <div class="param-label">
+                    <div class="label">Видимость</div>
+                    <button class="save-param" (click)="OnVisibleChange($event)">Запомнить</button>
+                </div>
                 <div class="inputs">
                     <input type="checkbox" [(ngModel)]="propertiesObject.visible" class="input-checkbox"
                         (change)="OnVisibleChange($event)">
                 </div>
             </div>
+            <div class="param" *ngIf="cutPlane">
+                <div class="param-label">
+                    <div class="label">Видимость</div>
+                </div>
+                <div class="inputs">
+                    <input type="checkbox" [(ngModel)]="propertiesObject.material.visible" class="input-checkbox">
+                </div>
+            </div>
+            <div class="param" *ngIf="cutPlane">
+                <div class="param-label">
+                    <div class="label">Обратить</div>
+                    <!-- <button class="save-param" (click)="OnVisibleChange($event)">Запомнить</button> -->
+                </div>
+                <div class="inputs">
+                    <input type="checkbox" class="input-checkbox" (change)="propertiesObject.plane.negate()">
+                </div>
+            </div>
+            <div class="param" *ngIf="light && !ambLight && !group">
+                <div class="param-label">
+                    <div class="label">Тени</div>
+                </div>
+                <div class="inputs">
+                    <input type="checkbox" [(ngModel)]="propertiesObject.castShadow" (change)="OnShadowChange($event)"
+                        class="input-checkbox">
+                </div>
+                <div class="param-label">
+                    <div class="label">Показать цель</div>
+                </div>
+                <div class="inputs">
+                    <input type="checkbox" [(ngModel)]="propertiesObject.children[0].visible" class="input-checkbox">
+                </div>
+            </div>
+            <div class="param" *ngIf="light && dirLight && propertiesObject.castShadow && !group">
+                <div class="inputs">
+                    <div class="label">Показать область</div>
+                    <input type="checkbox" [(ngModel)]="propertiesObject.children[1].visible" class="input-checkbox">
+                </div>
+                <div class="inputs">
+                    <input type="range" min="5" max="1000" step="1" class="input-range" [(ngModel)]="shadowWidth"
+                        placeholder="0" (change)="OnShadowCameraChange($event)">
+                    <input type="number" class="input-number" min="5" max="1000" step="1" placeholder="width"
+                        [(ngModel)]="shadowWidth" (change)="OnShadowCameraChange($event)">
+                </div>
+                <div class="inputs">
+                    <input type="range" min="5" max="1000" step="1" class="input-range" [(ngModel)]="shadowHeight"
+                        placeholder="0" (change)="OnShadowCameraChange($event)">
+                    <input type="number" class="input-number" min="10" max="170" step="1" placeholder="height"
+                        [(ngModel)]="shadowHeight" (change)="OnShadowCameraChange($event)">
+                </div>
+                <div class="inputs">
+                    <input type="range" min="10" max="3000" step="1" class="input-range" [(ngModel)]="shadowDist"
+                        placeholder="0" (change)="OnShadowCameraChange($event)">
+                    <input type="number" class="input-number" min="10" max="3000" step="1" placeholder="opacity"
+                        [(ngModel)]="shadowDist" (change)="OnShadowCameraChange($event)">
+                </div>
+            </div>
+            <div class="controls" *ngIf="camera && !group">
+                <button class="button" (click)="OnCameraChange($event)">Сохранить позицию</button>
+                <button class="button" (click)="OnCameraRotation($event)">Анимация вращения</button>
+            </div>
             <div class="controls" *ngIf="AnimationService.selectedKeyframe!=undefined">
-                <button class="delete"
-                    (click)="AnimationService.DeleteKeyframe(AnimationService.selectedKeyframe)">Удалить ключевой
+                <button class="delete" (click)="DeleteKeyframe($event)">Удалить ключевой
                     кадр</button>
             </div>
         </div>
