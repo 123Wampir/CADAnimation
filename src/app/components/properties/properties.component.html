@@ -6,7 +6,7 @@
     <div class="form">
         <div *ngIf="propertiesObject!=undefined">
             <div class="object-label">{{propertiesObject.name}}</div>
-            <div class="param">
+            <div class="param" *ngIf="posParam">
                 <div class="param-label">
                     <div class="label">Позиция</div>
                     <button *ngIf="!camera" class="save-param" (click)="OnPositionChange($event)">Запомнить</button>
@@ -20,7 +20,7 @@
                         (ngModelChange)="OnPositionChange($event)">
                 </div>
             </div>
-            <div class="param">
+            <div class="param" *ngIf="rotParam">
                 <div class="param-label">
                     <div class="label">Вращение</div>
                     <button class="save-param" *ngIf="!camera" (click)="OnRotationChange($event)">Запомнить</button>
@@ -34,7 +34,7 @@
                         (change)="OnRotationChange($event)">
                 </div>
             </div>
-            <div class="param" *ngIf="propertiesObject.material!=undefined && !light && !camera">
+            <div class="param" *ngIf="opacityParam">
                 <div class="param-label">
                     <div class="label">Прозрачность</div>
                     <button class="save-param" *ngIf="!camera" (click)="OnOpacityChange($event)">Запомнить</button>

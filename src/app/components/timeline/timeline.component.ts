@@ -54,6 +54,8 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     }
   }
   CreateTreeView() {
+    let ln = document.getElementById("lines");
+    // ln?.replaceChildren();
     this.CreateTreeViewElements(this.scene);
     setTimeout(() => { this.UpdateTracks(); }, 1000);
   }
@@ -86,7 +88,7 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
           console.log(item);
           this.AnimationService.Select(item, this.AnimationService.CTRLPressed);
         })
-        let keyframeTrack: AnimationModel.KeyframeTrackModel = { DOMElement: track, name: item.name, keyframes: [] };
+        let keyframeTrack: AnimationModel.KeyframeTrackModel = { DOMElement: track, name: item.name, keyframes: [], actions: [] };
         this.timeLine.tracks.push(keyframeTrack);
 
         if (item.type == "Object3D" || item.type == "Container") {
@@ -174,43 +176,35 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
       let name = action.getRoot().name;
       let clip = action.getClip();
       let keyframeTrack = AnimationModel.FindKeyframeTrack(this.timeLine, name);
-      clip.tracks.forEach(track => {
-        track.times.forEach(time => {
-          let key = AnimationModel.CreateKeyframe(time, keyframeTrack, clip)
-        })
-      })
+      AnimationModel.CreateActions(keyframeTrack, clip);
+      // console.log(keyframeTrack);
+      // clip.tracks.forEach(track => {
+
+      //   track.times.forEach(time => {
+      //     let key = AnimationModel.CreateKeyframe(time, keyframeTrack, clip)
+      //   })
+      // })
     })
     this.timeLine.tracks.forEach(track => {
-      this.AppendKeyframes(track)
+      this.AppendActions(track);
     })
+    // this.timeLine.tracks.forEach(track => {
+    //   this.AppendKeyframes(track)
+    // })
     console.log(this.timeLine);
   }
 
-  AppendKeyframes(keyframeTrack: AnimationModel.KeyframeTrackModel) {
-    let trackline = keyframeTrack.DOMElement;
-    for (let i = 0; i < keyframeTrack.keyframes.length; i++) {
-      let keyframe = this.renderer.createElement("div");
-      keyframeTrack.keyframes[i].DOMElement = keyframe;
-      this.renderer.addClass(keyframe, "keyframe")
-      this.renderer.setStyle(keyframe, "left", `${keyframeTrack.keyframes[i].time * this.timeLine.scale}px`)
-      this.renderer.setAttribute(keyframe, "time", keyframeTrack.keyframes[i].time.toString())
-      this.renderer.setAttribute(keyframe, "part", keyframeTrack.name)
-      this.renderer.appendChild(trackline, keyframe)
-      this.renderer.listen(keyframe, "click", (event) => {
-        let time = Number.parseFloat(event.target.attributes["time"].nodeValue);
-        let name = event.target.attributes["part"].nodeValue;
-        let track = AnimationModel.FindKeyframeTrack(this.timeLine, name);
-        let keyframe = AnimationModel.FindKeyframeByTime(track, time);
-        console.log(keyframe);
-        this.AnimationService.selectedKeyframe = keyframe;
-        this.AnimationService.currentTime = time;
-        this.AnimationService.currentTimeChange = true;
-      })
+  AppendActions(keyframeTrack: AnimationModel.KeyframeTrackModel) {
+    for (let i = 0; i < keyframeTrack.actions.length; i++) {
+      this.AnimationService.CreateActionDOM(keyframeTrack, keyframeTrack.actions[i]);
+      this.AppendKeyframes(keyframeTrack.actions[i])
     }
   }
-
-
-
+  AppendKeyframes(action: AnimationModel.KeyframeActionModel) {
+    for (let i = 0; i < action.keyframes.length; i++) {
+      this.AnimationService.CreateKeyframeDOM(action, action.keyframes[i]);
+    }
+  }
 
   //UI
   ShowChildren(name: string, show: boolean) {
@@ -268,9 +262,14 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     this.timeLine.tracks.forEach(track => {
       let partline = this.FindPartLineByName(track.name);
       this.renderer.setStyle(track.DOMElement, "width", `${this.timeLine.duration * this.timeLine.scale}px`);
-      track.keyframes.forEach(keyframe => {
-        if (keyframe.DOMElement != undefined) {
-          this.renderer.setStyle(keyframe.DOMElement, "left", `${keyframe.time * this.timeLine.scale}px`)
+      track.actions.forEach(action => {
+        if (action.DOMElement != undefined) {
+          this.renderer.setStyle(action.DOMElement, "left", `${action.start * this.timeLine.scale}px`)
+          this.renderer.setStyle(action.DOMElement, "width", `${action.length * this.timeLine.scale}px`)
+          action.keyframes.forEach(keyframe => {
+            if (keyframe.DOMElement != undefined)
+              this.renderer.setStyle(keyframe.DOMElement, "left", `${(keyframe.time - action.start) * this.timeLine.scale}px`)
+          })
         }
       })
     })
@@ -278,10 +277,11 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   OnCurrentTimeMouseUp(event: MouseEvent) {
     this.AnimationService.currentTimeChange = false;
     this.onCurrentTimeMove = false;
-    console.log(this.AnimationService.currentTime);
   }
   OnCurrentTimeMouseMove(event: MouseEvent) {
     if (this.onCurrentTimeMove) {
+      (this.AnimationService.selectedAction as any) = undefined;
+      (this.AnimationService.selectedKeyframe as any) = undefined;
       this.AnimationService.currentTimeChange = true;
       let curTime = document.getElementById("curTime")!;
       let time = event.clientX - this.startPos;
@@ -297,3 +297,4 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     this.startPos = event.clientX - this.AnimationService.currentTime * this.timeLine.scale;
   }
 }
+

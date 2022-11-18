@@ -213,14 +213,26 @@ export class AppComponent implements OnInit, AfterViewInit {
     //console.log(this.renderer.domElement)
     this.mainObject = new THREE.Object3D();
     this.scene.add(this.mainObject)
-    await this.LoadGeometry(this.mainObject)
+    await this.LoadGeometry("", this.mainObject)
     //console.log(this.AnimationService.mixers)
     console.log(this.scene);
     console.log();
 
   }
 
-  async LoadGeometry(targetObject: THREE.Object3D) {
+  async LoadFile(event: Event) {
+    console.log(event);
+    let f = event.target as any;
+    console.log(f.files);
+    if (f.files.length != 0) {
+      f.files[0]
+    }
+    let str = window.URL.createObjectURL(f.files[0]);
+    console.log(str);
+    this.LoadGeometry(str, this.mainObject);
+  }
+
+  async LoadGeometry(URL: string, targetObject: THREE.Object3D) {
     // Создание объекта загрузчика GLTF файлов
     let loader = new GLTFLoader();
     // Загрузка файла модели
@@ -228,7 +240,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     loader.load(
       // Ссылка на ресурс
       // Вызывается когда ресурс загружен
-      'http://127.0.0.1:5500/src/models/sborka.gltf',
+      // URL,
+      'http://127.0.0.1:5500/src/models/Zachvat.gltf',
       async function (gltf) {
         if (gltf.scene.children.length != 0) {
           // Добавление модели в контейнер
@@ -382,7 +395,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     // Чтение анимации
     // Создание объекта парсера XML/HTML-файлов
     let parser = new DOMParser();
-    let fileUrl1 = 'http://127.0.0.1:5500/src/Animations/АнимацияДиплом.xml';
+    let fileUrl1 = 'http://127.0.0.1:5500/src/Animations/.xml';
     let response1 = await fetch(fileUrl1);
     let buffer1 = await response1.text();
     // Преобразование файла в DOM элемент

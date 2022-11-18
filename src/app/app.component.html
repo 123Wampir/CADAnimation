@@ -1,4 +1,5 @@
 <router-outlet></router-outlet>
+<input type="file" name="" accept=".step,.stp,.gltf" (change)="LoadFile($event)" id="">
 <canvas #canvas class="canvas" (mousemove)="onPointerMove($event)" (click)="onClick($event)"
     (window:resize)="onResize($event)" (window:keydown)="onKeyDown($event)" (window:keyup)="onKeyUp($event)"></canvas>
 <app-timeline [scene]="AnimationService.scene" [actions]="AnimationService.actions"

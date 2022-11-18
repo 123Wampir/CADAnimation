@@ -15,6 +15,9 @@ export class PropertiesComponent implements OnInit, OnChanges {
   @Input() selected: boolean = false;
   @Input() transformed: boolean = false;
   propertiesObject!: any;
+  posParam = false;
+  rotParam = false;
+  opacityParam = false;
   expanded = true;
   group = false;
   camera = false;
@@ -35,16 +38,21 @@ export class PropertiesComponent implements OnInit, OnChanges {
   }
   ngOnChanges(changes: SimpleChanges) {
     if (changes["selected"] != undefined) {
-      // console.log(changes["selected"]);
       if (this.AnimationService.selected.length != 0) {
         if (this.AnimationService.selected.length == 1) {
           this.group = false;
+          this.posParam = true;
+          this.rotParam = true;
+          this.opacityParam = true;
           this.propertiesObject = this.AnimationService.selected[0];
-          if (/(Camera)/g.exec(this.propertiesObject.type) != undefined)
+          if (/(Camera)/g.exec(this.propertiesObject.type) != undefined) {
             this.camera = true;
+            this.opacityParam = false;
+          }
           else this.camera = false;
           if (/(Light)/g.exec(this.propertiesObject.type) != undefined) {
             this.light = true;
+            this.opacityParam = false;
             this.hex = "#" + this.propertiesObject.color.getHexString();
             if (this.propertiesObject.type == "DirectionalLight") {
               this.dirLight = true;
@@ -53,13 +61,22 @@ export class PropertiesComponent implements OnInit, OnChanges {
               this.shadowDist = this.propertiesObject.shadow.camera.far;
             }
             else this.dirLight = false;
-            if (this.propertiesObject.type == "AmbientLight")
+            if (this.propertiesObject.type == "AmbientLight") {
               this.ambLight = true;
+              this.posParam = false;
+              this.rotParam = false;
+              this.opacityParam = false;
+            }
             else this.ambLight = false;
           }
           else this.light = false;
           if (this.propertiesObject.type == "PlaneHelper") {
-            this.cutPlane = true;
+            {
+              this.cutPlane = true;
+              this.posParam = false;
+              this.rotParam = false;
+              this.opacityParam = false;
+            }
           }
           else this.cutPlane = false;
         }
@@ -68,6 +85,8 @@ export class PropertiesComponent implements OnInit, OnChanges {
           this.propertiesObject.type = "Group";
           this.propertiesObject.name = "Group";
           this.group = true;
+          this.posParam = true;
+          this.opacityParam = true;
           this.cutPlane = false;
           this.light = false;
           this.camera = false;
@@ -78,6 +97,9 @@ export class PropertiesComponent implements OnInit, OnChanges {
         this.light = false;
         this.camera = false;
         this.group = false;
+        this.posParam = false;
+        this.rotParam = false;
+        this.opacityParam = false;
       }
     }
     if (changes["transformed"] != undefined) {
@@ -87,11 +109,11 @@ export class PropertiesComponent implements OnInit, OnChanges {
       if (this.propertiesObject != undefined) {
         if (this.propertiesObject.type == "Mesh") {
           let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, this.propertiesObject.name);
-          let keyframe = AnimationModel.FindKeyframeByTime(track, this.curTime);
-          if (keyframe != undefined) {
-            this.AnimationService.selectedKeyframe = keyframe;
-          }
-          else { (this.AnimationService.selectedKeyframe as any) = undefined; }
+          // let keyframe = AnimationModel.FindKeyframeByTime(track, this.curTime);
+          // if (keyframe != undefined) {
+          //   this.AnimationService.selectedKeyframe = keyframe;
+          // }
+          // else { (this.AnimationService.selectedKeyframe as any) = undefined; }
         }
         if (this.propertiesObject.color != undefined) {
           this.hex = "#" + this.propertiesObject.color.getHexString();

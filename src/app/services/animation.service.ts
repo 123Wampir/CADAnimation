@@ -18,6 +18,9 @@ export class AnimationService {
   transformChange: boolean = false;
   CTRLPressed: boolean = false;
   stencilNeedUpdate = false;
+  actionDragged = false;
+  actionMoved = true;
+  pos = 0;
 
   renderer!: THREE.WebGLRenderer;
   scene!: THREE.Scene;
@@ -27,6 +30,7 @@ export class AnimationService {
   planeHelpers = new THREE.Object3D();
   startPos: THREE.Vector3[] = [];
   selected: THREE.Object3D[] = [];
+  selectedAction!: AnimationModel.KeyframeActionModel;
   selectedKeyframe!: AnimationModel.KeyframeModel;
   actions: THREE.AnimationAction[] = [];
   mixers: THREE.AnimationMixer[] = [];
@@ -42,29 +46,116 @@ export class AnimationService {
   dialogModal = false;
   dialogType = "";
 
-  CreateKeyframeDOM(track: AnimationModel.KeyframeTrackModel, keyframe: AnimationModel.KeyframeModel) {
-    let trackline = track.DOMElement;
-    let keyframeDOM = this.angRenderer.createElement("div");
-    keyframe.DOMElement = keyframeDOM;
-    this.angRenderer.addClass(keyframeDOM, "keyframe")
-    this.angRenderer.setStyle(keyframeDOM, "left", `${keyframe.time * this.timeLine.scale}px`)
-    this.angRenderer.setAttribute(keyframeDOM, "time", keyframe.time.toString())
-    this.angRenderer.setAttribute(keyframeDOM, "part", track.name)
-    this.angRenderer.appendChild(trackline, keyframeDOM)
-    this.angRenderer.listen(keyframeDOM, "click", (event) => {
-      let time = Number.parseFloat(event.target.attributes["time"].nodeValue);
-      let name = event.target.attributes["part"].nodeValue;
-      let track = AnimationModel.FindKeyframeTrack(this.timeLine, name);
-      let keyframe = AnimationModel.FindKeyframeByTime(track, time);
-      console.log(keyframe);
-      this.selectedKeyframe = keyframe;
-      this.currentTime = time;
-      this.currentTimeChange = true;
+
+  CreateActionDOM(keyframeTrack: AnimationModel.KeyframeTrackModel, action: AnimationModel.KeyframeActionModel) {
+    let trackline = keyframeTrack.DOMElement;
+    let actionDOM = this.angRenderer.createElement("div");
+    action.DOMElement = actionDOM;
+    this.angRenderer.addClass(actionDOM, "action");
+    this.angRenderer.setStyle(actionDOM, "left", `${action.start * this.timeLine.scale}px`);
+    this.angRenderer.setStyle(actionDOM, "width", `${action.length * this.timeLine.scale + 10}px`);
+    this.angRenderer.setStyle(actionDOM, "background", `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255})`);
+    // this.renderer.setAttribute(actionDOM, "time", keyframeTrack.keyframes[i].time.toString())
+    this.angRenderer.setAttribute(actionDOM, "part", keyframeTrack.name);
+    this.angRenderer.setAttribute(actionDOM, "show", "0");
+    this.angRenderer.appendChild(trackline, actionDOM);
+    this.angRenderer.listen(actionDOM, "mousedown", (event) => {
+      this.actionDragged = true;
+      this.pos = event.clientX - action.start * this.timeLine.scale;
     })
-
+    // let h = (actionDOM as HTMLElement);
+    // console.log(h.parentElement);
+    this.angRenderer.listen(actionDOM.parentElement, "mousemove", (event) => {
+      if (this.actionDragged) {
+        if (this.selectedAction != undefined) {
+          if (this.selectedAction == action) {
+            this.actionMoved = true;
+            let time = event.clientX - this.pos;
+            if (time >= 0 && time + action.length * this.timeLine.scale <= this.timeLine.duration * this.timeLine.scale) {
+              action.DOMElement!.style.left = `${time}px`;
+              let offset = time / this.timeLine.scale - action.start;
+              action.track?.shift(offset);
+              action.keyframes[0].clip.resetDuration();
+              action.start = time / this.timeLine.scale;
+              action.keyframes.forEach(keyframe => {
+                keyframe.time += offset;
+              })
+            }
+          }
+        }
+      }
+    })
+    this.angRenderer.listen(actionDOM.parentElement, "mouseup", (event) => {
+      this.actionDragged = false;
+      //console.log(action);
+    })
+    this.angRenderer.listen(actionDOM, "click", (event) => {
+      this.selectedAction = action;
+      if (action.DOMElement?.getAttribute("show") == "0") {
+        this.angRenderer.setAttribute(actionDOM, "show", "1");
+        action.DOMElement?.childNodes.forEach(child => {
+          this.angRenderer.setStyle(child, "visibility", "visible");
+        })
+      }
+      else if (!this.actionMoved) {
+        if (this.selectedKeyframe == undefined) {
+          this.angRenderer.setAttribute(actionDOM, "show", "0");
+          action.DOMElement?.childNodes.forEach(child => {
+            this.angRenderer.setStyle(child, "visibility", "hidden");
+          })
+        }
+        else if (this.selectedKeyframe.action != action) {
+          this.angRenderer.setAttribute(actionDOM, "show", "0");
+          action.DOMElement?.childNodes.forEach(child => {
+            this.angRenderer.setStyle(child, "visibility", "hidden");
+          })
+        }
+      }
+      this.actionMoved = false;
+    });
   }
-
-  CreateKeyframe(track: AnimationModel.KeyframeTrackModel, time: number, obj: THREE.Object3D, type: string, value: any) {
+  CreateAction(track: AnimationModel.KeyframeTrackModel, type: string) {
+    let action: AnimationModel.KeyframeActionModel;
+    action = { keyframes: [], length: 0, start: 0, trackDOM: track, type: type };
+    track.actions.push(action);
+    //console.log(action);
+    return action;
+  }
+  UpdateAction(action: AnimationModel.KeyframeActionModel) {
+    action.start = action.track!.times[0];
+    action.length = action.track!.times[action.track!.times.length - 1] - action.start;
+    if (action.DOMElement != undefined) {
+      this.angRenderer.setStyle(action.DOMElement, "left", `${action.start * this.timeLine.scale}px`);
+      this.angRenderer.setStyle(action.DOMElement, "width", `${action.length * this.timeLine.scale}px`);
+      action.keyframes.forEach(keyframe => {
+        if (keyframe.DOMElement != undefined)
+          this.angRenderer.setStyle(keyframe.DOMElement, "left", `${(keyframe.time - action.start) * this.timeLine.scale}px`)
+      })
+    }
+    else {
+      this.CreateActionDOM(action.trackDOM, action);
+    }
+  }
+  CreateKeyframeDOM(action: AnimationModel.KeyframeActionModel, keyframe: AnimationModel.KeyframeModel) {
+    let trackline = action.DOMElement;
+    if (keyframe.DOMElement == undefined) {
+      let keyframeDOM = this.angRenderer.createElement("div");
+      keyframe.DOMElement = keyframeDOM;
+      this.angRenderer.addClass(keyframeDOM, "keyframe");
+      this.angRenderer.setStyle(keyframeDOM, "left", `${(keyframe.time - action.start) * this.timeLine.scale}px`);
+      // this.renderer.setStyle(keyframe, "visibility", `hidden`);
+      this.angRenderer.setAttribute(keyframeDOM, "time", keyframe.time.toString())
+      // this.angRenderer.setAttribute(keyframeDOM, "part", keyframeTrack.name)
+      this.angRenderer.appendChild(trackline, keyframeDOM);
+      this.angRenderer.listen(keyframeDOM, "click", (event) => {
+        console.log(keyframe);
+        this.selectedKeyframe = keyframe;
+        this.currentTime = keyframe.time;
+        this.currentTimeChange = true;
+      })
+    }
+  }
+  CreateKeyframe(act: AnimationModel.KeyframeActionModel, time: number, obj: THREE.Object3D, type: string, value: any) {
     // console.log("create key");
     let clip: THREE.AnimationClip;
     if (obj.animations.length == 0) {
@@ -72,31 +163,11 @@ export class AnimationService {
       obj.animations.push(clip);
     }
     clip = obj.animations[0];
-    // console.log(clip);
-    let keyframe = AnimationModel.CreateKeyframe(time, track, clip);
-    switch (type) {
-      case ".position":
-        keyframe.position = value;
-        break;
-      case ".quaternion":
-        keyframe.quaternion = value;
-        break;
-      case ".material.opacity":
-        keyframe.opacity = value;
-        break;
-      case ".visible":
-        keyframe.visible = value;
-        break;
-      case ".color":
-        keyframe.color = value;
-        break;
-      case ".plane.constant":
-        keyframe.constant = value;
-        break;
-      default:
-        break;
-    }
+    let keyframe = AnimationModel.CreateKeyframe(time, act, clip);
+    keyframe.value = value;
     this.ChangeKeyframe(keyframe, type, value);
+    act.keyframes.push(keyframe);
+    act.track = clip.tracks.find(tr => tr.name == type);
     let mixers: any[] = [];
     this.FindMixer(this.mixers, obj, mixers);
     let mixer!: THREE.AnimationMixer;
@@ -107,14 +178,12 @@ export class AnimationService {
       this.mixers.push(mixer);
     }
     let action = mixer.clipAction(clip);
-    // console.log((mixer as any)._listeners);
     if ((mixer as any)._listeners == undefined)
       mixer.addEventListener('finished', function (e) {
         let act = e["action"];
         act.paused = false;
       });
     this.actions.push(action);
-    // console.log(action);
     if (type == ".plane.constant") {
       let act = action as any;
       act._propertyBindings[0].binding.propertyName = "constant";
@@ -126,35 +195,12 @@ export class AnimationService {
     action.play();
     action.clampWhenFinished = true;
     mixer.setTime(time);
-    this.CreateKeyframeDOM(track, keyframe)
+    this.UpdateAction(act);
+    this.CreateKeyframeDOM(act, keyframe)
   }
   ChangeKeyframe(keyframe: AnimationModel.KeyframeModel, type: string, value: any) {
     // console.log(keyframe);
-    switch (type) {
-      case ".position":
-        keyframe.position = value;
-        break;
-      case ".quaternion":
-        keyframe.quaternion = value;
-        break;
-      case ".material.opacity":
-        keyframe.opacity = value;
-        break;
-      case ".visible":
-        keyframe.visible = value;
-        break;
-      case ".color":
-        keyframe.color = value;
-        break;
-      case ".color":
-        keyframe.color = value;
-        break;
-      case ".plane.constant":
-        keyframe.constant = value;
-        break;
-      default:
-        break;
-    }
+    keyframe.value = value;
     let track = keyframe.clip.tracks.find(track => (track.name == type))
     if (track != undefined) {
       let updateTrack = true;
@@ -396,16 +442,11 @@ export class AnimationService {
               let act = e["action"];
               act.paused = false;
               console.log(act);
-
             });
-          // console.log(mixer.time);
-
         }
       })
     }
-    //return clip
   }
-
   DeleteKeyframe(keyframe: AnimationModel.KeyframeModel) {
     keyframe.DOMElement?.remove();
     (this.selectedKeyframe as any) = undefined;
@@ -496,7 +537,6 @@ export class AnimationService {
           newAction.clampWhenFinished = true;
           this.actions.splice(index, 1, newAction);
           mixer.setTime(keyframe.time);
-          // console.log(mixer.time);
         }
       })
     })
@@ -543,14 +583,16 @@ export class AnimationService {
         }
       }
     }
-    let mergedGeom = BufferGeometryUtils.mergeBufferGeometries(geomArr);
-    for (let i = 0; i < geomArr.length; i++) {
-      geomArr[i].dispose();
-    }
-    for (let i = 0; i < group.children.length; i++) {
-      let mesh = group.children[i] as any;
-      mesh.geometry.dispose();
-      mesh.geometry = mergedGeom.clone();
+    if (geomArr.length != 0) {
+      let mergedGeom = BufferGeometryUtils.mergeBufferGeometries(geomArr);
+      for (let i = 0; i < geomArr.length; i++) {
+        geomArr[i].dispose();
+      }
+      for (let i = 0; i < group.children.length; i++) {
+        let mesh = group.children[i] as any;
+        mesh.geometry.dispose();
+        mesh.geometry = mergedGeom.clone();
+      }
     }
   }
 
@@ -667,7 +709,7 @@ export class AnimationService {
       this.selected.push(obj);
     }
     else if (obj.type == "Container") {
-      this.selected.push(obj);
+      // this.selected.push(obj);
     }
     else if (obj.type == "PlaneHelper") {
       this.selected.push(obj);

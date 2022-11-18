@@ -65,12 +65,15 @@ button {
     /* background-color: black;
     color: white; */
 }
-.timer{
+
+.timer {
     margin: 0px 5px;
 }
+
 .window-controls {
     display: flex;
     justify-content: space-around;
+    align-items: center;
 }
 
 .expand-first {
@@ -80,6 +83,7 @@ button {
     transition: transform 1s;
     font-size: 100%;
 }
+
 .expand-second {
     background: none;
     box-shadow: none;
@@ -177,11 +181,10 @@ button {
     border-right: 1px solid gray;
     /* background-color: antiquewhite; */
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
     position: relative;
     overflow: visible;
-    grid-column-start: 2;
-    grid-column-end: -1;
     height: 25px;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
@@ -228,8 +231,29 @@ button {
     cursor: e-resize;
 }
 
+.actions {
+    display: flex;
+    flex-direction: column;
+}
+
 .action {
+    position: relative;
     width: 100px;
-    height: 2px;
+    height: 6px;
     background-color: aquamarine;
+    border-radius: 5px;
+    transition: height 100ms;
+    cursor: pointer;
+}
+
+.action>.keyframe {
+    visibility: hidden;
+}
+
+.action:hover {
+    height: 10px;
+}
+
+.action:active>.keyframe {
+    visibility: visible;
 }
