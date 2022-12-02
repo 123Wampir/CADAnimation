@@ -96,7 +96,8 @@
                     <div class="label">Видимость</div>
                 </div>
                 <div class="inputs">
-                    <input type="checkbox" [(ngModel)]="propertiesObject.material.visible" class="input-checkbox">
+                    <input type="checkbox" (change)="ShowPlane($event)" [(ngModel)]="propertiesObject.material.visible"
+                        class="input-checkbox">
                 </div>
             </div>
             <div class="param" *ngIf="cutPlane">
@@ -129,21 +130,21 @@
                     <input type="checkbox" [(ngModel)]="propertiesObject.children[1].visible" class="input-checkbox">
                 </div>
                 <div class="inputs">
-                    <input type="range" min="5" max="1000" step="1" class="input-range" [(ngModel)]="shadowWidth"
+                    <input type="range" min="5" max="9999999" step="1" class="input-range" [(ngModel)]="shadowWidth"
                         placeholder="0" (change)="OnShadowCameraChange($event)">
-                    <input type="number" class="input-number" min="5" max="1000" step="1" placeholder="width"
+                    <input type="number" class="input-number" min="5" max="9999999" step="1" placeholder="width"
                         [(ngModel)]="shadowWidth" (change)="OnShadowCameraChange($event)">
                 </div>
                 <div class="inputs">
-                    <input type="range" min="5" max="1000" step="1" class="input-range" [(ngModel)]="shadowHeight"
+                    <input type="range" min="5" max="9999999" step="1" class="input-range" [(ngModel)]="shadowHeight"
                         placeholder="0" (change)="OnShadowCameraChange($event)">
-                    <input type="number" class="input-number" min="10" max="170" step="1" placeholder="height"
+                    <input type="number" class="input-number" min="10" max="9999999" step="1" placeholder="height"
                         [(ngModel)]="shadowHeight" (change)="OnShadowCameraChange($event)">
                 </div>
                 <div class="inputs">
-                    <input type="range" min="10" max="3000" step="1" class="input-range" [(ngModel)]="shadowDist"
+                    <input type="range" min="10" max="9999999" step="1" class="input-range" [(ngModel)]="shadowDist"
                         placeholder="0" (change)="OnShadowCameraChange($event)">
-                    <input type="number" class="input-number" min="10" max="3000" step="1" placeholder="opacity"
+                    <input type="number" class="input-number" min="10" max="9999999" step="1" placeholder="opacity"
                         [(ngModel)]="shadowDist" (change)="OnShadowCameraChange($event)">
                 </div>
             </div>
@@ -154,6 +155,9 @@
             <div class="controls" *ngIf="AnimationService.selectedKeyframe!=undefined">
                 <button class="delete" (click)="DeleteKeyframe($event)">Удалить ключевой
                     кадр</button>
+            </div>
+            <div class="controls" *ngIf="AnimationService.selectedAction!=undefined">
+                <button class="delete" (click)="DeleteAction($event)">Удалить действие</button>
             </div>
         </div>
     </div>

@@ -16,6 +16,7 @@
             <div class="window-controls">
                 <input type="range" min="1" max="300" step="0.5" [(ngModel)]="timeLine.scale"
                     (change)="OnResizeTimeline($event)">
+                <input type="range" min="0" max="300" step="0.5" (mousemove)="OnExplode($event)">
                 <button class="load">load</button>
                 <button class="save">save</button>
                 <button class="expand-first" (click)="OnTimelineExpand($event)">▼</button>
@@ -33,6 +34,14 @@
                     <div class="current-time" id="curTime" (mousedown)="OnCurrentTimeMouseDown($event)"></div>
                 </div>
             </div>
+            <!-- <div class="line" *ngFor="let track of timeLine.tracks">
+                <div class="part">{{track.name}}</div>
+                <div class="track">
+                    <div class="action" *ngFor="let action of track.actions">
+                        <div class="keyframe" *ngFor="let keyframe of action.keyframes"></div>
+                    </div>
+                </div>
+            </div> -->
         </div>
         <!-- <div class="line">
             <div class="mesh">

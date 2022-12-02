@@ -7,13 +7,15 @@ import { TimelineComponent } from './components/timeline/timeline.component';
 import { PropertiesComponent } from './components/properties/properties.component';
 import { FormsModule } from '@angular/forms';
 import { DialogComponent } from './components/dialog/dialog.component';
+import { ViewcubeComponent } from './components/viewcube/viewcube.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     TimelineComponent,
     PropertiesComponent,
-    DialogComponent
+    DialogComponent,
+    ViewcubeComponent
   ],
   imports: [
     BrowserModule,

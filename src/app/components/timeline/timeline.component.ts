@@ -1,6 +1,7 @@
 import { Component, Renderer2, Input, OnChanges, OnInit, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
 import { AnimationService } from 'src/app/services/animation.service';
 import * as AnimationModel from 'src/app/shared/animation.model';
+import THREE = require('three');
 
 @Component({
   selector: 'app-timeline',
@@ -11,12 +12,14 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() actions!: THREE.AnimationAction[];
   @Input() scene!: THREE.Object3D;
   @Input() curTime = 0;
+  @Input() newFile!: boolean;
   constructor(public AnimationService: AnimationService, private renderer: Renderer2) { }
   timeLine: AnimationModel.TimelineModel = { tracks: [], duration: 20, scale: 50 };
   onCurrentTimeMove = false;
   onTimeLineExpand = true;
   startPos = 0;
-
+  center!: THREE.Vector3;
+  point!: THREE.Object3D;
 
   OnSceneColorChange(event: Event) {
     let e = event as any;
@@ -25,6 +28,35 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   CLIPPINGTEST(event: Event) {
     let idk = event?.target as any;
     this.AnimationService.EnableClipping(idk.checked)
+  }
+  OnExplode(event: Event) {
+    let arr: any[] = [];
+    // console.log(this.center);
+    this.AnimationService.FindMeshes(this.AnimationService.scene, arr);
+    if (this.center == undefined) {
+      this.center = new THREE.Vector3();
+      this.AnimationService.boundingBox.getCenter(this.center);
+      let geom = new THREE.CylinderGeometry();
+      let mat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+      this.point = new THREE.Mesh(geom, mat);
+      this.point.type = "point";
+      this.point.position.add(this.center)
+      this.scene.add(this.point)
+      console.log(this.point);
+
+    }
+    arr.forEach((item, index) => {
+      if (this.AnimationService.startPos.length != arr.length)
+        this.AnimationService.startPos.push(item.position.clone());
+      let q = new THREE.Quaternion();
+      item.getWorldQuaternion(q);
+      let ps = new THREE.Vector3();
+      item.getWorldPosition(ps);
+      let offset = ps.clone().applyQuaternion(q.invert()).sub(this.center).normalize();
+      let pos = offset.multiplyScalar((event.target as any).value).add(this.AnimationService.startPos[index]);
+      item.position.set(pos.x, pos.y, pos.z);
+    })
+
   }
   ngOnInit(): void {
   }
@@ -44,10 +76,18 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     //console.log(changes)
-    if (changes["scene"] != undefined)
-      if (changes["scene"].currentValue != undefined) {
-        this.CreateTreeView();
-      }
+    if (changes["newFile"] != undefined) {
+      console.log(changes["newFile"]);
+      if (!changes["newFile"].firstChange)
+        if (changes["newFile"].currentValue == this.AnimationService.newFileLoading) {
+          console.log("KEK");
+          this.CreateTreeView();
+        }
+    }
+    // if (changes["scene"] != undefined)
+    //   if (changes["scene"].currentValue != undefined) {
+    //     this.CreateTreeView();
+    //   }
     if (changes["curTime"] != undefined) {
       let currentTime = document.getElementById("curTime")!;
       this.renderer.setStyle(currentTime, "left", `${this.AnimationService.currentTime * this.timeLine.scale}px`);
@@ -55,9 +95,32 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   }
   CreateTreeView() {
     let ln = document.getElementById("lines");
-    // ln?.replaceChildren();
+    ln?.replaceChildren();
+    this.CreateRulerElement(ln!);
     this.CreateTreeViewElements(this.scene);
-    setTimeout(() => { this.UpdateTracks(); }, 1000);
+    setTimeout(() => {
+      this.UpdateTracks();
+    }, 1000);
+  }
+  CreateRulerElement(lines: HTMLElement) {
+    let line = this.renderer.createElement("div");
+    this.renderer.addClass(line, "line");
+    let part = this.renderer.createElement("div");
+    this.renderer.addClass(part, "part");
+    this.renderer.appendChild(line, part);
+    let partname = this.renderer.createElement("div");
+    this.renderer.addClass(partname, "partname");
+    this.renderer.appendChild(part, partname);
+    let ruler = this.renderer.createElement("div");
+    this.renderer.addClass(ruler, "ruler-track");
+    this.renderer.setAttribute(ruler, "id", "rulerTrack");
+    this.renderer.appendChild(line, ruler);
+    let currentTime = this.renderer.createElement("div");
+    this.renderer.addClass(currentTime, "current-time");
+    this.renderer.listen(currentTime, "mousedown", (event) => this.OnCurrentTimeMouseDown(event));
+    this.renderer.setAttribute(currentTime, "id", "curTime");
+    this.renderer.appendChild(ruler, currentTime);
+    this.renderer.appendChild(lines, line);
   }
   CreateTreeViewElements(obj: THREE.Object3D, tabIndex: number = 0) {
     if (obj.children.length != 0) {

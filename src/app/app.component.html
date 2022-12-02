@@ -1,9 +1,10 @@
 <router-outlet></router-outlet>
-<input type="file" name="" accept=".step,.stp,.gltf" (change)="LoadFile($event)" id="">
+<input class="file" type="file" name="" accept=".step,.stp,.gltf" (change)="LoadFile($event)" id="">
 <canvas #canvas class="canvas" (mousemove)="onPointerMove($event)" (click)="onClick($event)"
     (window:resize)="onResize($event)" (window:keydown)="onKeyDown($event)" (window:keyup)="onKeyUp($event)"></canvas>
+<app-viewcube></app-viewcube>
 <app-timeline [scene]="AnimationService.scene" [actions]="AnimationService.actions"
-    [curTime]="AnimationService.currentTime">
+    [curTime]="AnimationService.currentTime" [newFile]="AnimationService.newFileLoading">
 </app-timeline>
 <app-properties [selected]="AnimationService.selectionChange" [curTime]="AnimationService.currentTime"
     [transformed]="AnimationService.transformChange">

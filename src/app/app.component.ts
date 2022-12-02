@@ -222,6 +222,11 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   async LoadFile(event: Event) {
     console.log(event);
+    this.mainObject.clear();
+    this.meshArr = [];
+    this.AnimationService.timeLine.tracks = [];
+    this.AnimationService.planeHelpers.clear();
+    this.AnimationService.stencilGroups.clear();
     let f = event.target as any;
     console.log(f.files);
     if (f.files.length != 0) {
@@ -229,7 +234,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     let str = window.URL.createObjectURL(f.files[0]);
     console.log(str);
-    this.LoadGeometry(str, this.mainObject);
+    await this.LoadGeometry(str, this.mainObject);
+    // this.AnimationService.newFileLoading = !this.AnimationService.newFileLoading;
   }
 
   async LoadGeometry(URL: string, targetObject: THREE.Object3D) {
@@ -240,8 +246,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     loader.load(
       // Ссылка на ресурс
       // Вызывается когда ресурс загружен
-      // URL,
-      'http://127.0.0.1:5500/src/models/Zachvat.gltf',
+      URL,
+      //'http://127.0.0.1:5500/src/models/Razrez.gltf',
       async function (gltf) {
         if (gltf.scene.children.length != 0) {
           // Добавление модели в контейнер
@@ -264,9 +270,9 @@ export class AppComponent implements OnInit, AfterViewInit {
 
           //component.AnimationService.mixers = component.mixers;
           // Загрузка файла анимации
-          component.LoadAnimation(targetObject, component.AnimationService.mixers);
+          //component.LoadAnimation(targetObject, component.AnimationService.mixers);
 
-
+          component.AnimationService.newFileLoading = !component.AnimationService.newFileLoading;
         }
       },
       // Вызывается в процессе загрузки
@@ -395,7 +401,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     // Чтение анимации
     // Создание объекта парсера XML/HTML-файлов
     let parser = new DOMParser();
-    let fileUrl1 = 'http://127.0.0.1:5500/src/Animations/.xml';
+    let fileUrl1 = 'http://127.0.0.1:5500/src/Animations/Разрез.xml';
     let response1 = await fetch(fileUrl1);
     let buffer1 = await response1.text();
     // Преобразование файла в DOM элемент
@@ -635,7 +641,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
     return arr;
   }
-
 
 
 

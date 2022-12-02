@@ -142,7 +142,11 @@ export class PropertiesComponent implements OnInit, OnChanges {
   }
 
   DeleteKeyframe(event: MouseEvent) {
-    this.AnimationCreatorService.DeleteKeyframe(this.propertiesObject);
+    // this.AnimationCreatorService.DeleteKeyframe(this.propertiesObject);
+    this.AnimationService.DeleteKeyframe(this.AnimationService.selectedKeyframe);
+  }
+  DeleteAction(event: MouseEvent) {
+    this.AnimationService.DeleteAction(this.AnimationService.selectedAction);
   }
 
   OnCameraChange($event: MouseEvent) {
@@ -169,7 +173,10 @@ export class PropertiesComponent implements OnInit, OnChanges {
     this.propertiesObject.shadow.camera.updateProjectionMatrix();
     this.propertiesObject.children[1].update();
   }
-
+  ShowPlane(event: Event) {
+    // this.propertiesObject.material.visible = (event.target as any).checked;
+    this.propertiesObject.children[0].material.visible = (event.target as any).checked;
+  }
   OnFOVChange($event: Event) {
     this.propertiesObject.updateProjectionMatrix();
   }
