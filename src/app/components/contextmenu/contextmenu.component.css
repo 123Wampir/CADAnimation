@@ -1,0 +1,53 @@
+.checkbox-line {
+    transition: all 0.1s;
+    white-space: nowrap;
+    display: flex;
+}
+
+.checkbox-line:hover {
+    background: lightgray;
+}
+
+.menu-line {
+    transition: all 0.1s;
+    display: flex;
+    flex-direction: row;
+}
+
+.menu-line>div {
+    display: none;
+}
+
+.menu-line:hover>div {
+    display: block;
+}
+
+.menu-label {
+    white-space: nowrap;
+    transition: all 0.1s;
+    padding: 1px 10px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.menu-label:hover {
+    background: lightgray;
+}
+
+.menu-items {
+    position: absolute;
+    left: 100%;
+    border-radius: 2px;
+}
+
+.basic-line {
+    transition: all 0.1s;
+    white-space: nowrap;
+    padding: 1px 10px;
+}
+
+.basic-line:hover {
+    background: lightgray;
+}

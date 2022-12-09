@@ -1,12 +1,15 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+//import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
+import { ArcballControls } from 'three/examples/jsm/controls/ArcballControls';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { exec, execFile } from 'child_process';
 import { AnimationService } from './services/animation.service';
 import { degToRad } from 'three/src/math/MathUtils';
+import { WebGLCapabilities } from 'three';
 
 @Component({
   selector: 'app-root',
@@ -29,15 +32,19 @@ export class AppComponent implements OnInit, AfterViewInit {
   intersection: any;
   pointer!: THREE.Vector2;
   raycaster!: THREE.Raycaster;
-  orbitControls!: OrbitControls;
+  //orbitControls!: OrbitControls;
+  orbitControls!: TrackballControls;
+  // orbitControls!: ArcballControls;
   transformControls!: TransformControls;
   meshArr: THREE.Mesh[] = [];
   geomArr: THREE.BufferGeometry[] = [];
   counter = 0;
+  delta = 0.01;
 
   CreateScene() {
     this.scene = new THREE.Scene();
     // Добавление и настройка камеры
+
     this.camera = new THREE.PerspectiveCamera(45, this.getAspectRatio(), 1.0, 100000.0);
     this.camera.position.set(50.0, 150.0, 100.0);
     this.camera.up.set(0.0, 0.0, 1.0);
@@ -51,7 +58,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
 
     // Добавление глобального освещения
-    const ambientLight = new THREE.AmbientLight(0x444444);
+    const ambientLight = new THREE.AmbientLight(0xffffff);
     this.scene.add(ambientLight);
     // Добавление направленного света
     const directionalLight = new THREE.DirectionalLight(0x888888);
@@ -68,7 +75,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.pointer = new THREE.Vector2();
 
     const planeGeometry = new THREE.PlaneGeometry(10000, 10000, 32, 32);
-    const planeMaterial = new THREE.ShadowMaterial({ color: ambientLight.color })
+    const planeMaterial = new THREE.ShadowMaterial({ color: 0x000000 })
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.name = "Zero Plane";
     plane.type = "zeroPlane";
@@ -77,6 +84,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     planeHelper.visible = false;
     plane.receiveShadow = true;
     this.scene.add(plane);
+    this.AnimationService.zeroPlane = plane;
     this.AnimationService.planeHelpers.type = "Container";
     this.AnimationService.planeHelpers.name = "CuttingPlanes";
     this.scene.add(this.AnimationService.planeHelpers);
@@ -114,21 +122,31 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   startRenderingLoop() {
-    this.renderer = new THREE.WebGL1Renderer({ canvas: this.canvas, antialias: true });
+    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: false, failIfMajorPerformanceCaveat: true });
+    this.AnimationService.scene = this.scene;
     this.AnimationService.renderer = this.renderer;
     this.renderer.shadowMap.enabled = true;
     // this.renderer.localClippingEnabled = true;
-    //this.renderer.physicallyCorrectLights = true;
+    this.renderer.physicallyCorrectLights = true;
     console.log(this.renderer);
     this.renderer.setSize(window.innerWidth * 0.99, window.innerHeight * 0.99);
     this.renderer.setClearColor(0xffffff);
-    this.orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
-    this.orbitControls.enableDamping = false;
-    this.orbitControls.dampingFactor = 0.1;
-    this.orbitControls.autoRotate = false;
+    this.orbitControls = new TrackballControls(this.camera, this.renderer.domElement);
+    // this.orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
+    // this.orbitControls = new ArcballControls(this.camera, this.renderer.domElement);
+    // this.orbitControls.enableDamping = false;
+    console.log(this.orbitControls);
+
+    //this.orbitControls.enableAnimations = false;
+    // this.orbitControls.dynamicDampingFactor = 1;
+    this.orbitControls.rotateSpeed = 10;
+    this.orbitControls.panSpeed = 1.5;
+    this.orbitControls.staticMoving = true;
+    // this.orbitControls.autoRotate = false;
     this.AnimationService.orbit = this.orbitControls;
-    this.orbitControls.addEventListener('change', (event) => {
+    this.orbitControls.addEventListener('change', (event: any) => {
       this.firstClick = true;
+      // this.firstClick = false;
     })
     this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
     this.transformControls.space = "local";
@@ -147,7 +165,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     (function animate() {
       if (component.mainObject != undefined) {
         component.FindIntersection();
-        if (component.AnimationService.stencilNeedUpdate)
+        if (component.AnimationService.stencilNeedUpdate && component.renderer.localClippingEnabled)
           if (component.meshArr.length != 0) {
             for (let i = 0; i < component.AnimationService.stencilGroups.children.length; i++) {
               component.AnimationService.UpdateStencilGeometry(component.meshArr, component.AnimationService.stencilGroups.children[i])
@@ -156,15 +174,14 @@ export class AppComponent implements OnInit, AfterViewInit {
           }
       }
       //component.renderer.shadowMap.needsUpdate = true;
-      //component.orbitControls.update()
+      component.orbitControls.update()
       requestAnimationFrame(animate);
       stats.update();
-      component.AnimationService.helpers.forEach(helper => {
-        helper.update()
-      })
+      // component.AnimationService.helpers.forEach(helper => {
+      //   helper.update()
+      // })
       if (component.AnimationService.play) {
-        let delta = 0.01;
-        component.AnimationService.currentTime += delta;
+        component.AnimationService.currentTime += component.delta;
         if (component.AnimationService.currentTime > component.AnimationService.timeLine.duration) {
           component.AnimationService.play = false;
           component.AnimationService.currentTime = component.AnimationService.timeLine.duration;
@@ -195,12 +212,12 @@ export class AppComponent implements OnInit, AfterViewInit {
         })
         component.AnimationService.stop = false;
       }
-      component.counter++;
+      // component.counter++;
       if (component.counter == 60) {
-        component.AnimationService.stencilNeedUpdate = true;
-        component.counter = 0;
+        //   component.AnimationService.stencilNeedUpdate = true;
+        //   component.counter = 0;
       }
-      component.renderer.render(component.scene, component.camera);
+      component.renderer.render(component.scene, component.AnimationService.currentCamera);
     }());
   }
   ngOnInit() {
@@ -222,11 +239,6 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   async LoadFile(event: Event) {
     console.log(event);
-    this.mainObject.clear();
-    this.meshArr = [];
-    this.AnimationService.timeLine.tracks = [];
-    this.AnimationService.planeHelpers.clear();
-    this.AnimationService.stencilGroups.clear();
     let f = event.target as any;
     console.log(f.files);
     if (f.files.length != 0) {
@@ -249,6 +261,17 @@ export class AppComponent implements OnInit, AfterViewInit {
       URL,
       //'http://127.0.0.1:5500/src/models/Razrez.gltf',
       async function (gltf) {
+        component.mainObject.traverse(item => {
+          if (item.type == "Mesh") {
+            (item as any).geometry.dispose();
+            (item as any).material.dispose();
+          }
+        })
+        component.mainObject.clear();
+        component.meshArr = [];
+        component.AnimationService.timeLine.tracks = [];
+        component.AnimationService.planeHelpers.clear();
+        component.AnimationService.stencilGroups.clear();
         if (gltf.scene.children.length != 0) {
           // Добавление модели в контейнер
           targetObject.add(gltf.scene.children[0]);
@@ -259,14 +282,16 @@ export class AppComponent implements OnInit, AfterViewInit {
 
           //component.CreateEdges(targetObject, true, 25);
           console.log(targetObject);
+          component.AnimationService.model = targetObject;
           component.AnimationService.scene = component.scene;
           component.AnimationService.FindMeshes(targetObject, component.meshArr);
           //console.log(component.meshArr);
           let arr: any[] = [];
           component.AnimationService.FindMeshes(targetObject, arr);
           component.AnimationService.CreateClippingPlanes(arr);
+          component.AnimationService.SetZeroPlane();
           // Создание миксеров(дорожек) для модели
-          component.CreateMixers(targetObject)
+          component.CreateMixers(targetObject);
 
           //component.AnimationService.mixers = component.mixers;
           // Загрузка файла анимации
@@ -312,18 +337,28 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
   CreateUniqueMaterial(obj: THREE.Object3D) {
     let arr: any[] = [];
-    obj.receiveShadow = true;
-    obj.castShadow = true;
+    // obj.receiveShadow = true;
+    // obj.castShadow = true;
     this.AnimationService.FindMeshes(obj, arr);
     if (arr.length != 0) {
       arr.forEach(mesh => {
-        mesh.material.side = THREE.FrontSide;
-        mesh.material = mesh.material.clone();
-        mesh.material.transparent = true;
-        //mesh.material.alphaToCoverage = true;
+        let mat = new THREE.MeshPhongMaterial();
+        mat.transparent = true;
+        mat.side = THREE.FrontSide;
+        // console.log(mesh.geometry.attributes["color"].array[0]);
+        let r = mesh.geometry.attributes["color"].array[0];
+        let g = mesh.geometry.attributes["color"].array[1];
+        let b = mesh.geometry.attributes["color"].array[2];
+        mat.color.setRGB(r, g, b);
+        mat.clipIntersection = true;
+        mesh.material = mat.clone();
+        // console.log(mesh.material.color);
+        // mesh.material.side = THREE.FrontSide;
+        // mesh.material.transparent = true;
+        // mesh.material.alphaToCoverage = true;
+        // mesh.material.clipIntersection = true;
         mesh.receiveShadow = true;
         mesh.castShadow = true;
-        mesh.material.clipIntersection = true;
       })
     }
   }
@@ -380,6 +415,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
   onClick(event: MouseEvent) {
+    this.AnimationService.contextMenu = false;
     if (!this.firstClick) {
       if (this.intersection != undefined) {
         this.AnimationService.Select(this.intersection, this.AnimationService.CTRLPressed);

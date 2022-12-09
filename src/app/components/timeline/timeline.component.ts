@@ -20,6 +20,7 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   startPos = 0;
   center!: THREE.Vector3;
   point!: THREE.Object3D;
+  offsets: any[] = [];
 
   OnSceneColorChange(event: Event) {
     let e = event as any;
@@ -34,29 +35,44 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     // console.log(this.center);
     this.AnimationService.FindMeshes(this.AnimationService.scene, arr);
     if (this.center == undefined) {
+      // this.AnimationService.boundingBox.getCenter(this.center);
+      if (this.AnimationService.boundingSphere == null) {
+        //console.log(this.AnimationService.boundingSphere);
+        return;
+      }
       this.center = new THREE.Vector3();
-      this.AnimationService.boundingBox.getCenter(this.center);
-      let geom = new THREE.CylinderGeometry();
-      let mat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+      this.center = this.AnimationService.boundingSphere.center.clone();
+      console.log(this.AnimationService.boundingSphere);
+      let geom = new THREE.SphereGeometry(this.AnimationService.boundingSphere.radius);
+      let mat = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.7, alphaToCoverage: true });
       this.point = new THREE.Mesh(geom, mat);
       this.point.type = "point";
       this.point.position.add(this.center)
-      this.scene.add(this.point)
-      console.log(this.point);
-
+      //this.scene.add(this.point)
+      //console.log(this.point);
     }
     arr.forEach((item, index) => {
-      if (this.AnimationService.startPos.length != arr.length)
+      if (this.AnimationService.startPos.length != arr.length) {
         this.AnimationService.startPos.push(item.position.clone());
-      let q = new THREE.Quaternion();
-      item.getWorldQuaternion(q);
+        let pts: any[] = [];
+        item.updateWorldMatrix(true, true);
+        pts.push(this.center.clone());
+        let wPos = new THREE.Vector3();
+        item.getWorldPosition(wPos);
+        let offset = wPos.clone().sub(this.center).normalize();
+        pts.push(item.getWorldPosition(new THREE.Vector3()));
+        let geom = new THREE.BufferGeometry().setFromPoints(pts);
+        let mat = new THREE.LineBasicMaterial({ color: 0xff0000 });
+        let line = new THREE.Line(geom, mat);
+        //this.scene.add(line);
+        this.offsets.push(offset);
+      }
       let ps = new THREE.Vector3();
       item.getWorldPosition(ps);
-      let offset = ps.clone().applyQuaternion(q.invert()).sub(this.center).normalize();
-      let pos = offset.multiplyScalar((event.target as any).value).add(this.AnimationService.startPos[index]);
+      let pos = item.worldToLocal(ps.clone().add(this.offsets[index].clone().multiplyScalar((event.target as any).value))).add(this.AnimationService.startPos[index])
       item.position.set(pos.x, pos.y, pos.z);
     })
-
+    //console.log(this.AnimationService.startPos);
   }
   ngOnInit(): void {
   }
@@ -80,7 +96,6 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
       console.log(changes["newFile"]);
       if (!changes["newFile"].firstChange)
         if (changes["newFile"].currentValue == this.AnimationService.newFileLoading) {
-          console.log("KEK");
           this.CreateTreeView();
         }
     }

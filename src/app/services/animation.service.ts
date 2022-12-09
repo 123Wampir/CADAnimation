@@ -4,6 +4,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import * as AnimationModel from 'src/app/shared/animation.model';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls';
+import { ArcballControls } from 'three/examples/jsm/controls/ArcballControls';
 
 @Injectable({
   providedIn: 'root'
@@ -27,8 +29,10 @@ export class AnimationService {
 
   renderer!: THREE.WebGLRenderer;
   scene!: THREE.Scene;
+  model!: THREE.Object3D;
   group: THREE.Mesh = new THREE.Mesh();
   stencilGroups = new THREE.Group();
+  zeroPlane!: THREE.Mesh;
   planes: any[] = [];
   planeHelpers = new THREE.Object3D();
   startPos: THREE.Vector3[] = [];
@@ -40,15 +44,20 @@ export class AnimationService {
   helpers: any[] = [];
   timeLine!: AnimationModel.TimelineModel;
   transform!: TransformControls;
-  orbit!: OrbitControls;
+  //orbit!: OrbitControls;
+  orbit!: TrackballControls;
+  // orbit!: ArcballControls;
   angRenderer!: Renderer2;
   currentCamera!: THREE.Camera;
   boundingBoxSize!: THREE.Vector3;
   boundingBox!: THREE.Box3;
+  boundingSphere!: THREE.Sphere;
 
   dialogShow = false;
   dialogModal = false;
   dialogType = "";
+
+  contextMenu = false;
 
 
   CreateActionDOM(keyframeTrack: AnimationModel.KeyframeTrackModel, action: AnimationModel.KeyframeActionModel) {
@@ -627,8 +636,6 @@ export class AnimationService {
     }
     if (geomArr.length != 0) {
       let mergedGeom = BufferGeometryUtils.mergeBufferGeometries(geomArr);
-      mergedGeom.computeBoundingBox();
-      this.boundingBox = mergedGeom.boundingBox!;
       for (let i = 0; i < geomArr.length; i++) {
         geomArr[i].dispose();
       }
@@ -677,6 +684,10 @@ export class AnimationService {
       }
     })
     let mergedGeom = BufferGeometryUtils.mergeBufferGeometries(geomArr);
+    mergedGeom.computeBoundingBox();
+    mergedGeom.computeBoundingSphere();
+    this.boundingBox = mergedGeom.boundingBox!;
+    this.boundingSphere = mergedGeom.boundingSphere!;
     geomArr.forEach(geo => {
       geo.dispose();
     })
@@ -708,6 +719,34 @@ export class AnimationService {
     }
     this.scene.add(this.stencilGroups)
     this.stencilNeedUpdate = true;
+  }
+
+  CalculateBounding() {
+    let arr: any[] = [];
+    this.FindMeshes(this.model, arr);
+    let geomArr: THREE.BufferGeometry[] = [];
+    arr.forEach((obj) => {
+      if (obj.type == "Mesh") {
+        if (obj.visible) {
+          let item = (obj as any)
+          item.updateWorldMatrix(true, true);
+          let newGeom = item.geometry.clone().applyMatrix4(item.matrixWorld);
+          geomArr.push(newGeom);
+        }
+      }
+    })
+    let mergedGeom = BufferGeometryUtils.mergeBufferGeometries(geomArr);
+    mergedGeom.computeBoundingBox();
+    mergedGeom.computeBoundingSphere();
+    this.boundingBox = mergedGeom.boundingBox!;
+    this.boundingSphere = mergedGeom.boundingSphere!;
+    geomArr.forEach(geo => {
+      geo.dispose();
+    })
+    mergedGeom.dispose();
+  }
+  SetZeroPlane() {
+    this.zeroPlane.position.set(this.zeroPlane.position.x, this.zeroPlane.position.y, this.boundingBox.min.z);
   }
 
   ClearSelection() {

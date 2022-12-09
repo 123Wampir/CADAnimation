@@ -8,6 +8,7 @@ import { PropertiesComponent } from './components/properties/properties.componen
 import { FormsModule } from '@angular/forms';
 import { DialogComponent } from './components/dialog/dialog.component';
 import { ViewcubeComponent } from './components/viewcube/viewcube.component';
+import { ContextmenuComponent } from './components/contextmenu/contextmenu.component';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,8 @@ import { ViewcubeComponent } from './components/viewcube/viewcube.component';
     TimelineComponent,
     PropertiesComponent,
     DialogComponent,
-    ViewcubeComponent
+    ViewcubeComponent,
+    ContextmenuComponent
   ],
   imports: [
     BrowserModule,

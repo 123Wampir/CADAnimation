@@ -1,10 +1,72 @@
-<div class="scene">
+<div class="scene" (contextmenu)="ShowContextMenu($event)">
     <div class="cube" #cube>
-        <div class="cube__face cube__face--front" (click)="setView(0,1,0)">front</div>
-        <div class="cube__face cube__face--back" (click)="setView(0,-1,0)">back</div>
-        <div class="cube__face cube__face--right" (click)="setView(-1,0,0)">right</div>
-        <div class="cube__face cube__face--left" (click)="setView(1,0,0)">left</div>
-        <div class="cube__face cube__face--top" (click)="setView(0,0,1)">top</div>
-        <div class="cube__face cube__face--bottom" (click)="setView(0,0,-1)">bottom</div>
+        <div class="cube__face cube__face--front">
+            <div class="corner" (click)="setView(1,1,1)"></div>
+            <div class="up-middle" (click)="setView(0,1,1)"></div>
+            <div class="corner" (click)="setView(-1,1,1)"></div>
+            <div class="left-middle" (click)="setView(1,1,0)"></div>
+            <div class="center" (click)="setView(0,1,0)">Front</div>
+            <div class="right-middle" (click)="setView(-1,1,0)"></div>
+            <div class="corner" (click)="setView(1,1,-1)"></div>
+            <div class="bottom-middle" (click)="setView(0,1,-1)"></div>
+            <div class="corner" (click)="setView(-1,1,-1)"></div>
+        </div>
+        <div class="cube__face cube__face--back">
+            <div class="corner" (click)="setView(-1,-1,1)"></div>
+            <div class="up-middle" (click)="setView(0,-1,1)"></div>
+            <div class="corner" (click)="setView(1,-1,1)"></div>
+            <div class="left-middle" (click)="setView(-1,-1,0)"></div>
+            <div class="center" (click)="setView(0,-1,0)">Back</div>
+            <div class="right-middle" (click)="setView(1,-1,0)"></div>
+            <div class="corner" (click)="setView(-1,-1,-1)"></div>
+            <div class="bottom-middle" (click)="setView(0,-1,-1)"></div>
+            <div class="corner" (click)="setView(1,-1,-1)"></div>
+        </div>
+        <div class="cube__face cube__face--right">
+            <div class="corner" (click)="setView(-1,1,1)"></div>
+            <div class="up-middle" (click)="setView(-1,0,1)"></div>
+            <div class="corner" (click)="setView(-1,-1,1)"></div>
+            <div class="left-middle" (click)="setView(-1,1,0)"></div>
+            <div class="center" (click)="setView(-1,0,0)">Right</div>
+            <div class="right-middle" (click)="setView(-1,-1,0)"></div>
+            <div class="corner" (click)="setView(-1,1,-1)"></div>
+            <div class="bottom-middle" (click)="setView(-1,0,-1)"></div>
+            <div class="corner" (click)="setView(-1,-1,-1)"></div>
+        </div>
+        <div class="cube__face cube__face--left">
+            <div class="corner" (click)="setView(1,-1,1)"></div>
+            <div class="up-middle" (click)="setView(1,0,1)"></div>
+            <div class="corner" (click)="setView(1,1,1)"></div>
+            <div class="left-middle" (click)="setView(1,-1,0)"></div>
+            <div class="center" (click)="setView(1,0,0)">Left</div>
+            <div class="right-middle" (click)="setView(1,1,0)"></div>
+            <div class="corner" (click)="setView(1,-1,-1)"></div>
+            <div class="bottom-middle" (click)="setView(1,0,-1)"></div>
+            <div class="corner" (click)="setView(1,1,-1)"></div>
+        </div>
+        <div class="cube__face cube__face--top">
+            <div class="corner" (click)="setView(1,-1,1)"></div>
+            <div class="up-middle" (click)="setView(0,-1,1)"></div>
+            <div class="corner" (click)="setView(-1,-1,1)"></div>
+            <div class="left-middle" (click)="setView(1,0,1)"></div>
+            <div class="center" (click)="setView(0,0,1)">Top</div>
+            <div class="right-middle" (click)="setView(-1,0,1)"></div>
+            <div class="corner" (click)="setView(1,1,1)"></div>
+            <div class="bottom-middle" (click)="setView(0,1,1)"></div>
+            <div class="corner" (click)="setView(-1,1,1)"></div>
+        </div>
+        <div class="cube__face cube__face--bottom">
+            <div class="corner" (click)="setView(1,1,-1)"></div>
+            <div class="up-middle" (click)="setView(0,1,-1)"></div>
+            <div class="corner" (click)="setView(-1,1,-1)"></div>
+            <div class="left-middle" (click)="setView(1,0,-1)"></div>
+            <div class="center" (click)="setView(0,0,-1)">Bottom</div>
+            <div class="right-middle" (click)="setView(-1,0,-1)"></div>
+            <div class="corner" (click)="setView(1,-1,-1)"></div>
+            <div class="bottom-middle" (click)="setView(0,-1,-1)"></div>
+            <div class="corner" (click)="setView(-1,-1,-1)"></div>
+        </div>
     </div>
+    <app-contextmenu *ngIf="AnimationService.contextMenu" [posX]="posX" [posY]="posY" [type]="'viewcube'"
+        (SetAsView)="SetAsView($event)"></app-contextmenu>
 </div>

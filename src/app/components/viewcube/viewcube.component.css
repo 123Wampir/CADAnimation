@@ -36,8 +36,11 @@
     text-align: center;
     user-select: none;
     cursor: pointer;
+    display: grid;
+    grid-template-columns: 25% 50% 25%;
+    grid-template-rows: 25% 50% 25%;
   }
-  .cube__face:hover{
+  .cube__face>div:hover{
     background-color: gray;
     color: white;
     transition: all 0.2s;
@@ -57,4 +60,11 @@
   .cube__face--top    { transform: rotateZ(180deg) rotateX(180deg) translateZ(-50px); }
   .cube__face--bottom { transform: rotateZ(180deg) translateZ(-50px); }
   
+  .center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: -1;
+  }
+
   label { margin-right: 10px; }
