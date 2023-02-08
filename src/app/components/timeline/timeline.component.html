@@ -7,6 +7,9 @@
                 <input type="checkbox" name="" (change)="CLIPPINGTEST($event)" id="">
                 <div class="label">Цвет сцены</div>
                 <input type="color" name="" (change)="OnSceneColorChange($event)" id="">
+                <div class="label">Разрешение</div>
+                <input type="range" min="0.1" max="1" step="0.05" [(ngModel)]="SceneUtilsService.renderScale"
+                    (change)="SceneUtilsService.onResize($event)">
             </div>
             <div class="playback-controls">
                 <button class="playback-play" (click)="OnPlayClick($event)">▶</button>
@@ -14,11 +17,20 @@
                 <div class="timer">{{curTime.toPrecision(3)}}</div>
             </div>
             <div class="window-controls">
-                <input type="range" min="1" max="300" step="0.5" [(ngModel)]="timeLine.scale"
-                    (change)="OnResizeTimeline($event)">
+                <div class="label">Длительность</div>
+                <input type="number" class="input-number" min="1" max="3600" step="0.5" placeholder="Длительность"
+                    [(ngModel)]="AnimationService.timeLine.duration">
+                <input type="range" min="1" max="300" step="0.5" [(ngModel)]="AnimationService.timeLine.scale">
                 <input type="range" value="0" min="0" max="300" step="0.5" (mousemove)="OnExplode($event)">
-                <button class="load">load</button>
-                <button class="save">save</button>
+                <label class="file-label" for="load">
+                    <input class="file" type="file" name="load" id="load" accept=".xml"
+                        (change)="AnimationService.LoadAnimationFile($event)">
+                    Загрузить
+                </label>
+                <label class="file-label" for="save">
+                    <input class="file" type="file" name="save" id="save" accept=".xml">
+                    Сохранить
+                </label>
                 <button class="expand-first" (click)="OnTimelineExpand($event)">▼</button>
             </div>
         </div>
@@ -34,31 +46,33 @@
                     <div class="current-time" id="curTime" (mousedown)="OnCurrentTimeMouseDown($event)"></div>
                 </div>
             </div>
-            <!-- <div class="line" *ngFor="let track of timeLine.tracks">
-                <div class="part">{{track.name}}</div>
-                <div class="track">
-                    <div class="action" *ngFor="let action of track.actions">
-                        <div class="keyframe" *ngFor="let keyframe of action.keyframes"></div>
+            <cdk-virtual-scroll-viewport [itemSize]="30">
+                <div *cdkVirtualFor="let person of persons;let i = index">
+                    <div class="card">
+                        <div class="container">
+                            <h4><b>{{person.name}}</b></h4>
+                            <h4><b>ID: {{i}}</b></h4>
+                            <!-- <p>{{person.bio.substr(0, 30)}}...</p> -->
+                        </div>
                     </div>
                 </div>
-            </div> -->
-        </div>
-        <!-- <div class="line">
-            <div class="mesh">
-                <div name="Оболочка_30" class="meshname">╠════Оболочка_30</div>
-            </div>
-            <div class="track" style="width: 1000px;">
-                <div class="actions">
-                    <div class="action" style="left: 200px;width: 150px;"></div>
-                    <div class="action" style="left: 250px;width: 100px;"></div>
-                    <div class="action" style="left: 200px;width: 300px;"></div>
-                    <div class="action" style="left: 250px;width: 250px;"></div>
+            </cdk-virtual-scroll-viewport>
+            <!-- <cdk-virtual-scroll-viewport [itemSize]="141" style="height:300px">
+                <div class="line" *cdkVirtualFor="let track of timeline.tracks; trackBy:TrackByFunction">
+                    <div class="part" *ngSwitchCase="'Part'">
+                        <div class="partname">{{track.name}}</div>
+                    </div>
+                    <div class="mesh" *ngSwitchCase="'Mesh'">
+                        <div class="meshname">{{track.name}}</div>
+                    </div>
+                    <div class="track" [ngStyle]="SetTrackStyle()">
+                        <div class="action" [ngStyle]="SetActionStyle(action)" *ngFor="let action of track.actions">
+                            <div class="keyframe" [ngStyle]="SetKeyframeStyle(keyframe)"
+                                *ngFor="let keyframe of action.keyframes"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="keyframe" time="4" part="Оболочка_30" style="left: 200px;"></div>
-                <div class="keyframe" time="5" part="Оболочка_30" style="left: 250px;"></div>
-                <div class="keyframe" time="7" part="Оболочка_30" style="left: 350px;"></div>
-                <div class="keyframe" time="10" part="Оболочка_30" style="left: 500px;"></div>
-            </div>
-        </div> -->
+            </cdk-virtual-scroll-viewport> -->
+        </div>
     </div>
 </div>

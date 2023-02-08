@@ -16,21 +16,13 @@
     transform: translateZ(-100px);
     /* transition: transform 0.2s; */
   }
-  
-  /* .cube.show-front  { transform: translateZ(-100px) rotateY(   0deg); }
-  .cube.show-right  { transform: translateZ(-100px) rotateY( -90deg); }
-  .cube.show-back   { transform: translateZ(-100px) rotateY(-180deg); }
-  .cube.show-left   { transform: translateZ(-100px) rotateY(  90deg); }
-  .cube.show-top    { transform: translateZ(-100px) rotateX( -90deg); }
-  .cube.show-bottom { transform: translateZ(-100px) rotateX(  90deg); } */
-  
   .cube__face {
     position: absolute;
     width: 100px;
     height: 100px;
     border: 2px solid black;
     line-height: 100px;
-    font-size: 28px;
+    font-size: 24px;
     font-weight: bold;
     color: black;
     text-align: center;

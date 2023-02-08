@@ -240,7 +240,7 @@ button {
     position: relative;
     width: 100px;
     height: 6px;
-    background-color: aquamarine;
+    background-color: darkgoldenrod;
     border-radius: 5px;
     transition: height 100ms;
     cursor: pointer;

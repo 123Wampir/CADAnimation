@@ -81,6 +81,18 @@
                     <input type="color" class="input-color" [(ngModel)]="hex" (change)="OnColorChange($event)">
                 </div>
             </div>
+            <div class="param" *ngIf="light && !group">
+                <div class="param-label">
+                    <div class="label">Интенсивность</div>
+                    <button class="save-param" *ngIf="!camera" (click)="OnIntensityChange($event)">Запомнить</button>
+                </div>
+                <div class="inputs">
+                    <input type="range" min="0" max="100" step="0.1" class="input-range"
+                        [(ngModel)]="propertiesObject.intensity" placeholder="0" (change)="OnIntensityChange($event)">
+                    <input type="number" class="input-number" min="0" max="100" step="0.1" placeholder="Интенсивность"
+                        [(ngModel)]="propertiesObject.intensity" (change)="OnIntensityChange($event)">
+                </div>
+            </div>
             <div class="param" *ngIf="!camera && !cutPlane">
                 <div class="param-label">
                     <div class="label">Видимость</div>

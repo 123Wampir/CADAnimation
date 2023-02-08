@@ -3,7 +3,7 @@ import THREE = require("three");
 export interface KeyframeModel {
     time: number;
     clip: THREE.AnimationClip;
-    DOMElement?: HTMLElement;
+    // DOMElement?: HTMLElement;
     value: any;
     action: KeyframeActionModel;
 }
@@ -11,16 +11,16 @@ export interface KeyframeActionModel {
     keyframes: KeyframeModel[];
     type: string;
     track?: THREE.KeyframeTrack;
-    DOMElement?: HTMLElement;
+    // DOMElement?: HTMLElement;
     start: number;
     length: number;
     trackDOM: KeyframeTrackModel;
 }
 export interface KeyframeTrackModel {
-    keyframes: KeyframeModel[];
     actions: KeyframeActionModel[];
     name: string;
-    DOMElement: HTMLElement;
+    type: string;
+    // DOMElement?: HTMLElement;
 }
 export interface TimelineModel {
     tracks: KeyframeTrackModel[];

@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { DialogComponent } from './components/dialog/dialog.component';
 import { ViewcubeComponent } from './components/viewcube/viewcube.component';
 import { ContextmenuComponent } from './components/contextmenu/contextmenu.component';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { ContextmenuComponent } from './components/contextmenu/contextmenu.compo
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule
+    FormsModule,
+    ScrollingModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,6 +1,7 @@
 import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
-import { AnimationCreatorService } from 'src/app/services/animation.creator.service';
-import { AnimationService } from 'src/app/services/animation.service';
+import { AnimationCreatorService } from 'src/app/services/animation/animation.creator.service';
+import { AnimationService } from 'src/app/services/animation/animation.service';
+import { SceneUtilsService } from 'src/app/services/utils/scene.utils.service';
 import THREE = require('three');
 
 @Component({
@@ -9,7 +10,7 @@ import THREE = require('three');
   styleUrls: ['./dialog.component.css']
 })
 export class DialogComponent implements OnInit, OnChanges {
-  constructor(public AnimationService: AnimationService, private AnimationCreatorService: AnimationCreatorService) { }
+  constructor(public AnimationService: AnimationService, private AnimationCreatorService: AnimationCreatorService, private SceneUtilsService:SceneUtilsService) { }
 
   @ViewChild('container') containerRef!: ElementRef;
   get container(): HTMLCanvasElement {
@@ -37,12 +38,12 @@ export class DialogComponent implements OnInit, OnChanges {
 
   OnCameraRotationCreate(event: MouseEvent) {
     // console.log(this.AnimationService.currentTime, this.endTime, this.rotAngle, this.rotDirection);
-    this.AnimationService.currentCamera.lookAt(this.AnimationService.scene.position);
+    this.SceneUtilsService.currentCamera.lookAt(this.SceneUtilsService.scene.position);
     // this.AnimationService.orbit.enabled = false;
     if (this.endTime == this.AnimationService.currentTime)
       this.endTime += 1;
     //this.AnimationCreatorService.OnRotationChange(this.AnimationService.currentCamera.parent!);
-    this.AnimationCreatorService.OnCameraChange(this.AnimationService.currentCamera);
+    this.AnimationCreatorService.OnCameraChange(this.SceneUtilsService.currentCamera);
     let ang = 0;
     if (!this.rotDirection)
       ang = this.rotAngle;
@@ -64,13 +65,13 @@ export class DialogComponent implements OnInit, OnChanges {
       let dt = duration * Math.abs(mult);
       time += dt;
       this.AnimationService.currentTime = time;
-      let pos = this.AnimationService.currentCamera.position;
+      let pos = this.SceneUtilsService.currentCamera.position;
       pos.applyAxisAngle(new THREE.Vector3(0, 0, 1), step * Math.PI / 180);
-      this.AnimationService.currentCamera.position.set(pos.x, pos.y, pos.z);
-      this.AnimationService.currentCamera.lookAt(new THREE.Vector3())
+      this.SceneUtilsService.currentCamera.position.set(pos.x, pos.y, pos.z);
+      this.SceneUtilsService.currentCamera.lookAt(new THREE.Vector3())
       //this.AnimationService.currentCamera.rotateOnAxis(new THREE.Vector3(0, 1, 0), (step * Math.PI / 180));
       //this.AnimationCreatorService.OnRotationChange(this.AnimationService.currentCamera.parent!);
-      this.AnimationCreatorService.OnCameraChange(this.AnimationService.currentCamera);
+      this.AnimationCreatorService.OnCameraChange(this.SceneUtilsService.currentCamera);
     }
     // this.AnimationService.orbit.enabled = true;
   }
@@ -82,8 +83,8 @@ export class DialogComponent implements OnInit, OnChanges {
   }
   AcceptClick(event: MouseEvent) {
     this.container.style.visibility = "hidden";
-    this.AnimationService.dialogShow = false;
     this.show = false;
+    this.AnimationService.dialogShow = false;
   }
 
   OnMouseUp(event: MouseEvent) {

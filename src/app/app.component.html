@@ -1,13 +1,17 @@
 <router-outlet></router-outlet>
-<input class="file" type="file" name="" accept=".step,.stp,.gltf" (change)="LoadFile($event)" id="">
+<label class="file-label" for="file">
+    <input class="file" type="file" name="file" id="file" accept=".step,.stp,.gltf" (change)="LoadFile($event)">
+    Загрузить модель
+</label>
 <canvas #canvas class="canvas" (mousemove)="onPointerMove($event)" (click)="onClick($event)"
-    (window:resize)="onResize($event)" (window:keydown)="onKeyDown($event)" (window:keyup)="onKeyUp($event)"></canvas>
+    (window:resize)="SceneUtilsService.onResize($event)" (window:keydown)="onKeyDown($event)"
+    (window:keyup)="onKeyUp($event)"></canvas>
 <app-viewcube></app-viewcube>
-<app-timeline [scene]="AnimationService.scene" [actions]="AnimationService.actions"
-    [curTime]="AnimationService.currentTime" [newFile]="AnimationService.newFileLoading">
+<app-timeline [actions]="AnimationService.actions" [curTime]="AnimationService.currentTime"
+    [newFile]="SceneUtilsService.newFileLoading">
 </app-timeline>
-<app-properties [selected]="AnimationService.selectionChange" [curTime]="AnimationService.currentTime"
-    [transformed]="AnimationService.transformChange">
+<app-properties [selected]="SceneUtilsService.selectionChange" [curTime]="AnimationService.currentTime"
+    [transformed]="SceneUtilsService.transformChange">
 </app-properties>
 <app-dialog [show]="AnimationService.dialogShow" [modal]="AnimationService.dialogModal"
     [type]="AnimationService.dialogType"></app-dialog>

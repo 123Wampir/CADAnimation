@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { AnimationService } from 'src/app/services/animation.service';
+import { AnimationService } from 'src/app/services/animation/animation.service';
 
 @Component({
   selector: 'app-contextmenu',

@@ -1,5 +1,6 @@
 import { AfterViewChecked, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { AnimationService } from 'src/app/services/animation.service';
+import { AnimationService } from 'src/app/services/animation/animation.service';
+import { SceneUtilsService } from 'src/app/services/utils/scene.utils.service';
 import THREE = require('three');
 
 @Component({
@@ -15,11 +16,11 @@ export class ViewcubeComponent implements OnInit, AfterViewChecked {
   get cube(): HTMLCanvasElement {
     return this.cubeRef.nativeElement;
   }
-  constructor(public AnimationService: AnimationService, private renderer: Renderer2) { }
+  constructor(public AnimationService: AnimationService, private renderer: Renderer2,private SceneUtilsService:SceneUtilsService) { }
   ngAfterViewChecked(): void {
-    if (this.AnimationService.currentCamera != undefined) {
+    if (this.SceneUtilsService.currentCamera != undefined) {
       let matrix = new THREE.Matrix4();
-      matrix.extractRotation(this.AnimationService.currentCamera.matrixWorldInverse);
+      matrix.extractRotation(this.SceneUtilsService.currentCamera.matrixWorldInverse);
       this.cube.style.transform = `translateZ(-300px) ${this.getCameraCSSMatrix(matrix)}`;
     }
   }
@@ -36,14 +37,16 @@ export class ViewcubeComponent implements OnInit, AfterViewChecked {
       offsetUnit * vec.z
     );
     const center = new THREE.Vector3();
-    const finishPosition = center.copy(offset.normalize().multiplyScalar(this.AnimationService.boundingSphere.radius * 3));
-    console.log(finishPosition);
-    this.AnimationService.currentCamera.position.set(finishPosition.x, finishPosition.y, finishPosition.z);
-    this.AnimationService.orbit.target.set(0, 0, 0);
-    let rot = this.AnimationService.currentCamera.rotation.clone();
-    console.log(rot.x * 180 / Math.PI, rot.y * 180 / Math.PI, rot.z * 180 / Math.PI);
-    console.log(vec);
-    let up = this.AnimationService.currentCamera.up.clone();
+    let finishPosition = new THREE.Vector3();
+    if (this.SceneUtilsService.boundingSphere != undefined)
+      finishPosition = center.copy(offset.normalize().multiplyScalar(this.SceneUtilsService.boundingSphere.radius * 3));
+    else finishPosition = center.copy(offset.normalize().multiplyScalar(this.SceneUtilsService.currentCamera.position.length()));
+    this.SceneUtilsService.currentCamera.position.set(finishPosition.x, finishPosition.y, finishPosition.z);
+    this.SceneUtilsService.orbit.target.set(0, 0, 0);
+    let rot = this.SceneUtilsService.currentCamera.rotation.clone();
+    // console.log(rot.x * 180 / Math.PI, rot.y * 180 / Math.PI, rot.z * 180 / Math.PI);
+    // console.log(vec);
+    let up = this.SceneUtilsService.currentCamera.up.clone();
     const zero = 10e-4;
     // console.log(rot);
     if (vec.x != 0) {
@@ -58,27 +61,11 @@ export class ViewcubeComponent implements OnInit, AfterViewChecked {
       (Math.abs(up.x) > Math.abs(up.y)) ? up.y = 0 : up.x = 0;
       (up.z > 0) ? up.z = zero : up.z = -zero;
     }
-    // if (vec.x != 0 && vec.y != 0) {
-    //   (vec.x == vec.y) ? true : up.negate();
-    // } else if (vec.x != 0 && vec.z != 0) {
-    //   (vec.x == vec.z) ? true : up.negate();
-    // } else if (vec.y != 0 && vec.z != 0) {
-    //   (vec.y == vec.z) ? true : up.negate();
-    // }
     up.normalize()
-    //console.log(up.normalize());
     let pts: any[] = [];
     pts.push(new THREE.Vector3())
     pts.push(up.clone().normalize().multiplyScalar(50));
-    let geom = new THREE.BufferGeometry().setFromPoints(pts);
-    let mat = new THREE.LineBasicMaterial({ color: 0xff0000 });
-    this.line.geometry = geom;
-    this.line.material = mat;
-    this.AnimationService.scene.add(this.line);
-    // console.log(pts[1]);
-    this.AnimationService.currentCamera.up.copy(up);
-    // console.log(this.AnimationService.currentCamera.up);
-
+    this.SceneUtilsService.currentCamera.up.copy(up);
   }
 
   ShowContextMenu(event: MouseEvent) {
@@ -90,17 +77,17 @@ export class ViewcubeComponent implements OnInit, AfterViewChecked {
   SetAsView(type: number) {
     switch (type) {
       case 0:
-        this.AnimationService.model.quaternion.copy(this.AnimationService.currentCamera.quaternion.clone());
-        this.AnimationService.CalculateBounding();
-        this.AnimationService.SetZeroPlane();
+        this.SceneUtilsService.model.quaternion.copy(this.SceneUtilsService.currentCamera.quaternion.clone());
+        this.SceneUtilsService.CalculateBounding();
+        this.SceneUtilsService.SetZeroPlane();
         break;
       case 1:
-        let oldq = this.AnimationService.currentCamera.quaternion.clone();
-        let q = this.AnimationService.currentCamera.rotateOnAxis(new THREE.Vector3(1, 0, 0), 90 * Math.PI / 180).quaternion.clone();
-        this.AnimationService.currentCamera.quaternion.copy(oldq);
-        this.AnimationService.model.quaternion.copy(q);
-        this.AnimationService.CalculateBounding();
-        this.AnimationService.SetZeroPlane();
+        let oldq = this.SceneUtilsService.currentCamera.quaternion.clone();
+        let q = this.SceneUtilsService.currentCamera.rotateOnAxis(new THREE.Vector3(1, 0, 0), 90 * Math.PI / 180).quaternion.clone();
+        this.SceneUtilsService.currentCamera.quaternion.copy(oldq);
+        this.SceneUtilsService.model.quaternion.copy(q);
+        this.SceneUtilsService.CalculateBounding();
+        this.SceneUtilsService.SetZeroPlane();
         break;
     }
 

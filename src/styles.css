@@ -26,6 +26,30 @@ button:active {
     transform: translateY(2px);
 }
 
+.file {
+    display: none;
+}
+
+.file-label {
+    position: relative;
+    border: none;
+    background: ghostwhite;
+    border-radius: 13px;
+    text-shadow: 1px 1px 2px grey;
+    box-shadow: 1px 1px 5px -1px grey;
+    padding: 3px 15px;
+    margin: 0px;
+    text-align: center;
+}
+
+.file-label:hover {
+    background-color: darkgray;
+}
+
+.file-label:active {
+    transform: translateY(2px);
+}
+
 .container {
     display: flex;
     flex-direction: column;

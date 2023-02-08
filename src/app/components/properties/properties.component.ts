@@ -1,6 +1,7 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { AnimationCreatorService } from 'src/app/services/animation.creator.service';
-import { AnimationService } from 'src/app/services/animation.service';
+import { AnimationCreatorService } from 'src/app/services/animation/animation.creator.service';
+import { AnimationService } from 'src/app/services/animation/animation.service';
+import { SceneUtilsService } from 'src/app/services/utils/scene.utils.service';
 import * as AnimationModel from 'src/app/shared/animation.model';
 import THREE = require('three');
 
@@ -32,19 +33,19 @@ export class PropertiesComponent implements OnInit, OnChanges {
   height = 300;
   opacity = 1;
   hex = "";
-  constructor(public AnimationService: AnimationService, public AnimationCreatorService: AnimationCreatorService) { }
+  constructor(public AnimationService: AnimationService, public AnimationCreatorService: AnimationCreatorService, public SceneUtilsService: SceneUtilsService) { }
 
   ngOnInit(): void {
   }
   ngOnChanges(changes: SimpleChanges) {
     if (changes["selected"] != undefined) {
-      if (this.AnimationService.selected.length != 0) {
-        if (this.AnimationService.selected.length == 1) {
+      if (this.SceneUtilsService.selected.length != 0) {
+        if (this.SceneUtilsService.selected.length == 1) {
           this.group = false;
           this.posParam = true;
           this.rotParam = true;
           this.opacityParam = true;
-          this.propertiesObject = this.AnimationService.selected[0];
+          this.propertiesObject = this.SceneUtilsService.selected[0];
           if (/(Camera)/g.exec(this.propertiesObject.type) != undefined) {
             this.camera = true;
             this.opacityParam = false;
@@ -137,6 +138,9 @@ export class PropertiesComponent implements OnInit, OnChanges {
   OnColorChange(event: Event) {
     this.AnimationCreatorService.OnColorChange(this.propertiesObject, this.hex);
   }
+  OnIntensityChange(event: Event) {
+    this.AnimationCreatorService.OnIntencityChange(this.propertiesObject);
+  }
   OnConstantChange(event: Event) {
     this.AnimationCreatorService.OnConstantChange(this.propertiesObject);
   }
@@ -153,11 +157,11 @@ export class PropertiesComponent implements OnInit, OnChanges {
     this.AnimationCreatorService.OnCameraChange(this.propertiesObject);
   }
   OnCameraRotation($event: MouseEvent) {
-    console.log(this.AnimationService.currentCamera.rotation);
-    console.log(this.AnimationService.scene.position);
+    console.log(this.SceneUtilsService.currentCamera.rotation);
+    console.log(this.SceneUtilsService.scene.position);
 
-    this.AnimationService.currentCamera.lookAt(this.AnimationService.scene.position);
-    console.log(this.AnimationService.currentCamera.rotation);
+    this.SceneUtilsService.currentCamera.lookAt(this.SceneUtilsService.scene.position);
+    console.log(this.SceneUtilsService.currentCamera.rotation);
     this.AnimationService.dialogType = "CameraRotation";
     this.AnimationService.dialogShow = true;
   }
