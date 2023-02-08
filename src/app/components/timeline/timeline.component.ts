@@ -16,15 +16,8 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() scene!: THREE.Object3D;
   @Input() curTime = 0;
   @Input() newFile!: boolean;
-  constructor(public AnimationService: AnimationService, private renderer: Renderer2, public SceneUtilsService: SceneUtilsService) {
-    this.persons = Array(100).fill(0).map(() => {
-      return {
-        name: "faker.name.findName()",
-        bio: "faker.hacker.phrase()",
-        avatar: "4343"
-      }
-    })
-  }
+  constructor(public AnimationService: AnimationService, private renderer: Renderer2, public SceneUtilsService: SceneUtilsService) { }
+  id: number = 0;
   persons: any;
   onCurrentTimeMove = false;
   onTimeLineExpand = true;
@@ -33,6 +26,7 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   point!: THREE.Object3D;
   offsets: any[] = [];
   timeline = this.AnimationService.timeLine;
+
   OnSceneColorChange(event: Event) {
     let e = event as any;
     this.SceneUtilsService.renderer.setClearColor(e.target.value);
@@ -48,7 +42,7 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
       this.offsets = [];
       (this.center as any) = undefined;
     }
-    this.AnimationService.FindMeshes(this.SceneUtilsService.scene, arr);
+    this.SceneUtilsService.FindMeshes(this.SceneUtilsService.scene, arr);
     if (this.center == undefined) {
       // this.AnimationService.boundingBox.getCenter(this.center);
       if (this.SceneUtilsService.boundingSphere == null) {
@@ -108,7 +102,9 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   TrackByFunction(index: number, item: any) {
     return index;
   }
-
+  SetLineNameStyle(type: string): string {
+    return `${type}name`;
+  }
   ngOnChanges(changes: SimpleChanges): void {
     //console.log(changes)
     if (changes["newFile"] != undefined) {
@@ -129,15 +125,9 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     }
   }
   CreateTreeView() {
-    // let ln = document.getElementById("lines");
-    // ln?.replaceChildren();
-    // this.CreateRulerElement(ln!);
-    // this.ngAfterViewInit();
+    this.id = 0;
     this.CreateTreeViewElements(this.SceneUtilsService.scene);
     this.UpdateTracks();
-    // setTimeout(() => {
-    //   this.UpdateTracks();
-    // }, 1000);
   }
   CreateRulerElement(lines: HTMLElement) {
     let line = this.renderer.createElement("div");
@@ -159,98 +149,73 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     this.renderer.appendChild(ruler, currentTime);
     this.renderer.appendChild(lines, line);
   }
-  CreateTreeViewElements(obj: THREE.Object3D, tabIndex: number = 0) {
+  CreateTreeViewElements(obj: THREE.Object3D, tabIndex: number = 0, parent?: AnimationModel.KeyframeTrackModel) {
     if (obj.children.length != 0) {
-      let ln = document.getElementById("lines")
       for (let item of obj.children) {
         if (item.type == "TransformControls" || item.type == "Group" || item.type == "Stencil") {
           continue;
         }
-        // let line = this.renderer.createElement("div");
-        // line.className = "line";
-        // let part = this.renderer.createElement("div");
-        // this.renderer.appendChild(line, part)
-        // let partname = this.renderer.createElement("div");
-        // if (item.name == "") {
-        //   item.name = item.type + " " + item.id.toString();
-        //   partname.innerText = item.name
-        // }
-        // partname.innerText = `${"  " + "  ".repeat(tabIndex) + item.name}`;
-        // this.renderer.appendChild(part, partname)
-        // this.renderer.setAttribute(partname, "name", item.name)
-        let track = this.renderer.createElement("div");
-        // this.renderer.addClass(track, "track")
-        // this.renderer.setStyle(track, "width", `${this.AnimationService.timeLine.duration * this.AnimationService.timeLine.scale}px`);
-        // this.renderer.appendChild(line, track)
-        // this.renderer.appendChild(ln, line)
-        // this.renderer.listen(line, "click", (event) => {
-        //   //let part = this.FindPartByName(event.target.attributes["name"].nodeValue)
-        //   console.log(item);
-        //   this.SceneUtilsService.Select(item, this.SceneUtilsService.CTRLPressed);
-        // })
-        let keyframeTrack: AnimationModel.KeyframeTrackModel = { name: item.name, type: "Part", actions: [] };
+        let keyframeTrack: AnimationModel.KeyframeTrackModel = { id: this.id, children: [], object: item, name: item.name, type: "Part", actions: [], level: tabIndex };
+        this.id++;
+        if (parent != undefined) {
+          parent.children.push(keyframeTrack.id);
+        }
         this.AnimationService.timeLine.tracks.push(keyframeTrack);
-        this.timeline = this.AnimationService.timeLine;
-
-
 
         if (item.type == "Object3D" || item.type == "Container") {
-          // this.renderer.addClass(part, "part");
-          // this.renderer.addClass(partname, "partname")
-          // let button = this.renderer.createElement("button");
-          // this.renderer.addClass(button, "expand-first");
-          // button.innerText = "▼";
-          // this.renderer.setAttribute(button, "show", "1")
-          // this.renderer.appendChild(part, button);
-          // this.renderer.listen(button, "click", (event) => {
-          //   let a = event.target as HTMLElement;
-          //   let show;
-          //   if (a.getAttribute("show") == "1")
-          //     show = false;
-          //   else show = true;
-          //   let name = a.parentElement?.getElementsByClassName("partname")[0].getAttribute("name");
-          //   console.log(name, a.getAttribute("show"), show);
-          //   this.ShowChildren(name!, show);
-          //   if (show) {
-          //     a.setAttribute("show", "1")
-          //     this.renderer.removeClass(a, "expand-second");
-          //     this.renderer.addClass(a, "expand-first");
-          //   }
-          //   else {
-          //     a.setAttribute("show", "0");
-          //     this.renderer.removeClass(a, "expand-first");
-          //     this.renderer.addClass(a, "expand-second");
-          //   }
-          // })
           if (item.children.length != 0) {
-            tabIndex++
-            this.CreateTreeViewElements(item, tabIndex)
+            tabIndex++;
+            this.CreateTreeViewElements(item, tabIndex, keyframeTrack)
             tabIndex--;
           }
         }
-        // else if (item.type == "Mesh") {
-        //   this.renderer.addClass(part, "mesh");
-        //   this.renderer.addClass(partname, "meshname")
-        // }
-        // else if (/(Camera)/g.exec(item.type) != undefined) {
-        //   this.renderer.addClass(part, "camera");
-        //   this.renderer.addClass(partname, "cameraname")
-        // }
-        // else if (/(Light)/g.exec(item.type) != undefined) {
-        //   this.renderer.addClass(part, "light");
-        //   this.renderer.addClass(partname, "lightname")
-        // }
-        // else if (item.type == "zeroPlane") {
-        //   this.renderer.addClass(part, "camera");
-        //   this.renderer.addClass(partname, "cameraname")
-        // }
-        // else if (item.type == "PlaneHelper") {
-        //   this.renderer.addClass(part, "camera");
-        //   this.renderer.addClass(partname, "cameraname")
-        // }
+        else if (item.type == "Mesh") {
+          keyframeTrack.type = "Mesh";
+        }
+        else if (/(Camera)/g.exec(item.type) != undefined) {
+          keyframeTrack.type = "Camera";
+        }
+        else if (/(Light)/g.exec(item.type) != undefined) {
+          keyframeTrack.type = "Light";
+        }
+        else if (item.type == "zeroPlane") {
+          keyframeTrack.type = "Plane";
+        }
+        else if (item.type == "PlaneHelper") {
+          keyframeTrack.type = "Plane";
+        }
       }
     }
+    this.timeline = this.AnimationService.timeLine;
   }
+
+  OnLineClick(id: number) {
+    console.log(id);
+    let item = this.timeline.tracks[id].object;
+    console.log(item);
+    this.SceneUtilsService.Select(item, this.SceneUtilsService.CTRLPressed);
+    // let part = this.FindPartByName(event.target.attributes["name"].nodeValue)
+    // console.log(item);
+  }
+  ShowLine(show: boolean) {
+    if (show)
+      return { 'content-visibility': 'visible' }
+    else return { 'content-visibility': 'hidden' }
+  }
+  SetLineExpandClass(expand: boolean) {
+    if (expand)
+      return "expand-first";
+    else return "expand-second";
+  }
+  OnExpandLineClick(track: any) {
+    track.children.forEach((i: any) => {
+      let item = AnimationModel.FindTrackById(this.timeline, i);
+      this.timeline.array![item!].show = !this.timeline.array![item!].show;
+      this.OnExpandLineClick(this.timeline.array![item!]);
+    })
+    track.expand = !track.expand;
+  }
+
   FindPartByName(name: string) {
     //console.log(this.scene.getObjectByName(name));
     return this.scene.getObjectByName(name);
@@ -294,6 +259,7 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     // this.timeLine.tracks.forEach(track => {
     //   this.AppendKeyframes(track)
     // })
+    AnimationModel.GetArrayTimeLine(this.AnimationService.timeLine);
     console.log(this.AnimationService.timeLine);
   }
 

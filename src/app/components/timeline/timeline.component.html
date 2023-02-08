@@ -35,44 +35,31 @@
             </div>
         </div>
     </div>
-    <div class="timeline" id="timeline">
+    <cdk-virtual-scroll-viewport [itemSize]="26" class="timeline" id="timeline">
         <div #lines class="lines" id="lines" (mousemove)="OnCurrentTimeMouseMove($event)"
             (mouseup)="OnCurrentTimeMouseUp($event)">
             <div class="line">
                 <div class="part">
                     <div class="partname"></div>
                 </div>
-                <div class="ruler-track" id="rulerTrack">
+                <div class="ruler-track" id="rulerTrack" [ngStyle]="SetTrackStyle()">
                     <div class="current-time" id="curTime" (mousedown)="OnCurrentTimeMouseDown($event)"></div>
                 </div>
             </div>
-            <cdk-virtual-scroll-viewport [itemSize]="30">
-                <div *cdkVirtualFor="let person of persons;let i = index">
-                    <div class="card">
-                        <div class="container">
-                            <h4><b>{{person.name}}</b></h4>
-                            <h4><b>ID: {{i}}</b></h4>
-                            <!-- <p>{{person.bio.substr(0, 30)}}...</p> -->
-                        </div>
+            <div class="line" *cdkVirtualFor="let track of timeline.array; trackBy:TrackByFunction"
+                [ngStyle]="ShowLine(track.show)">
+                <div [ngClass]="track.type" (click)="OnLineClick(track.id)">
+                    <div class="linename">{{" ".repeat(track.level*3)+track.name}}</div>
+                    <button *ngIf="track.type=='Part'" [ngClass]="SetLineExpandClass(track.expand)"
+                        (click)="OnExpandLineClick(track)">▼</button>
+                </div>
+                <div class="track" [ngStyle]="SetTrackStyle()">
+                    <div class="action" [ngStyle]="SetActionStyle(action)" *ngFor="let action of track.actions">
+                        <div class="keyframe" [ngStyle]="SetKeyframeStyle(keyframe)"
+                            *ngFor="let keyframe of action.keyframes"></div>
                     </div>
                 </div>
-            </cdk-virtual-scroll-viewport>
-            <!-- <cdk-virtual-scroll-viewport [itemSize]="141" style="height:300px">
-                <div class="line" *cdkVirtualFor="let track of timeline.tracks; trackBy:TrackByFunction">
-                    <div class="part" *ngSwitchCase="'Part'">
-                        <div class="partname">{{track.name}}</div>
-                    </div>
-                    <div class="mesh" *ngSwitchCase="'Mesh'">
-                        <div class="meshname">{{track.name}}</div>
-                    </div>
-                    <div class="track" [ngStyle]="SetTrackStyle()">
-                        <div class="action" [ngStyle]="SetActionStyle(action)" *ngFor="let action of track.actions">
-                            <div class="keyframe" [ngStyle]="SetKeyframeStyle(keyframe)"
-                                *ngFor="let keyframe of action.keyframes"></div>
-                        </div>
-                    </div>
-                </div>
-            </cdk-virtual-scroll-viewport> -->
+            </div>
         </div>
-    </div>
+    </cdk-virtual-scroll-viewport>
 </div>

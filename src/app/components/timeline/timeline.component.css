@@ -102,10 +102,17 @@ button {
 .line {
     display: grid;
     justify-content: left;
-    grid-template-columns: 20% 80%;
+    grid-template-columns: 250px auto;
 }
 
-.part {
+.linename {
+    padding: 2px 3px;
+    white-space: pre;
+    overflow: hidden;
+    user-select: text;
+}
+
+.Part {
     align-items: center;
     display: flex;
     justify-content: space-between;
@@ -115,14 +122,7 @@ button {
     border-bottom-left-radius: 10px;
 }
 
-.partname {
-    padding: 2px 3px;
-    white-space: pre;
-    overflow: hidden;
-    user-select: text;
-}
-
-.mesh {
+.Mesh {
     align-items: center;
     display: flex;
     /* justify-content: left; */
@@ -134,13 +134,7 @@ button {
     border-bottom-left-radius: 10px;
 }
 
-.meshname {
-    padding: 2px 3px;
-    white-space: pre;
-    overflow: hidden;
-}
-
-.light {
+.Light {
     align-items: center;
     display: flex;
     justify-content: left;
@@ -151,13 +145,7 @@ button {
     border-bottom-left-radius: 10px;
 }
 
-.lightname {
-    padding: 2px 3px;
-    white-space: pre;
-    overflow: hidden;
-}
-
-.camera {
+.Camera {
     align-items: center;
     display: flex;
     justify-content: left;
@@ -168,10 +156,15 @@ button {
     border-bottom-left-radius: 10px;
 }
 
-.cameraname {
-    padding: 2px 3px;
-    white-space: pre;
-    overflow: hidden;
+.Plane {
+    align-items: center;
+    display: flex;
+    justify-content: left;
+    background-color: plum;
+    border-left: 1px solid gray;
+    border-bottom: 1px solid gray;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
 }
 
 .track {

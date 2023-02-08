@@ -206,8 +206,20 @@ export class SceneUtilsService {
     })
     mergedGeom.dispose();
   }
-  FindMeshes(model: THREE.Object3D<THREE.Event>, arr: any[]) {
-    throw new Error('Method not implemented.');
+  FindMeshes(obj: THREE.Object3D, meshes: any[]) {
+    if (obj.children.length != 0) {
+      for (let item of obj.children) {
+        if (item.type == "Object3D") {
+          this.FindMeshes(item, meshes)
+        }
+        else {
+          if (item.type == "Mesh") {
+            meshes.push(item);
+            this.FindMeshes(item, meshes)
+          }
+        }
+      }
+    }
   }
   SetZeroPlane() {
     this.zeroPlane.position.set(this.zeroPlane.position.x, this.zeroPlane.position.y, this.boundingBox.min.z);

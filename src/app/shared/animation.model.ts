@@ -3,7 +3,6 @@ import THREE = require("three");
 export interface KeyframeModel {
     time: number;
     clip: THREE.AnimationClip;
-    // DOMElement?: HTMLElement;
     value: any;
     action: KeyframeActionModel;
 }
@@ -11,21 +10,41 @@ export interface KeyframeActionModel {
     keyframes: KeyframeModel[];
     type: string;
     track?: THREE.KeyframeTrack;
-    // DOMElement?: HTMLElement;
     start: number;
     length: number;
     trackDOM: KeyframeTrackModel;
 }
 export interface KeyframeTrackModel {
+    id: number;
+    object: THREE.Object3D;
     actions: KeyframeActionModel[];
     name: string;
     type: string;
-    // DOMElement?: HTMLElement;
+    level: number;
+    children: number[];
 }
 export interface TimelineModel {
     tracks: KeyframeTrackModel[];
     duration: number;
     scale: number;
+    array?: Array<any>;
+}
+export function GetArrayTimeLine(timeline: TimelineModel) {
+    timeline.array = Array(timeline.tracks.length).fill(0).map((v, i) => {
+        return {
+            name: timeline.tracks[i].name,
+            type: timeline.tracks[i].type,
+            level: timeline.tracks[i].level,
+            actions: timeline.tracks[i].actions,
+            id: timeline.tracks[i].id,
+            children: timeline.tracks[i].children,
+            expand: true,
+            show: true
+        }
+    })
+}
+export function FindTrackById(timeline: TimelineModel, id: number) {
+    return timeline.array?.findIndex(track => track.id == id);
 }
 
 export function FindKeyframeTrack(timeline: TimelineModel, name: string): KeyframeTrackModel {

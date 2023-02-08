@@ -43,6 +43,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.scene = new THREE.Scene();
     // Добавление и настройка камеры
     this.camera = new THREE.PerspectiveCamera(45, this.getAspectRatio(), 1.0, 100000.0);
+    this.camera.name = this.camera.type;
     this.camera.position.set(50.0, 150.0, 100.0);
     this.camera.up.set(0.0, 0.0, 1.0);
     this.camera.lookAt(new THREE.Vector3(0.0, 0.0, 0.0));
@@ -56,9 +57,11 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     // Добавление глобального освещения
     const ambientLight = new THREE.AmbientLight(0xffffff);
+    ambientLight.name = ambientLight.type;
     this.scene.add(ambientLight);
     // Добавление направленного света
     const directionalLight = new THREE.DirectionalLight(0xffffff, 2.2);
+    directionalLight.name = directionalLight.type;
     var lightHelper = new THREE.DirectionalLightHelper(directionalLight, 10, directionalLight.color);
     lightHelper.matrixWorld = directionalLight.matrixWorld;
     directionalLight.add(lightHelper);
@@ -194,6 +197,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.CreateScene()
     this.startRenderingLoop()
     this.mainObject = new THREE.Object3D();
+    this.mainObject.name = "Model";
     this.scene.add(this.mainObject)
     console.log(this.scene);
   }
@@ -222,10 +226,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.CreateUniqueMaterial(this.mainObject);
     this.FixMeshPivot(this.mainObject);
     this.SceneUtilsService.model = this.mainObject;
-    this.AnimationService.FindMeshes(this.mainObject, this.meshArr);
+    this.SceneUtilsService.FindMeshes(this.mainObject, this.meshArr);
     //console.log(component.meshArr);
     let arr: any[] = [];
-    this.AnimationService.FindMeshes(this.mainObject, arr);
+    this.SceneUtilsService.FindMeshes(this.mainObject, arr);
     this.SceneUtilsService.CreateClippingPlanes(arr);
     this.SceneUtilsService.SetZeroPlane();
     // Создание миксеров(дорожек) для модели
@@ -235,7 +239,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   FixMeshPivot(obj: THREE.Object3D) {
     obj.children.forEach(part => {
       let arr: any[] = [];
-      this.AnimationService.FindMeshes(part, arr);
+      this.SceneUtilsService.FindMeshes(part, arr);
       let vec = new THREE.Vector3(0, 0, 0);
       arr.forEach(mesh => {
         let geom = mesh as THREE.Mesh;
@@ -252,7 +256,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
   CreateUniqueMaterial(obj: THREE.Object3D) {
     let arr: any[] = [];
-    this.AnimationService.FindMeshes(obj, arr);
+    this.SceneUtilsService.FindMeshes(obj, arr);
     if (arr.length != 0) {
       arr.forEach(mesh => {
         mesh.material = mesh.material.clone();
@@ -267,7 +271,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
   CreateUniqueGeometry(obj: THREE.Object3D) {
     let arr: any[] = [];
-    this.AnimationService.FindMeshes(obj, arr);
+    this.SceneUtilsService.FindMeshes(obj, arr);
     if (arr.length != 0) {
       arr.forEach(mesh => {
         mesh.geometry = mesh.geometry.clone();

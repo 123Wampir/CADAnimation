@@ -5,8 +5,7 @@
     "outDir": "./out-tsc/spec",
     "types": [
       "node"
-    ],
-    "target": "ES5"
+    ]
   },
   "files": [
     "src/test.ts",

@@ -618,7 +618,7 @@ export class AnimationService {
   FindMixer(mixers: THREE.AnimationMixer[], obj: any, mix: any[]) {
     let meshes: any[] = [];
     if (obj.type == "Object3D" || obj.type == "Scene")
-      this.FindMeshes(obj, meshes);
+      this.SceneUtilsService.FindMeshes(obj, meshes);
     else if (obj.type == "Mesh")
       meshes.push(obj);
     meshes.forEach(mesh => {
@@ -641,21 +641,7 @@ export class AnimationService {
     })
   }
 
-  FindMeshes(obj: THREE.Object3D, meshes: any[]) {
-    if (obj.children.length != 0) {
-      for (let item of obj.children) {
-        if (item.type == "Object3D") {
-          this.FindMeshes(item, meshes)
-        }
-        else {
-          if (item.type == "Mesh") {
-            meshes.push(item);
-            this.FindMeshes(item, meshes)
-          }
-        }
-      }
-    }
-  }
+  
 
   FindPartByName(name: string) {
     let arr: THREE.Object3D[] = [];
@@ -816,7 +802,7 @@ export class AnimationService {
 
   CombineClips(obj: THREE.Object3D) {
     let arr: THREE.Object3D[] = [];
-    this.FindMeshes(obj, arr);
+    this.SceneUtilsService.FindMeshes(obj, arr);
     if (arr.length != 0) {
       arr.forEach(item => {
         if (item.animations.length > 1) {
