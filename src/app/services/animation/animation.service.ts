@@ -67,16 +67,7 @@ export class AnimationService {
   }
 
   CreateActionDOM(keyframeTrack: AnimationModel.KeyframeTrackModel, action: AnimationModel.KeyframeActionModel) {
-    // let trackline = keyframeTrack.DOMElement;
-    // let actionDOM = this.angRenderer.createElement("div");
-    // action.DOMElement = actionDOM;
-    // this.angRenderer.addClass(actionDOM, "action");
-    // this.angRenderer.setStyle(actionDOM, "left", `${action.start * this.timeLine.scale}px`);
-    // this.angRenderer.setStyle(actionDOM, "width", `${action.length * this.timeLine.scale + 10}px`);
-    // this.angRenderer.setStyle(actionDOM, "background", `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255})`);
-    // this.angRenderer.setAttribute(actionDOM, "part", keyframeTrack.name);
-    // this.angRenderer.setAttribute(actionDOM, "show", "0");
-    // this.angRenderer.appendChild(trackline, actionDOM);
+
     // this.angRenderer.listen(actionDOM, "mousedown", (event) => {
     //   this.actionDragged = true;
     //   this.pos = event.clientX - action.start * this.timeLine.scale;
@@ -152,17 +143,6 @@ export class AnimationService {
   UpdateAction(action: AnimationModel.KeyframeActionModel) {
     action.start = action.track!.times[0];
     action.length = action.track!.times[action.track!.times.length - 1] - action.start;
-    // if (action.DOMElement != undefined) {
-    //   this.angRenderer.setStyle(action.DOMElement, "left", `${action.start * this.timeLine.scale}px`);
-    //   this.angRenderer.setStyle(action.DOMElement, "width", `${action.length * this.timeLine.scale}px`);
-    //   action.keyframes.forEach(keyframe => {
-    //     if (keyframe.DOMElement != undefined)
-    //       this.angRenderer.setStyle(keyframe.DOMElement, "left", `${(keyframe.time - action.start) * this.timeLine.scale}px`)
-    //   })
-    // }
-    // else {
-    //   this.CreateActionDOM(action.trackDOM, action);
-    // }
   }
   DeleteAction(action: AnimationModel.KeyframeActionModel) {
     action.keyframes.forEach(key => {
@@ -178,16 +158,6 @@ export class AnimationService {
     })
   }
   CreateKeyframeDOM(action: AnimationModel.KeyframeActionModel, keyframe: AnimationModel.KeyframeModel) {
-    // let trackline = action.DOMElement;
-    // if (keyframe.DOMElement == undefined) {
-    //   let keyframeDOM = this.angRenderer.createElement("div");
-    //   keyframe.DOMElement = keyframeDOM;
-    //   this.angRenderer.addClass(keyframeDOM, "keyframe");
-    //   this.angRenderer.setStyle(keyframeDOM, "left", `${(keyframe.time - action.start) * this.timeLine.scale}px`);
-    //   // this.renderer.setStyle(keyframe, "visibility", `hidden`);
-    //   this.angRenderer.setAttribute(keyframeDOM, "time", keyframe.time.toString())
-    //   // this.angRenderer.setAttribute(keyframeDOM, "part", keyframeTrack.name)
-    //   this.angRenderer.appendChild(trackline, keyframeDOM);
     //   this.angRenderer.listen(keyframeDOM, "mousedown", (event) => {
     //     this.selectedKeyframe = keyframe;
     //     this.keyframeDragged = true;
@@ -206,90 +176,62 @@ export class AnimationService {
     //   })
     // }
   }
-  CreateKeyframe(act: AnimationModel.KeyframeActionModel, time: number, obj: THREE.Object3D, type: string, value: any) {
-    // console.log("create key");
+  CreateKeyframe(action: AnimationModel.KeyframeActionModel, type: string, time: number, value: any) {
     let clip: THREE.AnimationClip;
-    if (obj.animations.length == 0) {
-      clip = new THREE.AnimationClip(`${obj.name}`, -1, []);
-      obj.animations.push(clip);
+    if (action.trackDOM.object.animations.length == 0) {
+      clip = new THREE.AnimationClip(`${action.trackDOM.object.name}`, -1, []);
+      action.trackDOM.object.animations.push(clip);
     }
-    clip = obj.animations[0];
-    let keyframe = AnimationModel.CreateKeyframe(time, act, clip);
-    keyframe.value = value;
-    this.ChangeKeyframe(keyframe, type, value);
-    act.keyframes.push(keyframe);
-    act.track = clip.tracks.find(tr => tr.name == type);
+    clip = action.trackDOM.object.animations[0];
+    let keyframe: AnimationModel.KeyframeModel = { action: action, time: time, clip: clip, value: value }
+    // let keyframe = AnimationModel.CreateKeyframe(time, act, clip);
+    // keyframe.value = value;
+    this.ChangeKeyframe(keyframe);
+    action.keyframes.push(keyframe);
+    action.track = clip.tracks.find(tr => tr.name == type);
     let mixers: any[] = [];
-    this.FindMixer(this.mixers, obj, mixers);
+    this.FindMixer(this.mixers, action.trackDOM.object, mixers);
     let mixer!: THREE.AnimationMixer;
     if (mixers.length != 0)
       mixer = mixers[0] as THREE.AnimationMixer;
     else {
-      mixer = new THREE.AnimationMixer(obj);
+      mixer = new THREE.AnimationMixer(action.trackDOM.object);
       this.mixers.push(mixer);
     }
-    let action = mixer.clipAction(clip);
+    let newAction = mixer.clipAction(clip);
     if ((mixer as any)._listeners == undefined)
       mixer.addEventListener('finished', function (e) {
         let act = e["action"];
         act.paused = false;
       });
-    this.actions.push(action);
+    this.actions.push(newAction);
     if (type == ".plane.constant") {
-      let act = action as any;
+      let act = newAction as any;
       act._propertyBindings[0].binding.propertyName = "constant";
-      let pl = obj as any;
+      let pl = action.trackDOM.object as any;
       act._propertyBindings[0].binding.parsedPath.objectName = "plane";
       act._propertyBindings[0].binding.targetObject = pl.plane;
     }
-    action.setLoop(THREE.LoopRepeat, 1);
-    action.play();
-    action.clampWhenFinished = true;
+    newAction.setLoop(THREE.LoopRepeat, 1);
+    newAction.play();
+    newAction.clampWhenFinished = true;
     mixer.setTime(time);
-    this.UpdateAction(act);
-    this.CreateKeyframeDOM(act, keyframe)
+    this.UpdateAction(action);
+    this.CreateKeyframeDOM(action, keyframe)
   }
-  ChangeKeyframe(keyframe: AnimationModel.KeyframeModel, type: string, value: any) {
-    // console.log(keyframe);
-    keyframe.value = value;
-    let track = keyframe.clip.tracks.find(track => (track.name == type))
+  ChangeKeyframe(keyframe: AnimationModel.KeyframeModel) {
+    //console.log(keyframe);
+    // keyframe.value;
+    let track = keyframe.clip.tracks.find(track => (track.name == keyframe.action.type))
     if (track != undefined) {
       let updateTrack = true;
       for (let i = 0; i < track.times.length; i++) {
         if (Number(track.times[i].toFixed(3)) == Number(keyframe.time.toFixed(3))) {
           // console.log("change cur values");
           updateTrack = false;
-          switch (type) {
-            case ".position":
-              track.values[i * 3] = value.x;
-              track.values[i * 3 + 1] = value.y;
-              track.values[i * 3 + 2] = value.z;
-              break;
-            case ".quaternion":
-              track.values[i * 4] = value.x;
-              track.values[i * 4 + 1] = value.y;
-              track.values[i * 4 + 2] = value.z;
-              track.values[i * 4 + 3] = value.w;
-              break;
-            case ".material.opacity":
-              track.values[i] = value;
-              break;
-            case ".visible":
-              track.values[i] = value;
-              break;
-            case ".color":
-              track.values[i * 3] = value.r;
-              track.values[i * 3 + 1] = value.g;
-              track.values[i * 3 + 2] = value.b;
-              break;
-            case ".intensity":
-              track.values[i] = value;
-              break;
-            case ".plane.constant":
-              track.values[i] = value;
-              break;
-            default:
-              break;
+          let n = keyframe.value.length;
+          for (let j = 0; j < n; j++) {
+            track.values[i * n + j] = keyframe.value[j];
           }
           this.actions.find((action) => {
             if (action.getClip() == keyframe.clip) {
@@ -301,196 +243,99 @@ export class AnimationService {
       }
       if (updateTrack) {
         // Добавить новые значения в трек
-        this.AddValuesToTrack(keyframe.clip, type, keyframe.time, value);
+        this.AddValuesToTrack(keyframe);
       }
     }
     else {
       // Создать трек
-      this.AddTrackToClip(keyframe.clip, type, keyframe.time, value);
+      this.AddTrackToClip(keyframe);
     }
 
     keyframe.clip.resetDuration()
   }
-  AddTrackToClip(clip: THREE.AnimationClip, type: string, time: number, value: any) {
+  AddTrackToClip(keyframe: AnimationModel.KeyframeModel) {
+    let track = this.CreateKeyframeTrack(keyframe.action.type, [keyframe.time], keyframe.value)
+    keyframe.clip.tracks.push(track);
+    keyframe.clip.resetDuration();
+  }
+  CreateKeyframeTrack(type: string, times: number[], values: any[]): THREE.KeyframeTrack {
     let newTrack: any;
     switch (type) {
       case ".position":
-        newTrack = new THREE.VectorKeyframeTrack('.position', [time], [value.x, value.y, value.z]);
+        newTrack = new THREE.VectorKeyframeTrack('.position', times, values);
         break;
       case ".quaternion":
-        newTrack = new THREE.QuaternionKeyframeTrack('.quaternion', [time], [value.x, value.y, value.z, value.w]);
+        newTrack = new THREE.QuaternionKeyframeTrack('.quaternion', times, values);
         break;
       case ".material.opacity":
-        newTrack = new THREE.NumberKeyframeTrack('.material.opacity', [time], [value]);
+        newTrack = new THREE.NumberKeyframeTrack('.material.opacity', times, values);
         break;
       case ".visible":
-        newTrack = new THREE.BooleanKeyframeTrack('.visible', [time], [value]);
+        newTrack = new THREE.BooleanKeyframeTrack('.visible', times, values);
         break;
       case ".color":
-        newTrack = new THREE.ColorKeyframeTrack('.color', [time], [value.r, value.g, value.b]);
+        newTrack = new THREE.ColorKeyframeTrack('.color', times, values);
         break;
       case ".intensity":
-        newTrack = new THREE.NumberKeyframeTrack('.intensity', [time], [value]);
+        newTrack = new THREE.NumberKeyframeTrack('.intensity', times, values);
         break;
       case ".plane.constant":
-        newTrack = new THREE.NumberKeyframeTrack('.plane.constant', [time], [value]);
+        newTrack = new THREE.NumberKeyframeTrack('.plane.constant', times, values);
         break;
     }
-    clip.tracks.push(newTrack);
-    clip.resetDuration();
+    return newTrack;
   }
-
-  AddValuesToTrack(clip: THREE.AnimationClip, type: string, time: number, value: any) {
+  AddValuesToTrack(keyframe: AnimationModel.KeyframeModel) {
     // console.log(clip);
     let times: any[] = [];
     let values: any[] = [];
     let insert = false;
     // console.log(track.times);
-    let track = clip.tracks.find(track => (track.name == type))
+    let track = keyframe.clip.tracks.find(track => (track.name == keyframe.action.type))
     if (track != undefined) {
       for (let i = 0; i < track.times.length; i++) {
         // console.log(track.times[i]);
         if (!insert)
-          if (Number(track.times[i].toFixed(3)) > Number(time.toFixed(3))) {
-            times.push(Number(time.toFixed(3)));
+          if (Number(track.times[i].toFixed(3)) > Number(keyframe.time.toFixed(3))) {
+            times.push(Number(keyframe.time.toFixed(3)));
             insert = true;
-            switch (track.name) {
-              case ".position":
-                values.push(value.x);
-                values.push(value.y);
-                values.push(value.z);
-                break;
-              case ".quaternion":
-                values.push(value.x);
-                values.push(value.y);
-                values.push(value.z);
-                values.push(value.w);
-                break;
-              case ".material.opacity":
-                values.push(value);
-                break;
-              case ".visible":
-                values.push(value);
-                break;
-              case ".color":
-                values.push(value.r);
-                values.push(value.g);
-                values.push(value.b);
-                break;
-              case ".intensity":
-                values.push(value);
-                break;
-              case ".plane.constant":
-                values.push(value);
-                break;
+            let n = keyframe.value.length;
+            for (let j = 0; j < n; j++) {
+              values.push(keyframe.value[j]);
             }
           }
         times.push(track.times[i]);
-        switch (track.name) {
-          case ".position":
-            values.push(track.values[i * 3]);
-            values.push(track.values[i * 3 + 1]);
-            values.push(track.values[i * 3 + 2]);
-            break;
-          case ".quaternion":
-            values.push(track.values[i * 4]);
-            values.push(track.values[i * 4 + 1]);
-            values.push(track.values[i * 4 + 2]);
-            values.push(track.values[i * 4 + 3]);
-            break;
-          case ".material.opacity":
-            values.push(track.values[i]);
-            break;
-          case ".visible":
-            values.push(track.values[i]);
-            break;
-          case ".color":
-            values.push(track.values[i * 3]);
-            values.push(track.values[i * 3 + 1]);
-            values.push(track.values[i * 3 + 2]);
-            break;
-          case ".intensity":
-            values.push(track.values[i]);
-            break;
-          case ".plane.constant":
-            values.push(track.values[i]);
-            break;
+        let n = keyframe.value.length;
+        for (let j = 0; j < n; j++) {
+          values.push(track.values[i * n + j]);
         }
+
       }
       if (!insert) {
         // console.log("!insert");
-        times.push(time);
+        times.push(keyframe.time);
         insert = true;
-        switch (track.name) {
-          case ".position":
-            values.push(value.x);
-            values.push(value.y);
-            values.push(value.z);
-            break;
-          case ".quaternion":
-            values.push(value.x);
-            values.push(value.y);
-            values.push(value.z);
-            values.push(value.w);
-            break;
-          case ".material.opacity":
-            values.push(value);
-            break;
-          case ".visible":
-            values.push(value);
-            break;
-          case ".color":
-            values.push(value.r);
-            values.push(value.g);
-            values.push(value.b);
-            break;
-          case ".intensity":
-            values.push(value);
-            break;
-          case ".plane.constant":
-            values.push(value);
-            break;
+        let n = keyframe.value.length;
+        for (let j = 0; j < n; j++) {
+          values.push(keyframe.value[j]);
         }
       }
       // console.log(times);
       // console.log(values);
-      let newTrack: any;
-      switch (track.name) {
-        case ".position":
-          newTrack = new THREE.VectorKeyframeTrack('.position', times, values);
-          break;
-        case ".quaternion":
-          newTrack = new THREE.QuaternionKeyframeTrack('.quaternion', times, values);
-          break;
-        case ".material.opacity":
-          newTrack = new THREE.NumberKeyframeTrack('.material.opacity', times, values);
-          break;
-        case ".visible":
-          newTrack = new THREE.BooleanKeyframeTrack('.visible', times, values);
-          break;
-        case ".color":
-          newTrack = new THREE.ColorKeyframeTrack('.color', times, values);
-          break;
-        case ".intensity":
-          newTrack = new THREE.NumberKeyframeTrack('.intensity', times, values);
-          break;
-        case ".plane.constant":
-          newTrack = new THREE.NumberKeyframeTrack('.plane.constant', times, values);
-          break;
-      }
-      clip.tracks.find((tr, index) => {
+      let newTrack = this.CreateKeyframeTrack(track.name, times, values);
+      keyframe.clip.tracks.find((tr, index) => {
         if (tr.name == newTrack.name)
-          clip.tracks.splice(index, 1, newTrack);
+          keyframe.clip.tracks.splice(index, 1, newTrack);
       })
-      clip.resetDuration();
+      keyframe.clip.resetDuration();
       this.actions.find((action, index) => {
-        if (action.getClip() == clip) {
+        if (action.getClip() == keyframe.clip) {
           // console.log(action);
           action.stop();
           let mixer = action.getMixer();
-          mixer.uncacheAction(clip);
-          let newAction = mixer.clipAction(clip);
-          if (type == ".plane.constant") {
+          mixer.uncacheAction(keyframe.clip);
+          let newAction = mixer.clipAction(keyframe.clip);
+          if (keyframe.action.type == ".plane.constant") {
             let act = newAction as any;
             act._propertyBindings[0].binding.propertyName = "constant";
             let pl = newAction.getRoot() as any;
@@ -501,7 +346,7 @@ export class AnimationService {
           newAction.play();
           newAction.clampWhenFinished = true;
           this.actions.splice(index, 1, newAction);
-          mixer.setTime(time);
+          mixer.setTime(keyframe.time);
           if ((mixer as any)._listeners == undefined)
             mixer.addEventListener('finished', function (e) {
               let act = e["action"];
@@ -641,7 +486,7 @@ export class AnimationService {
     })
   }
 
-  
+
 
   FindPartByName(name: string) {
     let arr: THREE.Object3D[] = [];

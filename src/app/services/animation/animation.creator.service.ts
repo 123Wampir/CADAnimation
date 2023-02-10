@@ -12,38 +12,31 @@ export class AnimationCreatorService {
 
   OnPositionChange(obj: THREE.Object3D) {
     if (obj != undefined) {
-      if (obj.type != "Group") {
-        let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
+      this.SceneUtilsService.selected.forEach((item, index) => {
+        let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, item.name);
         let action = AnimationModel.FindActionByType(track, ".position");
         if (action == undefined) {
           action = this.AnimationService.CreateAction(track, ".position");
         }
         let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
-        if (keyframe != undefined) {
-          this.AnimationService.ChangeKeyframe(keyframe, ".position", obj.position);
+        let position!: THREE.Vector3;
+        if (obj.type != "Group") {
+          position = obj.position;
         }
         else {
-          this.AnimationService.CreateKeyframe(action, this.AnimationService.currentTime, obj, ".position", obj.position);
-        }
-      }
-      else if (obj.type == "Group") {
-        this.SceneUtilsService.selected.forEach((item, index) => {
-          let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, item.name);
-          let action = AnimationModel.FindActionByType(track, ".position");
-          if (action == undefined) {
-            action = this.AnimationService.CreateAction(track, ".position");
-          }
-          let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
           let q = new THREE.Quaternion();
           item.getWorldQuaternion(q);
-          let position = obj.position.clone().applyQuaternion(q.invert()).add(this.SceneUtilsService.startPos[index]);
-          if (keyframe != undefined) {
-            this.AnimationService.ChangeKeyframe(keyframe, ".position", position);
-          }
-          else {
-            this.AnimationService.CreateKeyframe(action, this.AnimationService.currentTime, item, ".position", position);
-          }
-        })
+          position = obj.position.clone().applyQuaternion(q.invert()).add(this.SceneUtilsService.startPos[index]);
+        }
+        if (keyframe != undefined) {
+          keyframe.value = position.toArray();
+          this.AnimationService.ChangeKeyframe(keyframe);
+        }
+        else {
+          this.AnimationService.CreateKeyframe(action, ".position", this.AnimationService.currentTime, position.toArray());
+        }
+      })
+      if (obj.type == "Group") {
         let vec = this.SceneUtilsService.group.position;
         obj.position.set(vec.x, vec.y, vec.z)
       }
@@ -59,92 +52,58 @@ export class AnimationCreatorService {
         }
         let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
         if (keyframe != undefined) {
-          this.AnimationService.ChangeKeyframe(keyframe, ".quaternion", obj.quaternion);
+          keyframe.value = obj.quaternion.toArray();
+          this.AnimationService.ChangeKeyframe(keyframe);
         }
         else {
-          this.AnimationService.CreateKeyframe(action, this.AnimationService.currentTime, obj, ".quaternion", obj.quaternion);
+          this.AnimationService.CreateKeyframe(action, ".quaternion", this.AnimationService.currentTime, obj.quaternion.toArray());
         }
       }
     }
   }
   OnOpacityChange(obj: any) {
     if (obj != undefined) {
-      if (obj.type != "Group") {
-        let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
+      this.SceneUtilsService.selected.forEach((item) => {
+        let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, item.name);
         let action = AnimationModel.FindActionByType(track, ".material.opacity");
         if (action == undefined) {
           action = this.AnimationService.CreateAction(track, ".material.opacity");
         }
         let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
         if (keyframe != undefined) {
-          this.AnimationService.ChangeKeyframe(keyframe, ".material.opacity", obj.material.opacity);
+          keyframe.value = [obj.material.opacity];
+          this.AnimationService.ChangeKeyframe(keyframe);
         }
         else {
-          this.AnimationService.CreateKeyframe(action, this.AnimationService.currentTime, obj, ".material.opacity", obj.material.opacity);
+          this.AnimationService.CreateKeyframe(action, ".material.opacity", this.AnimationService.currentTime, [obj.material.opacity]);
         }
-      }
-      else if (obj.type == "Group") {
-        this.SceneUtilsService.selected.forEach((item, index) => {
-          let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, item.name);
-          let action = AnimationModel.FindActionByType(track, ".material.opacity");
-          if (action == undefined) {
-            action = this.AnimationService.CreateAction(track, ".material.opacity");
-          }
-          let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
-          if (keyframe != undefined) {
-            this.AnimationService.ChangeKeyframe(keyframe, ".material.opacity", obj.material.opacity);
-          }
-          else {
-            this.AnimationService.CreateKeyframe(action, this.AnimationService.currentTime, item, ".material.opacity", obj.material.opacity);
-          }
-        })
-        //obj.material.opacity = (this.AnimationService.group as any).material.opacity;
-      }
+      })
     }
   }
   OnVisibleChange(obj: THREE.Object3D) {
     if (obj != undefined) {
-      if (obj.type != "Group") {
-        let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
+      this.SceneUtilsService.selected.forEach((item, index) => {
+        let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, item.name);
         let action = AnimationModel.FindActionByType(track, ".visible");
         if (action == undefined) {
           action = this.AnimationService.CreateAction(track, ".visible");
         }
         let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
+        // console.log(keyframe);
         if (keyframe != undefined) {
-          this.AnimationService.ChangeKeyframe(keyframe, ".visible", obj.visible);
+          keyframe.value = [obj.visible];
+          this.AnimationService.ChangeKeyframe(keyframe);
         }
         else {
-          this.AnimationService.CreateKeyframe(action, this.AnimationService.currentTime, obj, ".visible", obj.visible);
+          this.AnimationService.CreateKeyframe(action, ".visible", this.AnimationService.currentTime, [obj.visible]);
         }
-      }
-      else if (obj.type == "Group") {
-        console.log(this.SceneUtilsService.selected);
-        console.log(obj.visible);
-        this.SceneUtilsService.selected.forEach((item, index) => {
-          let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, item.name);
-          let action = AnimationModel.FindActionByType(track, ".visible");
-          if (action == undefined) {
-            action = this.AnimationService.CreateAction(track, ".visible");
-          }
-          let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
-          // console.log(keyframe);
-          if (keyframe != undefined) {
-            this.AnimationService.ChangeKeyframe(keyframe, ".visible", obj.visible);
-          }
-          else {
-            this.AnimationService.CreateKeyframe(action, this.AnimationService.currentTime, item, ".visible", obj.visible);
-          }
-        })
-        //obj.visible = this.AnimationService.group.visible;
-      }
+      })
     }
   }
   OnColorChange(obj: any, hex: string) {
     obj.color.set(hex);
     if (obj.children.length != 0)
       obj.children[0].update();
-    console.log(obj.color);
     let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
     let action = AnimationModel.FindActionByType(track, ".color");
     if (action == undefined) {
@@ -152,13 +111,15 @@ export class AnimationCreatorService {
     }
     let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
     if (keyframe != undefined) {
-      this.AnimationService.ChangeKeyframe(keyframe, ".color", obj.color);
+      keyframe.value = obj.color.toArray();
+      this.AnimationService.ChangeKeyframe(keyframe);
     }
     else {
-      this.AnimationService.CreateKeyframe(action, this.AnimationService.currentTime, obj, ".color", obj.color);
+      this.AnimationService.CreateKeyframe(action, ".color", this.AnimationService.currentTime, obj.color.toArray());
     }
   }
   OnIntencityChange(obj: any) {
+    console.log(obj);
     if (obj != undefined) {
       let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
       let action = AnimationModel.FindActionByType(track, ".intensity");
@@ -167,10 +128,11 @@ export class AnimationCreatorService {
       }
       let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
       if (keyframe != undefined) {
-        this.AnimationService.ChangeKeyframe(keyframe, ".intensity", obj.intensity);
+        keyframe.value = [obj.intensity];
+        this.AnimationService.ChangeKeyframe(keyframe);
       }
       else {
-        this.AnimationService.CreateKeyframe(action, this.AnimationService.currentTime, obj, ".intensity", obj.intensity);
+        this.AnimationService.CreateKeyframe(action, ".intensity", this.AnimationService.currentTime, [obj.intensity]);
       }
     }
   }
@@ -183,10 +145,11 @@ export class AnimationCreatorService {
       }
       let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
       if (keyframe != undefined) {
-        this.AnimationService.ChangeKeyframe(keyframe, ".plane.constant", obj.plane.constant);
+        keyframe.value = [obj.plane.constant];
+        this.AnimationService.ChangeKeyframe(keyframe);
       }
       else {
-        this.AnimationService.CreateKeyframe(action, this.AnimationService.currentTime, obj, ".plane.constant", obj.plane.constant);
+        this.AnimationService.CreateKeyframe(action, ".plane.constant", this.AnimationService.currentTime, [obj.plane.constant]);
       }
     }
   }

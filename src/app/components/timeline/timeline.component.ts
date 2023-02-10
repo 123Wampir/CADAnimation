@@ -119,7 +119,7 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     //     this.CreateTreeView();
     //   }
     if (changes["curTime"] != undefined) {
-      console.log("curTime");
+      //console.log("curTime");
       let currentTime = document.getElementById("curTime")!;
       this.renderer.setStyle(currentTime, "left", `${this.AnimationService.currentTime * this.AnimationService.timeLine.scale}px`);
     }
