@@ -66,7 +66,7 @@ export class AnimationService {
   CreateTreeViewElements(obj: THREE.Object3D, tabIndex: number = 0, parent?: AnimationModel.KeyframeTrackModel) {
     if (obj.children.length != 0) {
       for (let item of obj.children) {
-        if (item.type == "TransformControls" || item.type == "Group" || item.type == "Stencil") {
+        if (item.type == "Ignore") {
           continue;
         }
         let keyframeTrack: AnimationModel.KeyframeTrackModel = { id: this.id, children: [], object: item, name: item.name, type: "Part", actions: [], level: tabIndex };
@@ -76,7 +76,7 @@ export class AnimationService {
         }
         this.timeLine.tracks.push(keyframeTrack);
 
-        if (item.type == "Object3D" || item.type == "Container") {
+        if (item.type == "Object3D" || item.type == "Group") {
           if (item.children.length != 0) {
             tabIndex++;
             this.CreateTreeViewElements(item, tabIndex, keyframeTrack)
@@ -297,7 +297,7 @@ export class AnimationService {
             mixer.addEventListener('finished', function (e) {
               let act = e["action"];
               act.paused = false;
-              console.log(act);
+              // console.log(act);
             });
         }
       })
@@ -357,14 +357,15 @@ export class AnimationService {
   }
 
   FindMixer(mixers: THREE.AnimationMixer[], obj: any, mix: any[]) {
-    let meshes: any[] = [];
+    let items: any[] = [];
     if (obj.type == "Object3D" || obj.type == "Scene")
-      this.SceneUtilsService.FindMeshes(obj, meshes);
-    else if (obj.type == "Mesh")
-      meshes.push(obj);
-    meshes.forEach(mesh => {
+      this.SceneUtilsService.FindMeshes(obj, items);
+    else {
+      items.push(obj);
+    }
+    items.forEach(item => {
       mixers.forEach(mixer => {
-        if (mixer.getRoot() == mesh) {
+        if (mixer.getRoot() == item) {
           mix.push(mixer);
         }
       });
@@ -547,6 +548,11 @@ export class AnimationService {
       }
     })
     AnimationModel.GetArrayTimeLine(this.timeLine);
+    let i = this.timeLine.tracks.findIndex(item => item.object == this.SceneUtilsService.orthographicCamera)
+    console.log(i);
+    if (i != undefined) {
+      this.timeLine.array?.splice(i, 1);
+    }
     console.log(this.timeLine);
   }
   ClearAnimation() {

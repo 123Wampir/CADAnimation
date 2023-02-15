@@ -131,7 +131,8 @@
         </div>
         <div class="vert-separator"></div>
         <div class="toolbar-tool">
-            <input class="checkbox" type="checkbox" id="cameraType">
+            <input class="checkbox" type="checkbox" id="cameraType" [(ngModel)]="SceneUtilsService.orthographic"
+                (change)="SceneUtilsService.SwitchCamera()">
             <label for="cameraType"><img src="../../../assets/orthCamera.png" class="plane" width="20px"
                     height="20px"></label>
         </div>

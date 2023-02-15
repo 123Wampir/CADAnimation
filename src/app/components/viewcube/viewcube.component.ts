@@ -18,9 +18,9 @@ export class ViewcubeComponent implements OnInit, AfterViewChecked {
   }
   constructor(public AnimationService: AnimationService, private renderer: Renderer2, private SceneUtilsService: SceneUtilsService) { }
   ngAfterViewChecked(): void {
-    if (this.SceneUtilsService.currentCamera != undefined) {
+    if (this.SceneUtilsService.perspectiveCamera != undefined) {
       let matrix = new THREE.Matrix4();
-      matrix.extractRotation(this.SceneUtilsService.currentCamera.matrixWorldInverse);
+      matrix.extractRotation(this.SceneUtilsService.perspectiveCamera.matrixWorldInverse);
       this.cube.style.transform = `translateZ(-300px) ${this.getCameraCSSMatrix(matrix)}`;
     }
   }
@@ -40,13 +40,13 @@ export class ViewcubeComponent implements OnInit, AfterViewChecked {
     let finishPosition = new THREE.Vector3();
     if (this.SceneUtilsService.boundingSphere != undefined)
       finishPosition = center.copy(offset.normalize().multiplyScalar(this.SceneUtilsService.boundingSphere.radius * 3));
-    else finishPosition = center.copy(offset.normalize().multiplyScalar(this.SceneUtilsService.currentCamera.position.length()));
-    this.SceneUtilsService.currentCamera.position.set(finishPosition.x, finishPosition.y, finishPosition.z);
+    else finishPosition = center.copy(offset.normalize().multiplyScalar(this.SceneUtilsService.perspectiveCamera.position.length()));
+    this.SceneUtilsService.perspectiveCamera.position.set(finishPosition.x, finishPosition.y, finishPosition.z);
     this.SceneUtilsService.orbit.target.set(0, 0, 0);
-    let rot = this.SceneUtilsService.currentCamera.rotation.clone();
+    let rot = this.SceneUtilsService.perspectiveCamera.rotation.clone();
     // console.log(rot.x * 180 / Math.PI, rot.y * 180 / Math.PI, rot.z * 180 / Math.PI);
     // console.log(vec);
-    let up = this.SceneUtilsService.currentCamera.up.clone();
+    let up = this.SceneUtilsService.perspectiveCamera.up.clone();
     const zero = 10e-4;
     // console.log(rot);
     if (vec.x != 0) {
@@ -65,7 +65,7 @@ export class ViewcubeComponent implements OnInit, AfterViewChecked {
     let pts: any[] = [];
     pts.push(new THREE.Vector3())
     pts.push(up.clone().normalize().multiplyScalar(50));
-    this.SceneUtilsService.currentCamera.up.copy(up);
+    this.SceneUtilsService.perspectiveCamera.up.copy(up);
   }
 
   ShowContextMenu(event: MouseEvent) {
@@ -77,14 +77,14 @@ export class ViewcubeComponent implements OnInit, AfterViewChecked {
   SetAsView(type: number) {
     switch (type) {
       case 0:
-        this.SceneUtilsService.model.quaternion.copy(this.SceneUtilsService.currentCamera.quaternion.clone());
+        this.SceneUtilsService.model.quaternion.copy(this.SceneUtilsService.perspectiveCamera.quaternion.clone());
         this.SceneUtilsService.CalculateBounding(this.SceneUtilsService.model);
         this.SceneUtilsService.SetZeroPlane();
         break;
       case 1:
-        let oldq = this.SceneUtilsService.currentCamera.quaternion.clone();
-        let q = this.SceneUtilsService.currentCamera.rotateOnAxis(new THREE.Vector3(1, 0, 0), 90 * Math.PI / 180).quaternion.clone();
-        this.SceneUtilsService.currentCamera.quaternion.copy(oldq);
+        let oldq = this.SceneUtilsService.perspectiveCamera.quaternion.clone();
+        let q = this.SceneUtilsService.perspectiveCamera.rotateOnAxis(new THREE.Vector3(1, 0, 0), 90 * Math.PI / 180).quaternion.clone();
+        this.SceneUtilsService.perspectiveCamera.quaternion.copy(oldq);
         this.SceneUtilsService.model.quaternion.copy(q);
         this.SceneUtilsService.CalculateBounding(this.SceneUtilsService.model);
         this.SceneUtilsService.SetZeroPlane();

@@ -26,7 +26,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   title = 'CADAnimation';
   renderer!: THREE.WebGLRenderer;
   scene!: THREE.Scene;
-  camera: any;
+  orthographicCamera: any;
   firstClick = false;
   mainObject!: THREE.Object3D;
   intersection: any;
@@ -42,35 +42,44 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   CreateScene() {
     this.scene = new THREE.Scene();
+    this.SceneUtilsService.scene = this.scene;
     // Добавление и настройка камеры
-    this.camera = new THREE.PerspectiveCamera(45, this.getAspectRatio(), 1.0, 100000.0);
-    this.camera.name = this.camera.type;
-    this.camera.position.set(50.0, 150.0, 100.0);
-    this.camera.up.set(0.0, 0.0, 1.0);
-    this.camera.lookAt(new THREE.Vector3(0.0, 0.0, 0.0));
-    let CamerasContainer = new THREE.Object3D();
-    CamerasContainer.name = "Cameras";
-    CamerasContainer.type = "Container";
-    this.scene.add(CamerasContainer);
-    CamerasContainer.add(this.camera);
-    this.SceneUtilsService.currentCamera = this.camera;
+    this.SceneUtilsService.perspectiveCamera = new THREE.PerspectiveCamera(45, this.getAspectRatio(), 1.0, 100000.0);
+    this.SceneUtilsService.perspectiveCamera.name = "Camera";
+    this.SceneUtilsService.perspectiveCamera.position.set(50.0, 150.0, 100.0);
+    this.SceneUtilsService.perspectiveCamera.up.set(0.0, 0.0, 1.0);
+    this.SceneUtilsService.perspectiveCamera.lookAt(new THREE.Vector3(0.0, 0.0, 0.0));
+    this.scene.add(this.SceneUtilsService.perspectiveCamera);
+    this.SceneUtilsService.currentCamera = this.SceneUtilsService.perspectiveCamera;
+    let aspect = this.getAspectRatio();
+    this.SceneUtilsService.orthographicCamera = new THREE.OrthographicCamera(
+      this.SceneUtilsService.frustumSize * aspect / -2,
+      this.SceneUtilsService.frustumSize * aspect / 2,
+      this.SceneUtilsService.frustumSize / 2,
+      this.SceneUtilsService.frustumSize / - 2, 0, 100000.0);
+    (this.SceneUtilsService.orthographicCamera.type as any) = "Ignore";
+    this.scene.add(this.SceneUtilsService.orthographicCamera);
 
 
     // Добавление глобального освещения
+    this.SceneUtilsService.lightGroup = new THREE.Group();
+    this.SceneUtilsService.lightGroup.name = "Lights";
+    this.scene.add(this.SceneUtilsService.lightGroup);
     const ambientLight = new THREE.AmbientLight(0xffffff);
     ambientLight.name = ambientLight.type;
-    this.scene.add(ambientLight);
+    this.SceneUtilsService.lightGroup.add(ambientLight);
     // Добавление направленного света
     const directionalLight = new THREE.DirectionalLight(0xffffff, 2.2);
     directionalLight.name = directionalLight.type;
     var lightHelper = new THREE.DirectionalLightHelper(directionalLight, 10, directionalLight.color);
     lightHelper.matrixWorld = directionalLight.matrixWorld;
     directionalLight.add(lightHelper);
-    directionalLight.position.set(this.camera.position.x, this.camera.position.y, this.camera.position.z);
+    directionalLight.position.add(this.SceneUtilsService.perspectiveCamera.position);
     let cameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
     directionalLight.add(cameraHelper);
     cameraHelper.matrixWorld = directionalLight.shadow.camera.matrixWorld;
-    this.scene.add(directionalLight);
+    this.SceneUtilsService.lightGroup.add(directionalLight);
+
     this.raycaster = new THREE.Raycaster();
     this.pointer = new THREE.Vector2();
 
@@ -85,13 +94,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     plane.receiveShadow = true;
     this.scene.add(plane);
     this.SceneUtilsService.zeroPlane = plane;
-    this.SceneUtilsService.planeHelpers.type = "Container";
     this.SceneUtilsService.planeHelpers.name = "CuttingPlanes";
     this.scene.add(this.SceneUtilsService.planeHelpers);
   }
   startRenderingLoop() {
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: false, failIfMajorPerformanceCaveat: true });
-    this.SceneUtilsService.scene = this.scene;
     this.SceneUtilsService.renderer = this.renderer;
     this.renderer.shadowMap.enabled = true;
     // this.renderer.localClippingEnabled = true;
@@ -100,12 +107,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.renderer.setSize(window.innerWidth * 0.99, window.innerHeight * 0.99);
     // this.renderer.sortObjects = false;
     this.renderer.setClearColor(0xffffff);
-    this.orbitControls = new TrackballControls(this.camera, this.renderer.domElement);
-    console.log(this.orbitControls);
-
 
     this.effect = new OutlineEffect(this.renderer);
 
+    this.orbitControls = new TrackballControls(this.SceneUtilsService.currentCamera, this.renderer.domElement);
+    console.log(this.orbitControls);
     this.orbitControls.rotateSpeed = 10;
     this.orbitControls.panSpeed = 1.5;
     this.orbitControls.staticMoving = true;
@@ -113,9 +119,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.orbitControls.addEventListener('change', (event: any) => {
       this.firstClick = true;
     })
-    this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
+    this.transformControls = new TransformControls(this.SceneUtilsService.currentCamera, this.renderer.domElement);
+    this.transformControls.type = "Ignore";
     this.transformControls.space = "local";
-    this.transformControls.type = "TransformControls";
     this.transformControls.addEventListener('dragging-changed', (event) => {
       this.orbitControls.enabled = !event["value"];
     });
@@ -140,11 +146,10 @@ export class AppComponent implements OnInit, AfterViewInit {
             component.SceneUtilsService.stencilNeedUpdate = false;
           }
       }
-      //component.renderer.shadowMap.needsUpdate = true;
-      component.orbitControls.update()
       requestAnimationFrame(animate);
-
+      //component.renderer.shadowMap.needsUpdate = true;
       component.SceneUtilsService.stats.update();
+      component.orbitControls.update()
       if (component.AnimationService.play) {
         component.AnimationService.currentTime += component.delta;
         if (component.AnimationService.currentTime > component.AnimationService.timeLine.duration) {
@@ -182,6 +187,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         component.SceneUtilsService.stencilNeedUpdate = true;
         component.counter = 0;
       }
+      component.SceneUtilsService.CopyCameraPlacement();
       component.renderer.render(component.scene, component.SceneUtilsService.currentCamera);
 
       //effects
@@ -320,7 +326,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     return window.innerWidth / window.innerHeight;
   }
   FindIntersection() {
-    this.raycaster.setFromCamera(this.pointer, this.camera);
+    this.raycaster.setFromCamera(this.pointer, this.SceneUtilsService.currentCamera);
     // Рассчитывается какие объекты пересеклись с лучом
     const intersects = this.raycaster.intersectObjects(this.mainObject.children);
     if (intersects.length != 0) {

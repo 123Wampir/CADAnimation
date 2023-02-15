@@ -16,27 +16,43 @@ export class SceneUtilsService {
   newFileLoading = false;
   scene!: THREE.Scene;
   model!: THREE.Object3D;
-  renderer: any;
+  renderer!: THREE.WebGLRenderer;
+
+  zeroPlane: any;
+  zeroPlaneGrid: any;
+
+  lightGroup!: THREE.Group;
+  annotationGroup!: THREE.Group;
+
+
   planes: THREE.Plane[] = [];
-  planeHelpers = new THREE.Object3D();
+  planeHelpers = new THREE.Group();
   boundingBox!: THREE.Box3;
   boundingSphere!: THREE.Sphere;
-  stencilGroups: THREE.Group = new THREE.Group();
+  stencilGroups: THREE.Object3D = new THREE.Object3D();
   stencilNeedUpdate: boolean = false;
-  zeroPlane: any;
+
   selected: THREE.Object3D[] = [];
   selectionChange: boolean = false;
   transform!: TransformControls;
   group: THREE.Mesh = new THREE.Mesh();
   transformChange: boolean = false;
   startPos: THREE.Vector3[] = [];
+
+  orthographic = false;
+  perspectiveCamera!: THREE.PerspectiveCamera;
+  orthographicCamera!: THREE.OrthographicCamera;
+  frustumSize = 150;
+  zoom = 1;
   currentCamera!: THREE.Camera;
   orbit!: TrackballControls;
   renderScale: number = 1;
   stats!: Stats;
+
   AnimationService!: AnimationService;
   ModelloaderService!: ModelloaderService;
   AppComponent!: AppComponent;
+
   CTRLPressed: boolean = false;
   SHIFTPressed: boolean = false;
 
@@ -45,12 +61,33 @@ export class SceneUtilsService {
   LoadModelFile(event: Event) {
     this.AppComponent.LoadModelFile(event);
   }
-
   SaveModelAsGLTF(event: Event) {
     this.AppComponent.SaveFile(event);
   }
+
+  SwitchCamera() {
+    if (this.orthographic) {
+      this.currentCamera = this.orthographicCamera;
+      this.orthographicCamera.updateProjectionMatrix();
+    }
+    else {
+      this.currentCamera = this.perspectiveCamera;
+      this.perspectiveCamera.updateProjectionMatrix();
+    }
+  }
+  CopyCameraPlacement() {
+
+    this.orthographicCamera.position.set(this.perspectiveCamera.position.x, this.perspectiveCamera.position.y, this.perspectiveCamera.position.z);
+    this.orthographicCamera.rotation.setFromQuaternion(this.perspectiveCamera.quaternion);
+    this.zoom = this.orbit.position0.lengthSq() / this.perspectiveCamera.position.lengthSq();
+    this.orthographicCamera.zoom = Math.log1p(this.zoom * 2);
+    this.orthographicCamera.updateProjectionMatrix();
+    this.orthographicCamera.up = this.perspectiveCamera.up;
+  }
+
   createPlaneStencilGroup(geometry: any, plane: THREE.Plane, renderOrder: number) {
-    const group = new THREE.Group();
+    const group = new THREE.Object3D();
+    group.type = "Ignore";
     const baseMat = new THREE.MeshBasicMaterial();
     baseMat.depthWrite = false;
     baseMat.depthTest = false;
@@ -177,19 +214,20 @@ export class SceneUtilsService {
         clipIntersection: true
       });
     for (let i = 0; i < 3; i++) {
-      let stencilGroup = this.createPlaneStencilGroup(mergedGeom, this.planes[i], i + 1);
+      let stencil = this.createPlaneStencilGroup(mergedGeom, this.planes[i], i + 1);
       let po = new THREE.Mesh(planeGeom, planeMat);
-      po.type = "Stencil";
+      po.type = "Ignore";
       po.onAfterRender = function (render) {
         render.clearStencil();
       };
       po.renderOrder = i + 2;
-      this.stencilGroups.add(stencilGroup);
+      this.stencilGroups.add(stencil);
       this.planeHelpers.children[i].add(po);
     }
     mergedGeom.dispose();
     planeGeom.dispose();
     planeMat.dispose();
+    this.stencilGroups.type = "Ignore";
     this.scene.add(this.stencilGroups);
     this.stencilNeedUpdate = true;
   }
@@ -362,11 +400,21 @@ export class SceneUtilsService {
   }
 
   onResize(event: any) {
+    let aspect = window.innerWidth / window.innerHeight;
+    let width = window.innerWidth * 0.99;
+    let height = window.innerHeight * 0.99;
     if (this.currentCamera.type == "PerspectiveCamera") {
-      (this.currentCamera as any).aspect = window.innerWidth / window.innerHeight;
-      (this.currentCamera as any).updateProjectionMatrix();
+      this.perspectiveCamera.aspect = aspect;
+      this.perspectiveCamera.updateProjectionMatrix();
     }
-    this.renderer.setSize(window.innerWidth * 0.99, window.innerHeight * 0.99);
+    else {
+      this.orthographicCamera.left = -this.frustumSize * aspect / 2;
+      this.orthographicCamera.right = this.frustumSize * aspect / 2;
+      this.orthographicCamera.top = this.frustumSize / 2;
+      this.orthographicCamera.bottom = -this.frustumSize / 2;
+      this.orthographicCamera.updateProjectionMatrix();
+    }
+    this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(window.devicePixelRatio * this.renderScale);
   }
 }

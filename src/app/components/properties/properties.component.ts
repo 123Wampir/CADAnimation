@@ -137,14 +137,10 @@ export class PropertiesComponent implements OnInit, OnChanges {
   }
 
   DeleteKeyframe(event: MouseEvent) {
-    // this.AnimationCreatorService.DeleteKeyframe(this.propertiesObject);
     this.AnimationService.selKeyframe.forEach(keyframe => {
       this.AnimationService.DeleteKeyframe(keyframe);
     })
     this.AnimationService.selKeyframe = [];
-    // this.AnimationService.selKeyframe.forEach(key => {
-
-    // })
   }
   DeleteAction(event: MouseEvent) {
     this.AnimationService.selAction.forEach(action => {
@@ -154,7 +150,9 @@ export class PropertiesComponent implements OnInit, OnChanges {
   }
 
   OnCameraChange($event: MouseEvent) {
-    this.AnimationCreatorService.OnCameraChange(this.propertiesObject);
+
+    this.AnimationCreatorService.OnCameraChange(this.SceneUtilsService.perspectiveCamera);
+    // this.AnimationService.CopyCameraMixer();
   }
   OnCameraRotation($event: MouseEvent) {
     console.log(this.SceneUtilsService.currentCamera.rotation);
