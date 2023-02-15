@@ -80,7 +80,8 @@ export class SceneUtilsService {
     this.orthographicCamera.position.set(this.perspectiveCamera.position.x, this.perspectiveCamera.position.y, this.perspectiveCamera.position.z);
     this.orthographicCamera.rotation.setFromQuaternion(this.perspectiveCamera.quaternion);
     this.zoom = this.orbit.position0.lengthSq() / this.perspectiveCamera.position.lengthSq();
-    this.orthographicCamera.zoom = Math.log1p(this.zoom * 2);
+    this.orthographicCamera.zoom = this.zoom;
+    // this.orthographicCamera.zoom = Math.log1p(this.zoom * 2);
     this.orthographicCamera.updateProjectionMatrix();
     this.orthographicCamera.up = this.perspectiveCamera.up;
   }

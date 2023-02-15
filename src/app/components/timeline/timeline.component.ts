@@ -247,11 +247,6 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   }
   UpdateTracks() {
     AnimationModel.GetArrayTimeLine(this.AnimationService.timeLine);
-    let i = this.AnimationService.timeLine.tracks.findIndex(item => item.object == this.SceneUtilsService.orthographicCamera)
-    console.log(i);
-    if (i != undefined) {
-      this.AnimationService.timeLine.array?.splice(i, 1);
-    }
     console.log(this.AnimationService.timeLine);
   }
   //UI
