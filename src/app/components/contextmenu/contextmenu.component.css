@@ -36,9 +36,15 @@
     background: lightgray;
 }
 
-.menu-items {
+.container {
     position: absolute;
     left: 100%;
+    border-radius: 2px;
+    
+}
+
+.menu-items {
+    position: absolute;
     border-radius: 2px;
 }
 

@@ -8,6 +8,7 @@ import { AnimationService } from './services/animation/animation.service';
 import { degToRad } from 'three/src/math/MathUtils';
 import { ModelloaderService } from './services/model/modelloader.service';
 import { SceneUtilsService } from './services/utils/scene.utils.service';
+import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 
 
 @Component({
@@ -97,6 +98,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.renderer.physicallyCorrectLights = true;
     console.log(this.renderer);
     this.renderer.setSize(window.innerWidth * 0.99, window.innerHeight * 0.99);
+    // this.renderer.sortObjects = false;
     this.renderer.setClearColor(0xffffff);
     this.orbitControls = new TrackballControls(this.camera, this.renderer.domElement);
     console.log(this.orbitControls);
@@ -194,29 +196,59 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
   async ngAfterViewInit() {
     this.SceneUtilsService.AnimationService = this.AnimationService;
+    this.SceneUtilsService.ModelloaderService = this.ModelloaderService;
+    this.SceneUtilsService.AppComponent = this;
     this.CreateScene()
     this.startRenderingLoop()
     this.mainObject = new THREE.Object3D();
     this.mainObject.name = "Model";
+    this.SceneUtilsService.model = this.mainObject;
     this.scene.add(this.mainObject)
     console.log(this.scene);
   }
-  async LoadFile(event: Event) {
-    console.log(event);
+
+  async LoadModelFile(event: Event) {
     let f = event.target as any;
-    console.log(f.files);
+    // console.log(event);
+    // console.log(f.files);
     if (f.files.length != 0) {
-      f.files[0]
-    }
-    let str = window.URL.createObjectURL(f.files[0]);
-    console.log(str);
-    let res: boolean = await this.ModelloaderService.LoadModel(str, f.files[0].name, this.mainObject)
-    console.log(res);
-    if (res) {
-      this.PrepareScene();
+      let str = window.URL.createObjectURL(f.files[0]);
+      console.log(str);
+      let res: boolean = await this.ModelloaderService.LoadModel(str, f.files[0].name, this.SceneUtilsService.model);
+      if (res) {
+        this.PrepareModel();
+      }
     }
   }
-  PrepareScene() {
+
+  async SaveFile(event: Event) {
+    const exporter = new GLTFExporter();
+    console.log('save');
+    this.mainObject.updateWorldMatrix(false, true);
+    // Parse the input and generate the glTF output
+    exporter.parse(
+      this.mainObject.children[0],
+      // called when the gltf has been generated
+      function (gltf) {
+        console.log(gltf);
+        const output = JSON.stringify(gltf, null, 2);
+        const link = document.createElement('a');
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.href = URL.createObjectURL(new Blob([output], { type: 'text/plain' }));
+        link.download = "model.gltf";
+        link.click();
+      },
+      // called when there is an error in the generation
+      function (error) {
+        console.log('An error happened');
+      },
+      {
+        trs: true
+      }
+    );
+  }
+  PrepareModel() {
     this.meshArr.forEach(mesh => {
       (mesh as any).geometry.dispose();
       (mesh as any).material.dispose();
@@ -243,6 +275,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       let vec = new THREE.Vector3(0, 0, 0);
       arr.forEach(mesh => {
         let geom = mesh as THREE.Mesh;
+        let pos = geom.position.clone();
         let vec = new THREE.Vector3(0, 0, 0);
         var geometry = geom.geometry;
         geometry.computeBoundingBox();
@@ -251,6 +284,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         geom.localToWorld(center);
         geometry.center()
         geom.position.set(center.x, center.y, center.z);
+        geom.position.add(pos);
       })
     })
   }
@@ -260,10 +294,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (arr.length != 0) {
       arr.forEach(mesh => {
         mesh.material = mesh.material.clone();
+        //mesh.material = new THREE.MeshToonMaterial({ color: mesh.material.color });
+        if (mesh.geometry.hasAttribute('color')) {
+          mesh.material.vertexColors = true;
+        }
         mesh.material.side = THREE.FrontSide;
-        mesh.material.transparent = true;
-        mesh.material.alphaToCoverage = true;
+        //mesh.material.transparent = true;
         mesh.material.clipIntersection = true;
+        // mesh.material.wireframe = true;
         mesh.receiveShadow = true;
         mesh.castShadow = true;
       })
@@ -353,11 +391,17 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (event.key == "Control") {
       this.SceneUtilsService.CTRLPressed = true;
     }
+    if (event.key == "Shift") {
+      this.SceneUtilsService.SHIFTPressed = true;
+    }
 
   }
   onKeyUp(event: KeyboardEvent) {
     if (event.key == "Control") {
       this.SceneUtilsService.CTRLPressed = false;
+    }
+    if (event.key == "Shift") {
+      this.SceneUtilsService.SHIFTPressed = false;
     }
   }
 }

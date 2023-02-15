@@ -1,0 +1,139 @@
+<div class="container">
+    <div class="menubar">
+        <img src="../../../assets/logo.png" alt="logo" width="64px" height="64px">
+        <div class="menu-container">
+            <div class="label">FILENAME</div>
+            <div class="menu">
+                <div class="menu-line">
+                    <label class="first-menu-label">
+                        <div class="menu-name">File</div>
+                    </label>
+                    <div class="container menu-items">
+                        <div class="basic-line" (click)="NewProject()">Новый</div>
+                        <label class="basic-line" for="fileUpload">
+                            <input class="file" type="file" name="file" id="fileUpload"
+                                accept=".step,.stp,.gltf,.brep,.igs" (change)="SceneUtilsService.LoadModelFile($event)">
+                            Загрузить модель
+                        </label>
+                        <div class="basic-line" [ngStyle]="SetModelExportStyle()"
+                            (click)="SceneUtilsService.SaveModelAsGLTF($event)">Экспорт</div>
+                    </div>
+                </div>
+                <div class="menu-line">
+                    <label class="first-menu-label">
+                        <div class="menu-name">Edit</div>
+                    </label>
+                    <div class="container menu-items">
+                        <div class="basic-line">Вид спереди</div>
+                        <div class="basic-line">Вид сверху</div>
+                    </div>
+                </div>
+                <div class="menu-line">
+                    <label class="first-menu-label">
+                        <div class="menu-name">View</div>
+                    </label>
+                    <div class="container menu-items">
+                        <div class="basic-line">Вид спереди</div>
+                        <div class="basic-line">Вид сверху</div>
+                    </div>
+                </div>
+                <div class="menu-line">
+                    <label class="first-menu-label">
+                        <div class="menu-name">Scene</div>
+                    </label>
+                    <div class="container menu-items">
+                        <div class="menu-line">
+                            <label class="menu-label">
+                                <div class="menu-name">Источник света</div>
+                                <div class="arrow-right">🞂</div>
+                            </label>
+                            <div class="container side-menu-items">
+                                <div class="basic-line">Добавить</div>
+                                <div class="basic-line">Удалить</div>
+                                <div class="hor-separator"></div>
+                                <div class="basic-line">Включить все</div>
+                                <div class="checkbox-line">
+                                    <label class="basic-line" for="checkbox">Тени</label>
+                                    <input type="checkbox" id="checkbox">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="menu-line">
+                            <label class="menu-label">
+                                <div class="menu-name">Аннотация</div>
+                                <div class="arrow-right">🞂</div>
+                            </label>
+                            <div class="container side-menu-items">
+                                <div class="basic-line">Добавить</div>
+                                <div class="basic-line">Удалить</div>
+                            </div>
+                        </div>
+                        <div class="basic-line">Вид сверху</div>
+                    </div>
+                </div>
+                <div class="menu-line">
+                    <label class="first-menu-label">
+                        <div class="menu-name">Animation</div>
+                    </label>
+                    <div class="container menu-items">
+                        <div class="basic-line" (click)="NewProject()">Очистить</div>
+                        <label class="basic-line" for="fileUpload">
+                            <input class="file" type="file" name="file" id="fileUpload"
+                                accept=".step,.stp,.gltf,.brep,.igs" (change)="SceneUtilsService.LoadModelFile($event)">
+                            Открыть
+                        </label>
+                        <div class="basic-line" [ngStyle]="SetModelExportStyle()"
+                            (click)="SceneUtilsService.SaveModelAsGLTF($event)">Сохранить</div>
+                    </div>
+                </div>
+                <!-- <div class="menu-line">
+                    <label class="first-menu-label">
+                        <div class="menu-name">Help</div>
+                    </label>
+                    <div class="container menu-items">
+                        <div class="basic-line">Вид спереди</div>
+                        <div class="basic-line">Вид сверху</div>
+                    </div>
+                </div> -->
+                <!-- <div class="menulist">Edit</div>
+                <div class="menulist">View</div>
+                <div class="menulist">Scene</div>
+                <div class="menulist">Animation</div>
+                <div class="menulist">Help</div> -->
+            </div>
+        </div>
+    </div>
+    <div class="toolbar-container">
+        <div class="toolbar-tool">
+            <input type="color" (change)="OnSceneColorChange($event)" id="scene-color">
+        </div>
+        <div class="vert-separator"></div>
+        <div class="toolbar-tool">
+            <input class="checkbox" type="checkbox" id="ground">
+            <label for="ground"><img src="../../../assets/grid.png" width="20px" height="20px"></label>
+        </div>
+        <div class="vert-separator"></div>
+        <div class="toolbar-tool">
+            <input class="checkbox" type="checkbox" id="cut" (change)="SetClipping($event)">
+            <label for="cut"><img src="../../../assets/cut.png" width="20px" height="20px"></label>
+        </div>
+        <div class="toolbar-tool">
+            <input class="checkbox" type="checkbox" id="planeX" (change)="ShowPlaneX($event)">
+            <label for="planeX"><img src="../../../assets/planeX.png" class="plane" width="20px" height="20px"></label>
+        </div>
+        <div class="toolbar-tool">
+            <input class="checkbox" type="checkbox" id="planeY" (change)="ShowPlaneY($event)">
+            <label for="planeY"><img src="../../../assets/planeY.png" class="plane" width="20px" height="20px"></label>
+        </div>
+        <div class="toolbar-tool">
+            <input class="checkbox" type="checkbox" id="planeZ" (change)="ShowPlaneZ($event)">
+            <label for="planeZ"><img src="../../../assets/planeZ.png" class="plane" width="20px" height="20px"></label>
+        </div>
+        <div class="vert-separator"></div>
+        <div class="toolbar-tool">
+            <input class="checkbox" type="checkbox" id="cameraType">
+            <label for="cameraType"><img src="../../../assets/orthCamera.png" class="plane" width="20px"
+                    height="20px"></label>
+        </div>
+    </div>
+</div>

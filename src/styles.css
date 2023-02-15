@@ -30,6 +30,10 @@ button:active {
     display: none;
 }
 
+img {
+    /* filter: invert(1); */
+}
+
 .file-label {
     position: relative;
     border: none;
@@ -92,5 +96,13 @@ input {
 }
 
 .input-range {}
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}

@@ -1,4 +1,5 @@
-import { Component, Renderer2, Input, OnChanges, OnInit, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { Component, Renderer2, Input, OnChanges, OnInit, SimpleChanges, AfterViewInit, ViewChild } from '@angular/core';
 import { AnimationService } from 'src/app/services/animation/animation.service';
 import { SceneUtilsService } from 'src/app/services/utils/scene.utils.service';
 import * as AnimationModel from 'src/app/shared/animation.model';
@@ -12,20 +13,61 @@ import THREE = require('three');
   styleUrls: ['./timeline.component.css']
 })
 export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
-  @Input() actions!: THREE.AnimationAction[];
-  @Input() scene!: THREE.Object3D;
+
   @Input() curTime = 0;
   @Input() newFile!: boolean;
+  @Input() selChange!: boolean;
+  @ViewChild(CdkScrollable) cdkScrollable!: CdkScrollable;
+
   constructor(public AnimationService: AnimationService, private renderer: Renderer2, public SceneUtilsService: SceneUtilsService) { }
-  id: number = 0;
-  persons: any;
   onCurrentTimeMove = false;
   onTimeLineExpand = true;
+  actionMove = false;
+  keyframeClick = false;
+  actionClick = false;
   startPos = 0;
+  itemSize = 26;
   center!: THREE.Vector3;
   point!: THREE.Object3D;
   offsets: any[] = [];
-  timeline = this.AnimationService.timeLine;
+
+  ngOnInit(): void {
+  }
+  ngAfterViewInit(): void {
+    this.AnimationService.angRenderer = this.renderer;
+    const ro = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        const height = entry.contentBoxSize ? entry.contentBoxSize[0].blockSize : entry.contentRect.height;
+        let curTime = document.getElementById("curTime")!;
+        curTime.style.height = `${height}px`;
+      }
+    })
+    let ln = document.getElementById("lines")!;
+    ro.observe(ln);
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    //console.log(changes)
+    if (changes["newFile"] != undefined) {
+      console.log(changes["newFile"]);
+      if (!changes["newFile"].firstChange)
+        if (changes["newFile"].currentValue == this.SceneUtilsService.newFileLoading) {
+          this.CreateTreeView();
+        }
+    }
+    if (changes["selChange"] != undefined) {
+      if (!changes["selChange"].firstChange) {
+        if (this.SceneUtilsService.selected.length != 0) {
+          let id = this.AnimationService.timeLine.tracks.findIndex(item => item.object == this.SceneUtilsService.selected[0])
+          if (id != undefined)
+            this.ScrollTo(id);
+        }
+      }
+    }
+    if (changes["curTime"] != undefined) {
+      let currentTime = document.getElementById("curTime")!;
+      this.renderer.setStyle(currentTime, "left", `${this.AnimationService.currentTime * this.AnimationService.timeLine.scale}px`);
+    }
+  }
 
   OnSceneColorChange(event: Event) {
     let e = event as any;
@@ -83,119 +125,30 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
       item.position.set(pos.x, pos.y, pos.z);
     })
   }
-  ngOnInit(): void {
-  }
-  ngAfterViewInit(): void {
-    this.AnimationService.angRenderer = this.renderer;
-    // this.AnimationService.timeLine = this.AnimationService.timeLine;
-    const ro = new ResizeObserver(entries => {
-      for (let entry of entries) {
-        const height = entry.contentBoxSize ? entry.contentBoxSize[0].blockSize : entry.contentRect.height;
-        let curTime = document.getElementById("curTime")!;
-        curTime.style.height = `${height}px`;
-      }
-    })
-    let ln = document.getElementById("lines")!;
-    ro.observe(ln);
-  }
 
-  TrackByFunction(index: number, item: any) {
+  TrackByFunction(index: number) {
     return index;
   }
   SetLineNameStyle(type: string): string {
     return `${type}name`;
   }
-  ngOnChanges(changes: SimpleChanges): void {
-    //console.log(changes)
-    if (changes["newFile"] != undefined) {
-      console.log(changes["newFile"]);
-      if (!changes["newFile"].firstChange)
-        if (changes["newFile"].currentValue == this.SceneUtilsService.newFileLoading) {
-          this.CreateTreeView();
-        }
-    }
-    // if (changes["scene"] != undefined)
-    //   if (changes["scene"].currentValue != undefined) {
-    //     this.CreateTreeView();
-    //   }
-    if (changes["curTime"] != undefined) {
-      //console.log("curTime");
-      let currentTime = document.getElementById("curTime")!;
-      this.renderer.setStyle(currentTime, "left", `${this.AnimationService.currentTime * this.AnimationService.timeLine.scale}px`);
-    }
-  }
-  CreateTreeView() {
-    this.id = 0;
-    this.CreateTreeViewElements(this.SceneUtilsService.scene);
-    this.UpdateTracks();
-  }
-  CreateRulerElement(lines: HTMLElement) {
-    let line = this.renderer.createElement("div");
-    this.renderer.addClass(line, "line");
-    let part = this.renderer.createElement("div");
-    this.renderer.addClass(part, "part");
-    this.renderer.appendChild(line, part);
-    let partname = this.renderer.createElement("div");
-    this.renderer.addClass(partname, "partname");
-    this.renderer.appendChild(part, partname);
-    let ruler = this.renderer.createElement("div");
-    this.renderer.addClass(ruler, "ruler-track");
-    this.renderer.setAttribute(ruler, "id", "rulerTrack");
-    this.renderer.appendChild(line, ruler);
-    let currentTime = this.renderer.createElement("div");
-    this.renderer.addClass(currentTime, "current-time");
-    this.renderer.listen(currentTime, "mousedown", (event) => this.OnCurrentTimeMouseDown(event));
-    this.renderer.setAttribute(currentTime, "id", "curTime");
-    this.renderer.appendChild(ruler, currentTime);
-    this.renderer.appendChild(lines, line);
-  }
-  CreateTreeViewElements(obj: THREE.Object3D, tabIndex: number = 0, parent?: AnimationModel.KeyframeTrackModel) {
-    if (obj.children.length != 0) {
-      for (let item of obj.children) {
-        if (item.type == "TransformControls" || item.type == "Group" || item.type == "Stencil") {
-          continue;
-        }
-        let keyframeTrack: AnimationModel.KeyframeTrackModel = { id: this.id, children: [], object: item, name: item.name, type: "Part", actions: [], level: tabIndex };
-        this.id++;
-        if (parent != undefined) {
-          parent.children.push(keyframeTrack.id);
-        }
-        this.AnimationService.timeLine.tracks.push(keyframeTrack);
 
-        if (item.type == "Object3D" || item.type == "Container") {
-          if (item.children.length != 0) {
-            tabIndex++;
-            this.CreateTreeViewElements(item, tabIndex, keyframeTrack)
-            tabIndex--;
-          }
-        }
-        else if (item.type == "Mesh") {
-          keyframeTrack.type = "Mesh";
-        }
-        else if (/(Camera)/g.exec(item.type) != undefined) {
-          keyframeTrack.type = "Camera";
-        }
-        else if (/(Light)/g.exec(item.type) != undefined) {
-          keyframeTrack.type = "Light";
-        }
-        else if (item.type == "zeroPlane") {
-          keyframeTrack.type = "Plane";
-        }
-        else if (item.type == "PlaneHelper") {
-          keyframeTrack.type = "Plane";
-        }
-      }
-    }
-    this.timeline = this.AnimationService.timeLine;
+  ScrollTo(id: number) {
+    let offset = id * this.itemSize - this.cdkScrollable.getElementRef().nativeElement.clientHeight / 2;
+    this.cdkScrollable.scrollTo({ behavior: 'smooth', top: offset, left: 0 });
+  }
+
+  CreateTreeView() {
+    this.AnimationService.id = 0;
+    this.AnimationService.CreateTreeViewElements(this.SceneUtilsService.scene);
+    this.UpdateTracks();
   }
 
   OnLineClick(id: number) {
-    console.log(id);
-    let item = this.timeline.tracks[id].object;
+    console.log(this.AnimationService.timeLine.tracks[id]);
+    let item = this.AnimationService.timeLine.tracks[id].object;
     console.log(item);
     this.SceneUtilsService.Select(item, this.SceneUtilsService.CTRLPressed);
-    // let part = this.FindPartByName(event.target.attributes["name"].nodeValue)
-    // console.log(item);
   }
   ShowLine(show: boolean) {
     if (show)
@@ -209,95 +162,102 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   }
   OnExpandLineClick(track: any) {
     track.children.forEach((i: any) => {
-      let item = AnimationModel.FindTrackById(this.timeline, i);
-      this.timeline.array![item!].show = !this.timeline.array![item!].show;
-      this.OnExpandLineClick(this.timeline.array![item!]);
+      let item = AnimationModel.FindTrackById(this.AnimationService.timeLine, i);
+      this.AnimationService.timeLine.array![item!].show = !this.AnimationService.timeLine.array![item!].show;
+      this.OnExpandLineClick(this.AnimationService.timeLine.array![item!]);
     })
     track.expand = !track.expand;
   }
-
-  FindPartByName(name: string) {
-    //console.log(this.scene.getObjectByName(name));
-    return this.scene.getObjectByName(name);
+  TrackClick(event: MouseEvent) {
+    if (!this.keyframeClick && !this.actionClick) {
+      if (!this.SceneUtilsService.CTRLPressed) {
+        this.AnimationService.selAction.forEach(item => item.active = false)
+        this.AnimationService.selAction = [];
+        this.AnimationService.selKeyframe.forEach(item => item.active = false)
+        this.AnimationService.selKeyframe = [];
+      }
+    }
+    this.keyframeClick = false;
+    this.actionClick = false;
   }
-  FindPartLineByName(name: string) {
-    //console.log(name);
-    return document.getElementsByName(name)[0].parentElement?.parentElement;
-  }
-  SelectChildrenParts(obj: THREE.Object3D, arr: any[]) {
-    if (obj.children.length != 0) {
-      obj.children.forEach(item => {
-        if (item.type != "LineSegments") {
-          if (item.type == "PlaneHelper") {
-            arr.push(item);
-          }
-          else {
-            arr.push(item);
-            this.SelectChildrenParts(item, arr);
-          }
+  ActionClick(action: AnimationModel.KeyframeActionModel) {
+    this.actionClick = true;
+    // console.log(this.AnimationService.ignore);
+    if (!this.AnimationService.ignore) {
+      let value = !action.active;
+      if (!this.SceneUtilsService.CTRLPressed) {
+        this.AnimationService.selAction.forEach(item => item.active = false)
+        this.AnimationService.selAction = [];
+        // (this.AnimationService.selectedAction as any) = undefined;
+      }
+      action.active = value;
+      if (value) {
+        // this.AnimationService.selectedAction = action;
+        this.AnimationService.selAction.push(action);
+      }
+      else {
+        let i = this.AnimationService.selAction.findIndex(item => item == action);
+        if (i) {
+          this.AnimationService.selAction.splice(i, 1);
         }
-      })
+      }
+    }
+    if (this.AnimationService.selKeyframe.length == 0)
+      this.AnimationService.ignore = false;
+  }
+  ActionMouseDown(event: MouseEvent, action: AnimationModel.KeyframeActionModel) {
+    if (this.SceneUtilsService.SHIFTPressed) {
+      this.startPos = event.clientX - action.start * this.AnimationService.timeLine.scale;
+      this.actionMove = true;
+    }
+  }
+  ActionMouseMove(event: MouseEvent, action: AnimationModel.KeyframeActionModel) {
+    if (this.actionMove) {
+      let time = event.clientX - this.startPos;
+      if (time >= 0 && time + action.length * this.AnimationService.timeLine.scale <= this.AnimationService.timeLine.duration * this.AnimationService.timeLine.scale) {
+        let offset = time / this.AnimationService.timeLine.scale - action.start;
+        action.track?.shift(offset);
+        action.keyframes[0].clip.resetDuration();
+        action.start = time / this.AnimationService.timeLine.scale;
+        action.keyframes.forEach(keyframe => {
+          keyframe.time += offset;
+        })
+      }
+    }
+  }
+  ActionMouseUp(event: MouseEvent) {
+    this.actionMove = false;
+  }
+  KeyframeClick(keyframe: AnimationModel.KeyframeModel) {
+    this.keyframeClick = true;
+    let value = !keyframe.active;
+    if (!this.SceneUtilsService.CTRLPressed) {
+      this.AnimationService.selKeyframe.forEach(item => item.active = false)
+      this.AnimationService.selKeyframe = [];
+      // (this.AnimationService.selectedKeyframe as any) = undefined;
+    }
+    keyframe.active = value;
+    if (value) {
+      this.AnimationService.selKeyframe.push(keyframe);
+      this.AnimationService.ignore = true;
+      // this.AnimationService.selectedKeyframe = keyframe;
+      this.SceneUtilsService.Select(keyframe.action.trackDOM.object, false);
+      this.AnimationService.currentTime = keyframe.time;
+      this.AnimationService.currentTimeChange = true;
+    }
+    else {
+      let i = this.AnimationService.selKeyframe.findIndex(item => item == keyframe);
+      if (i) {
+        this.AnimationService.selKeyframe.splice(i, 1);
+        this.AnimationService.ignore = true;
+      }
     }
   }
   UpdateTracks() {
-    this.AnimationService.actions.forEach(action => {
-      let name = action.getRoot().name;
-      let clip = action.getClip();
-      let keyframeTrack = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, name);
-      AnimationModel.CreateActions(keyframeTrack, clip);
-      // console.log(keyframeTrack);
-      // clip.tracks.forEach(track => {
-
-      //   track.times.forEach(time => {
-      //     let key = AnimationModel.CreateKeyframe(time, keyframeTrack, clip)
-      //   })
-      // })
-    })
-    this.AnimationService.timeLine.tracks.forEach(track => {
-      this.AppendActions(track);
-    })
-    // this.timeLine.tracks.forEach(track => {
-    //   this.AppendKeyframes(track)
-    // })
     AnimationModel.GetArrayTimeLine(this.AnimationService.timeLine);
     console.log(this.AnimationService.timeLine);
   }
-
-  AppendActions(keyframeTrack: AnimationModel.KeyframeTrackModel) {
-    for (let i = 0; i < keyframeTrack.actions.length; i++) {
-      //this.AnimationService.CreateActionDOM(keyframeTrack, keyframeTrack.actions[i]);
-      this.AppendKeyframes(keyframeTrack.actions[i])
-    }
-  }
-  AppendKeyframes(action: AnimationModel.KeyframeActionModel) {
-    for (let i = 0; i < action.keyframes.length; i++) {
-      //this.AnimationService.CreateKeyframeDOM(action, action.keyframes[i]);
-    }
-  }
-
   //UI
-  ShowChildren(name: string, show: boolean) {
-    // console.log(show);
-    let arr: any[] = [];
-    let obj = this.FindPartByName(name);
-    this.SelectChildrenParts(obj!, arr)
-    arr.forEach(item => {
-      let line = this.FindPartLineByName(item.name);
-      let btn = line?.getElementsByTagName("button");
-      if (show) {
-        line!.style.display = "grid";
-        if (btn?.length != 0) {
-          btn![0].setAttribute("show", "1");
-        }
-      }
-      else {
-        line!.style.display = "none";
-        if (btn?.length != 0) {
-          btn![0].setAttribute("show", "0");
-        }
-      }
-    })
-  }
   OnTimelineExpand(event: MouseEvent) {
     let container = document.getElementById("timeline-container");
     if (this.onTimeLineExpand) {
@@ -327,13 +287,27 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     return { 'width': `${this.AnimationService.timeLine.duration * this.AnimationService.timeLine.scale}px` };
   }
   SetActionStyle(action: AnimationModel.KeyframeActionModel) {
-    return {
+    let res = {
       'width': `${action.length * this.AnimationService.timeLine.scale}px`,
-      'left': `${action.start * this.AnimationService.timeLine.scale}px`
+      'left': `${action.start * this.AnimationService.timeLine.scale}px`,
+      'background': 'darkgoldenrod'
     };
+    if (action.active)
+      res.background = 'springgreen';
+    return res;
   }
   SetKeyframeStyle(keyframe: AnimationModel.KeyframeModel) {
-    return { 'left': `${(keyframe.time - keyframe.action.start) * this.AnimationService.timeLine.scale}px` };
+    let res = {
+      'left': `${(keyframe.time - keyframe.action.start) * this.AnimationService.timeLine.scale}px`,
+      'visibility': 'hidden',
+      'background': 'tan'
+    };
+    if (keyframe.action.active) {
+      res.visibility = 'visible';
+    }
+    if (keyframe.active)
+      res.background = 'lime';
+    return res;
   }
   OnCurrentTimeMouseUp(event: MouseEvent) {
     this.AnimationService.currentTimeChange = false;
@@ -341,8 +315,6 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   }
   OnCurrentTimeMouseMove(event: MouseEvent) {
     if (this.onCurrentTimeMove) {
-      (this.AnimationService.selectedAction as any) = undefined;
-      (this.AnimationService.selectedKeyframe as any) = undefined;
       this.AnimationService.currentTimeChange = true;
       let curTime = document.getElementById("curTime")!;
       let time = event.clientX - this.startPos;

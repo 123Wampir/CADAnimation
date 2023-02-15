@@ -5,6 +5,8 @@ import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { AnimationService } from '../animation/animation.service';
+import { ModelloaderService } from '../model/modelloader.service';
+import { AppComponent } from 'src/app/app.component';
 
 @Injectable({
   providedIn: 'root'
@@ -33,10 +35,20 @@ export class SceneUtilsService {
   renderScale: number = 1;
   stats!: Stats;
   AnimationService!: AnimationService;
+  ModelloaderService!: ModelloaderService;
+  AppComponent!: AppComponent;
   CTRLPressed: boolean = false;
+  SHIFTPressed: boolean = false;
 
   constructor() { }
 
+  LoadModelFile(event: Event) {
+    this.AppComponent.LoadModelFile(event);
+  }
+
+  SaveModelAsGLTF(event: Event) {
+    this.AppComponent.SaveFile(event);
+  }
   createPlaneStencilGroup(geometry: any, plane: THREE.Plane, renderOrder: number) {
     const group = new THREE.Group();
     const baseMat = new THREE.MeshBasicMaterial();
@@ -182,9 +194,9 @@ export class SceneUtilsService {
     this.stencilNeedUpdate = true;
   }
 
-  CalculateBounding() {
+  CalculateBounding(object: any) {
     let arr: any[] = [];
-    this.FindMeshes(this.model, arr);
+    this.FindMeshes(object, arr);
     let geomArr: THREE.BufferGeometry[] = [];
     arr.forEach((obj) => {
       if (obj.type == "Mesh") {
@@ -227,7 +239,6 @@ export class SceneUtilsService {
 
   ClearSelection() {
     if (this.selected.length != 0) {
-      let arr: any[] = [];
       this.selected.forEach(item => {
         let mesh = item as any;
         if (mesh.material != undefined)
@@ -248,8 +259,11 @@ export class SceneUtilsService {
     if (obj.type == "Mesh") {
       if (obj.material.emissive)
         obj.material.emissive.set(0x004400);
-      this.selected.push(obj);
-      this.transform.attach(obj);
+      let i = this.selected.findIndex(item => item == obj);
+      if (i == -1) {
+        this.selected.push(obj);
+        this.transform.attach(obj);
+      }
     }
     else if (obj.type == "Object3D") {
       let arr: any[] = [];
@@ -261,17 +275,22 @@ export class SceneUtilsService {
       })
     }
     else if (/(Light)/g.exec(obj.type) != undefined) {
+      this.selected = [];
       this.selected.push(obj);
       this.transform.attach(obj);
     }
     else if (/(Camera)/g.exec(obj.type) != undefined) {
+      this.selected = [];
       this.selected.push(obj);
+      this.transform.detach();
     }
     else if (obj.type == "Container") {
       // this.selected.push(obj);
     }
     else if (obj.type == "PlaneHelper") {
+      this.selected = [];
       this.selected.push(obj);
+      this.transform.detach();
       // this.transform.attach(obj);
     }
     if (this.selected.length > 1) {
@@ -319,25 +338,7 @@ export class SceneUtilsService {
       })
       this.model.clear();
       this.startPos = [];
-      this.AnimationService.timeLine.tracks.forEach(track => {
-        // track.DOMElement.remove();
-        track.actions.forEach(action => {
-          // action.DOMElement?.remove();
-          // action.keyframes.forEach(keyframe => {
-          //   keyframe.DOMElement?.remove();
-          // })
-          action.keyframes = [];
-        })
-        track.actions = [];
-      })
-      this.AnimationService.timeLine.tracks = [];
-      this.AnimationService.actions.forEach(action => {
-        action.stop();
-        let mixer = action.getMixer();
-        mixer.uncacheRoot(mixer.getRoot());
-      })
-      this.AnimationService.actions = [];
-      this.AnimationService.mixers = [];
+      this.AnimationService.ClearAnimation();
       this.planeHelpers.traverse(obj => {
         if (obj.type == "Mesh" || obj.type == "PlaneHelper" || obj.type == "Stencil") {
           (obj as any).geometry.dispose();

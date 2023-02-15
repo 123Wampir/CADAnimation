@@ -10,6 +10,7 @@ import { DialogComponent } from './components/dialog/dialog.component';
 import { ViewcubeComponent } from './components/viewcube/viewcube.component';
 import { ContextmenuComponent } from './components/contextmenu/contextmenu.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { MenubarComponent } from './components/menubar/menubar.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
     PropertiesComponent,
     DialogComponent,
     ViewcubeComponent,
-    ContextmenuComponent
+    ContextmenuComponent,
+    MenubarComponent
   ],
   imports: [
     BrowserModule,

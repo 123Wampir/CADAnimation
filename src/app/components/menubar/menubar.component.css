@@ -1,0 +1,174 @@
+.container {
+    width: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.menubar {
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid lightgray;
+}
+
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.menu {
+    display: flex;
+    flex-direction: row;
+}
+
+.menulist {
+    padding: 3px 8px;
+    margin: 0 3px;
+    font-size: 95%;
+}
+
+.checkbox-line {
+    transition: all 0.1s;
+    white-space: nowrap;
+    display: flex;
+}
+
+.checkbox-line:hover {
+    background: lightgray;
+}
+
+.menu-line {
+    transition: all 0.1s;
+    display: flex;
+    flex-direction: row;
+}
+
+.menu-line>div {
+    display: none;
+}
+
+.menu-line:hover>div {
+    display: flex;
+}
+
+.first-menu-label {
+    white-space: nowrap;
+    transition: all 0.1s;
+    padding: 8px 10px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.first-menu-label:hover {
+    background: lightgray;
+}
+
+.menu-label {
+    white-space: nowrap;
+    transition: all 0.1s;
+    padding: 1px 10px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.menu-label:hover {
+    background: lightgray;
+}
+
+.menu-items {
+    position: absolute;
+    left: auto;
+    right: auto;
+    top: 64px;
+    border-radius: 2px;
+    box-shadow: 0px 0px 2px 0px black;
+}
+
+.side-menu-items {
+    position: absolute;
+    top: auto;
+    right: auto;
+    left: 100%;
+    border-radius: 2px;
+    box-shadow: 0px 0px 2px 0px black;
+}
+
+.basic-line {
+    transition: all 0.1s;
+    white-space: nowrap;
+    padding: 1px 10px;
+    padding-right: 50px;
+}
+
+.basic-line:hover {
+    background: lightgray;
+}
+
+.hor-separator {
+    border-bottom: 1px lightgray solid;
+    width: 95%;
+    margin: 2px;
+    align-self: center;
+}
+
+.vert-separator {
+    border-right: 1px lightgray solid;
+    height: 28px;
+    margin: 2px;
+}
+
+.arrow-right {
+    padding-left: 30px;
+}
+
+.toolbar-container {
+    display: flex;
+    align-items: center;
+    margin: 1px 5px;
+}
+
+.toolbar-tool {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0px 3px;
+}
+
+input {
+    margin: 0;
+}
+
+.checkbox {
+    display: none;
+}
+
+.checkbox+label {
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+    transition: .1s all;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: inset 0px 0px 3px 0px lightskyblue;
+    border-radius: 3px;
+}
+
+.checkbox:checked+label {
+    /* border: 3px solid black; */
+    background-color: lightskyblue;
+    box-shadow: inset 0px 0px 3px 0px black;
+}
+.plane{
+    filter: none;
+}

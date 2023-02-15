@@ -3,10 +3,6 @@
         <div class="label">CADAnimation</div>
         <div class="controls-panel">
             <div class="keyframe-controls">
-                <div class="label">Разрез</div>
-                <input type="checkbox" name="" (change)="CLIPPINGTEST($event)" id="">
-                <div class="label">Цвет сцены</div>
-                <input type="color" name="" (change)="OnSceneColorChange($event)" id="">
                 <div class="label">Разрешение</div>
                 <input type="range" min="0.1" max="1" step="0.05" [(ngModel)]="SceneUtilsService.renderScale"
                     (change)="SceneUtilsService.onResize($event)">
@@ -35,7 +31,7 @@
             </div>
         </div>
     </div>
-    <cdk-virtual-scroll-viewport [itemSize]="26" class="timeline" id="timeline">
+    <cdk-virtual-scroll-viewport #cdkScrollable [itemSize]="itemSize" class="timeline" id="timeline">
         <div #lines class="lines" id="lines" (mousemove)="OnCurrentTimeMouseMove($event)"
             (mouseup)="OnCurrentTimeMouseUp($event)">
             <div class="line">
@@ -46,16 +42,18 @@
                     <div class="current-time" id="curTime" (mousedown)="OnCurrentTimeMouseDown($event)"></div>
                 </div>
             </div>
-            <div class="line" *cdkVirtualFor="let track of timeline.array; trackBy:TrackByFunction"
-                [ngStyle]="ShowLine(track.show)">
+            <div class="line" *cdkVirtualFor="let track of AnimationService.timeLine.array; trackBy:TrackByFunction"
+                [ngStyle]="ShowLine(track.show)" [id]="track.id">
                 <div [ngClass]="track.type" (click)="OnLineClick(track.id)">
                     <div class="linename">{{" ".repeat(track.level*3)+track.name}}</div>
                     <button *ngIf="track.type=='Part'" [ngClass]="SetLineExpandClass(track.expand)"
                         (click)="OnExpandLineClick(track)">▼</button>
                 </div>
-                <div class="track" [ngStyle]="SetTrackStyle()">
-                    <div class="action" [ngStyle]="SetActionStyle(action)" *ngFor="let action of track.actions">
-                        <div class="keyframe" [ngStyle]="SetKeyframeStyle(keyframe)"
+                <div class="track" [ngStyle]="SetTrackStyle()" (click)="TrackClick($event)">
+                    <div class="action" [ngStyle]="SetActionStyle(action)" (click)="ActionClick(action)"
+                        (mousedown)="ActionMouseDown($event,action)" (mousemove)="ActionMouseMove($event,action)"
+                        (mouseup)="ActionMouseUp($event)" *ngFor="let action of track.actions">
+                        <div class="keyframe" [ngStyle]="SetKeyframeStyle(keyframe)" (click)="KeyframeClick(keyframe)"
                             *ngFor="let keyframe of action.keyframes"></div>
                     </div>
                 </div>

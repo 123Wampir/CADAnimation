@@ -1,13 +1,18 @@
 <router-outlet></router-outlet>
-<label class="file-label" for="file">
-    <input class="file" type="file" name="file" id="file" accept=".step,.stp,.gltf" (change)="LoadFile($event)">
-    Загрузить модель
-</label>
+<!-- <div class="btns">
+    <label class="file-label" for="fileUpload">
+        <input class="file" type="file" name="file" id="fileUpload" accept=".step,.stp,.gltf,.brep,.igs"
+            (change)="LoadFile($event)">
+        Загрузить модель
+    </label>
+    <button class="file-label" id="fileSave" (click)="SaveFile($event)">Сохранить модель </button>
+</div> -->
+<app-menubar></app-menubar>
 <canvas #canvas class="canvas" (mousemove)="onPointerMove($event)" (click)="onClick($event)"
     (window:resize)="SceneUtilsService.onResize($event)" (window:keydown)="onKeyDown($event)"
     (window:keyup)="onKeyUp($event)"></canvas>
 <app-viewcube></app-viewcube>
-<app-timeline [actions]="AnimationService.actions" [curTime]="AnimationService.currentTime"
+<app-timeline [curTime]="AnimationService.currentTime" [selChange]="SceneUtilsService.selectionChange"
     [newFile]="SceneUtilsService.newFileLoading">
 </app-timeline>
 <app-properties [selected]="SceneUtilsService.selectionChange" [curTime]="AnimationService.currentTime"

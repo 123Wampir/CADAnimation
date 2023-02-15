@@ -12,7 +12,6 @@ import THREE = require('three');
 })
 export class PropertiesComponent implements OnInit, OnChanges {
   @Input() curTime = 0;
-  @Input() keyframe!: AnimationModel.KeyframeModel;
   @Input() selected: boolean = false;
   @Input() transformed: boolean = false;
   propertiesObject!: any;
@@ -108,14 +107,6 @@ export class PropertiesComponent implements OnInit, OnChanges {
     }
     if (changes["curTime"] != undefined) {
       if (this.propertiesObject != undefined) {
-        if (this.propertiesObject.type == "Mesh") {
-          let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, this.propertiesObject.name);
-          // let keyframe = AnimationModel.FindKeyframeByTime(track, this.curTime);
-          // if (keyframe != undefined) {
-          //   this.AnimationService.selectedKeyframe = keyframe;
-          // }
-          // else { (this.AnimationService.selectedKeyframe as any) = undefined; }
-        }
         if (this.propertiesObject.color != undefined) {
           this.hex = "#" + this.propertiesObject.color.getHexString();
         }
@@ -147,10 +138,19 @@ export class PropertiesComponent implements OnInit, OnChanges {
 
   DeleteKeyframe(event: MouseEvent) {
     // this.AnimationCreatorService.DeleteKeyframe(this.propertiesObject);
-    this.AnimationService.DeleteKeyframe(this.AnimationService.selectedKeyframe);
+    this.AnimationService.selKeyframe.forEach(keyframe => {
+      this.AnimationService.DeleteKeyframe(keyframe);
+    })
+    this.AnimationService.selKeyframe = [];
+    // this.AnimationService.selKeyframe.forEach(key => {
+
+    // })
   }
   DeleteAction(event: MouseEvent) {
-    this.AnimationService.DeleteAction(this.AnimationService.selectedAction);
+    this.AnimationService.selAction.forEach(action => {
+      this.AnimationService.DeleteAction(action);
+    })
+    this.AnimationService.selAction = [];
   }
 
   OnCameraChange($event: MouseEvent) {

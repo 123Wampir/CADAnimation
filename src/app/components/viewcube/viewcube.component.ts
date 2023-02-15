@@ -16,7 +16,7 @@ export class ViewcubeComponent implements OnInit, AfterViewChecked {
   get cube(): HTMLCanvasElement {
     return this.cubeRef.nativeElement;
   }
-  constructor(public AnimationService: AnimationService, private renderer: Renderer2,private SceneUtilsService:SceneUtilsService) { }
+  constructor(public AnimationService: AnimationService, private renderer: Renderer2, private SceneUtilsService: SceneUtilsService) { }
   ngAfterViewChecked(): void {
     if (this.SceneUtilsService.currentCamera != undefined) {
       let matrix = new THREE.Matrix4();
@@ -78,7 +78,7 @@ export class ViewcubeComponent implements OnInit, AfterViewChecked {
     switch (type) {
       case 0:
         this.SceneUtilsService.model.quaternion.copy(this.SceneUtilsService.currentCamera.quaternion.clone());
-        this.SceneUtilsService.CalculateBounding();
+        this.SceneUtilsService.CalculateBounding(this.SceneUtilsService.model);
         this.SceneUtilsService.SetZeroPlane();
         break;
       case 1:
@@ -86,7 +86,7 @@ export class ViewcubeComponent implements OnInit, AfterViewChecked {
         let q = this.SceneUtilsService.currentCamera.rotateOnAxis(new THREE.Vector3(1, 0, 0), 90 * Math.PI / 180).quaternion.clone();
         this.SceneUtilsService.currentCamera.quaternion.copy(oldq);
         this.SceneUtilsService.model.quaternion.copy(q);
-        this.SceneUtilsService.CalculateBounding();
+        this.SceneUtilsService.CalculateBounding(this.SceneUtilsService.model);
         this.SceneUtilsService.SetZeroPlane();
         break;
     }

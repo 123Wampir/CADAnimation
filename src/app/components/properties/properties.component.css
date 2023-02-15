@@ -1,10 +1,12 @@
 .container {
-
     width: 300px;
     height: 400px;
     top: 50px;
     right: 0;
     transition: width 1s;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    z-index: 3;
 }
 
 .header {

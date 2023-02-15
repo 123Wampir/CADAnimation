@@ -5,6 +5,8 @@
     left: 0;
     right: 0;
     transition: height 1s;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .header {
@@ -103,6 +105,11 @@ button {
     display: grid;
     justify-content: left;
     grid-template-columns: 250px auto;
+}
+
+.line:active {
+    transition: all 2s;
+    border: 2px solid greenyellow;
 }
 
 .linename {
@@ -239,14 +246,14 @@ button {
     cursor: pointer;
 }
 
-.action>.keyframe {
+/* .action>.keyframe {
     visibility: hidden;
-}
+} */
 
 .action:hover {
     height: 10px;
 }
 
-.action:active>.keyframe {
+/* .action:active>.keyframe {
     visibility: visible;
-}
+} */

@@ -1,0 +1,53 @@
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { AnimationService } from 'src/app/services/animation/animation.service';
+import { SceneUtilsService } from 'src/app/services/utils/scene.utils.service';
+
+@Component({
+  selector: 'app-menubar',
+  templateUrl: './menubar.component.html',
+  styleUrls: ['./menubar.component.css']
+})
+export class MenubarComponent {
+  posX = 0;
+  posY = 0;
+  disableStyle = {
+    'pointer-events': 'none',
+    'opacity': '0.5'
+  }
+  @ViewChild('file') fileRef!: ElementRef;
+  get file(): HTMLCanvasElement {
+    return this.fileRef.nativeElement;
+  }
+  constructor(public SceneUtilsService: SceneUtilsService, public AnimationService: AnimationService) { }
+  NewProject() {
+    // this.AnimationService.ClearAnimation();
+    this.SceneUtilsService.ClearScene();
+  }
+  SetModelExportStyle() {
+    if (this.SceneUtilsService.model != undefined)
+      if (this.SceneUtilsService.model.children.length == 0)
+        return this.disableStyle;
+    return {};
+  }
+
+  OnSceneColorChange(event: Event) {
+    let e = event as any;
+    this.SceneUtilsService.renderer.setClearColor(e.target.value);
+  }
+  SetClipping(event: Event) {
+    let e = event?.target as any;
+    this.SceneUtilsService.EnableClipping(e.checked);
+  }
+  ShowPlaneX(event: Event) {
+    (this.SceneUtilsService.planeHelpers.children[0] as any).children[0].material.visible = (event.target as any).checked;
+    (this.SceneUtilsService.planeHelpers.children[0] as any).material.visible = (event.target as any).checked;
+  }
+  ShowPlaneY(event: Event) {
+    (this.SceneUtilsService.planeHelpers.children[1] as any).children[0].material.visible = (event.target as any).checked;
+    (this.SceneUtilsService.planeHelpers.children[1] as any).material.visible = (event.target as any).checked;
+  }
+  ShowPlaneZ(event: Event) {
+    (this.SceneUtilsService.planeHelpers.children[2] as any).children[0].material.visible = (event.target as any).checked;
+    (this.SceneUtilsService.planeHelpers.children[2] as any).material.visible = (event.target as any).checked;
+  }
+}

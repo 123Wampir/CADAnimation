@@ -4,8 +4,9 @@
     /* margin: 80px; */
     perspective: 400px;
     left: 2%;
-    top: 5%;
+    top: 11%;
     position: absolute;
+    z-index: 1;
   }
   
   .cube {
