@@ -14,6 +14,33 @@
                 <quill-editor (onEditorCreated)="OnEditorCreated($event)"
                     (onContentChanged)="OnTextChange($event)"></quill-editor>
             </div>
+            <div class="param" *ngIf="annotation">
+                <div class="param-label">
+                    <div class="label">Задать через смещение к цели</div>
+                    <input type="checkbox" [(ngModel)]="annotationTarget" class="input-checkbox"
+                        (change)="EnableAnnotationTarget($event)">
+                </div>
+            </div>
+            <div class="param" *ngIf="annotationTarget">
+                <div class="param-label">
+                    <div class="label">Цель</div>
+                    <div class="target-name">{{targetName}}</div>
+                    <button class="save-param" (click)="SelectTarget($event)">Выбрать</button>
+                </div>
+            </div>
+            <div class="param" *ngIf="annotation && !annotationTarget">
+                <div class="param-label">
+                    <div class="label">Цель</div>
+                </div>
+                <div class="inputs">
+                    <input type="number" class="input-number" placeholder="X" [(ngModel)]="targetVec.x"
+                        (ngModelChange)="OnTargetChange($event)">
+                    <input type="number" class="input-number" placeholder="Y" [(ngModel)]="targetVec.y"
+                        (ngModelChange)="OnTargetChange($event)">
+                    <input type="number" class="input-number" placeholder="Z" [(ngModel)]="targetVec.z"
+                        (ngModelChange)="OnTargetChange($event)">
+                </div>
+            </div>
             <div class="param" *ngIf="posParam">
                 <div class="param-label">
                     <div class="label">Позиция</div>

@@ -8,6 +8,7 @@ import { AnimationService } from '../animation/animation.service';
 import { ModelloaderService } from '../model/modelloader.service';
 import { AppComponent } from 'src/app/app.component';
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
+import { SceneManagerService } from '../scene.manager/scene.manager.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,8 +23,7 @@ export class SceneUtilsService {
 
   angRenderer!: Renderer2;
 
-  zeroPlane: any;
-  zeroPlaneGrid: any;
+  zeroPlane: THREE.Mesh = new THREE.Mesh();
 
   lightGroup!: THREE.Group;
   annotationGroup!: THREE.Group;
@@ -37,6 +37,7 @@ export class SceneUtilsService {
   stencilNeedUpdate: boolean = false;
 
   selected: THREE.Object3D[] = [];
+  selectReturn: boolean = false;
   selectionChange: boolean = false;
   transform!: TransformControls;
   group: THREE.Mesh = new THREE.Mesh();
@@ -53,7 +54,11 @@ export class SceneUtilsService {
   renderScale: number = 1;
   stats!: Stats;
 
+  outline: boolean = false;
+  wireframe: boolean = false;
+
   AnimationService!: AnimationService;
+  SceneManagerService!: SceneManagerService;
   ModelloaderService!: ModelloaderService;
   AppComponent!: AppComponent;
 
@@ -295,7 +300,12 @@ export class SceneUtilsService {
     this.transform.detach();
   }
   Select(obj: any, CTRLPressed: boolean) {
-    // console.log(obj);
+    if (this.selectReturn) {
+      (this.selected[0].children[0] as THREE.Line).geometry.userData["target"] = obj;
+      this.selectionChange = !this.selectionChange;
+      this.selectReturn = false;
+      return obj;
+    }
     if (!CTRLPressed) {
       this.selectionChange = !this.selectionChange;
       this.ClearSelection();

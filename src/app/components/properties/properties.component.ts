@@ -26,6 +26,9 @@ export class PropertiesComponent implements OnInit, OnChanges {
   ambLight = false;
   cutPlane = false;
   annotation = false;
+  annotationTarget = false;
+  targetName = "";
+  targetVec = new THREE.Vector3(0);
   shadowWidth = 5;
   shadowHeight = 5;
   shadowDist = 300;
@@ -55,6 +58,8 @@ export class PropertiesComponent implements OnInit, OnChanges {
           this.cutPlane = false;
 
           this.annotation = false;
+          this.annotationTarget = false;
+          this.targetName = "None";
 
           this.propertiesObject = this.SceneUtilsService.selected[0];
           if (/(Camera)/g.exec(this.propertiesObject.type) != undefined) {
@@ -91,6 +96,13 @@ export class PropertiesComponent implements OnInit, OnChanges {
             this.annotation = true;
             this.rotParam = false;
             this.opacityParam = false;
+            if (!(this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"].isVector3 == true) {
+              this.annotationTarget = true;
+              this.targetName = (this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"].name;
+            }
+            else {
+              this.targetVec = (this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"];
+            }
           }
         }
         else {
@@ -136,7 +148,22 @@ export class PropertiesComponent implements OnInit, OnChanges {
   OnTextSave(event: Event) {
     this.AnimationCreatorService.OnTextChange(this.propertiesObject);
   }
-
+  EnableAnnotationTarget(event: Event) {
+    if (this.annotationTarget) {
+      this.posParam = false;
+    }
+    else {
+      this.posParam = true;
+      this.SceneUtilsService.selectionChange = !this.SceneUtilsService.selectionChange;
+      (this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"] = new THREE.Vector3(0);
+    }
+  }
+  SelectTarget(event: Event) {
+    this.SceneUtilsService.selectReturn = true;
+  }
+  OnTargetChange(event: Event) {
+    (this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"] = this.targetVec;
+  }
   OnPositionChange(event: Event) {
     this.AnimationCreatorService.OnPositionChange(this.propertiesObject);
   }

@@ -1,5 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { AnimationService } from 'src/app/services/animation/animation.service';
+import { SceneManagerService } from 'src/app/services/scene.manager/scene.manager.service';
 import { SceneUtilsService } from 'src/app/services/utils/scene.utils.service';
 
 @Component({
@@ -18,18 +19,27 @@ export class MenubarComponent {
   get file(): HTMLCanvasElement {
     return this.fileRef.nativeElement;
   }
-  constructor(public SceneUtilsService: SceneUtilsService, public AnimationService: AnimationService) { }
+  constructor(public SceneUtilsService: SceneUtilsService,
+    public AnimationService: AnimationService,
+    public SceneManagerService: SceneManagerService) { }
   NewProject() {
     // this.AnimationService.ClearAnimation();
     this.SceneUtilsService.ClearScene();
   }
-  SetModelExportStyle() {
-    if (this.SceneUtilsService.model != undefined)
+  SeDisableStyle() {
+    if (this.SceneUtilsService.model != undefined) {
       if (this.SceneUtilsService.model.children.length == 0)
         return this.disableStyle;
+    }
+    else {
+      return this.disableStyle;
+    }
     return {};
   }
-
+  SetZeroPlaneGrid(event: Event) {
+    let e = event?.target as any;
+    this.SceneUtilsService.zeroPlane.children[0].visible = e.checked;
+  }
   OnSceneColorChange(event: Event) {
     let e = event as any;
     this.SceneUtilsService.renderer.setClearColor(e.target.value);
@@ -49,5 +59,12 @@ export class MenubarComponent {
   ShowPlaneZ(event: Event) {
     (this.SceneUtilsService.planeHelpers.children[2] as any).children[0].material.visible = (event.target as any).checked;
     (this.SceneUtilsService.planeHelpers.children[2] as any).material.visible = (event.target as any).checked;
+  }
+  SetWireframe(event: Event) {
+    let arr: any[] = [];
+    this.SceneUtilsService.FindMeshes(this.SceneUtilsService.model, arr);
+    arr.forEach(mesh => {
+      mesh.material.wireframe = this.SceneUtilsService.wireframe;
+    })
   }
 }

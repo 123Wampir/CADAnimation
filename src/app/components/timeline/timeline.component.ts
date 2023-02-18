@@ -57,7 +57,7 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     if (changes["selChange"] != undefined) {
       if (!changes["selChange"].firstChange) {
         if (this.SceneUtilsService.selected.length != 0) {
-          let id = this.AnimationService.timeLine.tracks.findIndex(item => item.object == this.SceneUtilsService.selected[0])
+          let id = this.AnimationService.timeLine.array!.findIndex(item => item.name == this.SceneUtilsService.selected[0].name);
           if (id != undefined)
             this.ScrollTo(id);
         }

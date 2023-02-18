@@ -10,6 +10,7 @@ import { ModelloaderService } from './services/model/modelloader.service';
 import { SceneUtilsService } from './services/utils/scene.utils.service';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
+import { SceneManagerService } from './services/scene.manager/scene.manager.service';
 
 
 @Component({
@@ -18,7 +19,10 @@ import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRe
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit, AfterViewInit {
-  constructor(public AnimationService: AnimationService, private ModelloaderService: ModelloaderService, public SceneUtilsService: SceneUtilsService) { }
+  constructor(public AnimationService: AnimationService,
+    private ModelloaderService: ModelloaderService,
+    public SceneUtilsService: SceneUtilsService,
+    private SceneManagerService: SceneManagerService) { }
 
   @ViewChild('canvas') canvasRef!: ElementRef;
   get canvas(): HTMLCanvasElement {
@@ -85,7 +89,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.pointer = new THREE.Vector2();
 
     const planeGeometry = new THREE.PlaneGeometry(10000, 10000, 32, 32);
-    const planeMaterial = new THREE.ShadowMaterial({ color: 0x000000, side: THREE.DoubleSide, alphaToCoverage: true })
+    const planeMaterial = new THREE.ShadowMaterial({ color: 0x000000, side: THREE.DoubleSide })
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.name = "Zero Plane";
     plane.type = "zeroPlane";
@@ -136,8 +140,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       geometry.setFromPoints(points);
       geometry.attributes['position'].needsUpdate = true;
     }
-    // (this.annotationGroup.children[0].children[0] as THREE.Line).geometry.userData["target"] = obj; КАК ЗАДАТЬ ЦЕЛЬ ДЛЯ АННОТАЦИИ
-    console.log(annotation);
     annotation.add(line);
   }
   startRenderingLoop() {
@@ -243,9 +245,11 @@ export class AppComponent implements OnInit, AfterViewInit {
       component.SceneUtilsService.CSSRenderer.render(component.scene, component.SceneUtilsService.currentCamera);
 
       //effects
-      // component.AnimationService.planeHelpers.removeFromParent();
-      // component.AnimationService.zeroPlane.removeFromParent();
-      // component.effect.renderOutline(component.scene, component.camera);
+      // component.SceneUtilsService.planeHelpers.removeFromParent();
+      // component.SceneUtilsService.zeroPlane.removeFromParent();
+      if (component.SceneUtilsService.outline)
+        if (component.SceneUtilsService.model != undefined)
+          component.effect.renderOutline(component.SceneUtilsService.model as any, component.SceneUtilsService.currentCamera);
       // component.scene.add(component.AnimationService.planeHelpers);
       // component.scene.add(component.AnimationService.zeroPlane);
     }());
@@ -255,6 +259,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   async ngAfterViewInit() {
     this.SceneUtilsService.AnimationService = this.AnimationService;
     this.SceneUtilsService.ModelloaderService = this.ModelloaderService;
+    this.SceneUtilsService.SceneManagerService = this.SceneManagerService;
     this.SceneUtilsService.AppComponent = this;
     this.CreateScene()
     this.startRenderingLoop()

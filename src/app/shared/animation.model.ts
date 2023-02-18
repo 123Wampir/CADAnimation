@@ -31,19 +31,46 @@ export interface TimelineModel {
     scale: number;
     array?: Array<any>;
 }
+let i = 0;
 export function GetArrayTimeLine(timeline: TimelineModel) {
-    timeline.array = Array(timeline.tracks.length).fill(0).map((v, i) => {
-        return {
-            name: timeline.tracks[i].name,
-            type: timeline.tracks[i].type,
-            level: timeline.tracks[i].level,
-            actions: timeline.tracks[i].actions,
-            id: timeline.tracks[i].id,
-            children: timeline.tracks[i].children,
-            expand: true,
-            show: true
-        }
+    // timeline.array = Array(timeline.tracks.length).fill(0).map((v, i) => {
+    //     return {
+    //         name: timeline.tracks[i].name,
+    //         type: timeline.tracks[i].type,
+    //         level: timeline.tracks[i].level,
+    //         actions: timeline.tracks[i].actions,
+    //         id: timeline.tracks[i].id,
+    //         children: timeline.tracks[i].children,
+    //         expand: true,
+    //         show: true
+    //     }
+    // })
+    timeline.array = Array(timeline.tracks.length).fill(0);
+    let arr: any[] = [];
+    arr = timeline.tracks.filter(track => track.level == 0);
+    console.log(arr);
+    i = 0;
+    arr.forEach(item => {
+        CreateArrayTimeLine(timeline, item);
     })
+}
+function CreateArrayTimeLine(timeline: TimelineModel, item: KeyframeTrackModel) {
+    timeline.array![i] = {
+        name: item.name,
+        type: item.type,
+        level: item.level,
+        actions: item.actions,
+        id: item.id,
+        children: item.children,
+        expand: true,
+        show: true
+    }
+    i++;
+    if (item.children.length != 0) {
+        item.children.forEach(child => {
+            CreateArrayTimeLine(timeline, timeline.tracks[child]);
+        })
+    }
 }
 export function FindTrackById(timeline: TimelineModel, id: number) {
     return timeline.array?.findIndex(track => track.id == id);

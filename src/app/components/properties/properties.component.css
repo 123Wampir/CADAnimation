@@ -49,3 +49,6 @@ button {
     display: flex;
     flex-direction: column;
 }
+.target-name{
+    overflow: hidden;
+}

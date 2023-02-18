@@ -103,6 +103,19 @@ export class AnimationService {
       }
     }
   }
+  CreateTreeViewElement(obj: THREE.Object3D, parent: AnimationModel.KeyframeTrackModel) {
+
+    let keyframeTrack: AnimationModel.KeyframeTrackModel = { id: this.id, children: [], object: obj, name: obj.name, type: "Part", actions: [], level: parent.level + 1 };
+    this.id++;
+    parent.children.push(keyframeTrack.id);
+    this.timeLine.tracks.push(keyframeTrack);
+    if (/(Light)/g.exec(obj.type) != undefined) {
+      keyframeTrack.type = "Light";
+    }
+    else if (obj.type == "Annotation") {
+      keyframeTrack.type = "Annotation";
+    }
+  }
 
   CreateAction(track: AnimationModel.KeyframeTrackModel, type: string) {
     let action: AnimationModel.KeyframeActionModel;
@@ -275,7 +288,7 @@ export class AnimationService {
       keyframe.clip.resetDuration();
       this.actions.find((action, index) => {
         if (action.getClip() == keyframe.clip) {
-          console.log(action);
+          // console.log(action);
           action.stop();
           let mixer = action.getMixer();
           mixer.uncacheAction(keyframe.clip);
@@ -309,7 +322,6 @@ export class AnimationService {
         }
         if (act.type == ".element.innerHTML") {
           let css2d = track.object as any;
-          console.log(action._propertyBindings);
           action._propertyBindings[i].binding.propertyName = "innerHTML";
           action._propertyBindings[i].binding.parsedPath.objectName = "element";
           action._propertyBindings[i].binding.targetObject = css2d.element;
@@ -349,22 +361,7 @@ export class AnimationService {
           let mixer = action.getMixer();
           mixer.uncacheAction(keyframe.clip);
           let newAction = mixer.clipAction(keyframe.clip);
-          keyframe.clip.tracks.forEach(track => {
-            if (track.name == ".plane.constant") {
-              let act = newAction as any;
-              act._propertyBindings[0].binding.propertyName = "constant";
-              let pl = newAction.getRoot() as any;
-              act._propertyBindings[0].binding.parsedPath.objectName = "plane";
-              act._propertyBindings[0].binding.targetObject = pl.plane;
-            }
-          });
-          if (keyframe.action.type == ".element.innerHTML") {
-            let act = newAction as any;
-            act._propertyBindings[0].binding.propertyName = "innerHTML";
-            let css2d = newAction.getRoot() as any;
-            act._propertyBindings[0].binding.parsedPath.objectName = "element";
-            act._propertyBindings[0].binding.targetObject = css2d.element;
-          }
+          this.UpdatePropertyBinding(newAction, keyframe.action.trackDOM)
           newAction.setLoop(THREE.LoopRepeat, 1);
           newAction.play();
           newAction.clampWhenFinished = true;
