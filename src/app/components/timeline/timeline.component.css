@@ -174,6 +174,17 @@ button {
     border-bottom-left-radius: 10px;
 }
 
+.Annotation {
+    align-items: center;
+    display: flex;
+    justify-content: left;
+    background-color: lightcoral;
+    border-left: 1px solid gray;
+    border-bottom: 1px solid gray;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
 .track {
     width: 80%;
     border-bottom: 1px solid gray;

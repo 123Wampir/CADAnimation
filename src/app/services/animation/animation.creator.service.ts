@@ -154,6 +154,23 @@ export class AnimationCreatorService {
       }
     }
   }
+  OnTextChange(obj: any) {
+    if (obj != undefined) {
+      let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
+      let action = AnimationModel.FindActionByType(track, ".element.innerHTML");
+      if (action == undefined) {
+        action = this.AnimationService.CreateAction(track, ".element.innerHTML");
+      }
+      let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
+      if (keyframe != undefined) {
+        keyframe.value = [obj.element.innerHTML];
+        this.AnimationService.ChangeKeyframe(keyframe);
+      }
+      else {
+        this.AnimationService.CreateKeyframe(action, ".element.innerHTML", this.AnimationService.currentTime, [obj.element.innerHTML]);
+      }
+    }
+  }
   DeleteKeyframe(obj: THREE.Object3D) {
     // if (obj != undefined) {
     //   if (this.AnimationService.selected.length == 1) {

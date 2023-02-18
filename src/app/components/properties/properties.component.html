@@ -6,6 +6,14 @@
     <div class="form">
         <div *ngIf="propertiesObject!=undefined">
             <div class="object-label">{{propertiesObject.name}}</div>
+            <div class="param" *ngIf="annotation">
+                <div class="param-label">
+                    <div class="label">Текст аннотации</div>
+                    <button class="save-param" (click)="OnTextSave($event)">Запомнить</button>
+                </div>
+                <quill-editor (onEditorCreated)="OnEditorCreated($event)"
+                    (onContentChanged)="OnTextChange($event)"></quill-editor>
+            </div>
             <div class="param" *ngIf="posParam">
                 <div class="param-label">
                     <div class="label">Позиция</div>

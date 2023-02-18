@@ -1,4 +1,4 @@
-import { Injectable, Renderer2 } from '@angular/core';
+import { Injectable } from '@angular/core';
 import THREE = require('three');
 import * as AnimationModel from 'src/app/shared/animation.model';
 import { SceneUtilsService } from '../utils/scene.utils.service';
@@ -22,7 +22,6 @@ export class AnimationService {
   timeLine: AnimationModel.TimelineModel = { tracks: [], duration: 30, scale: 50 };
   //orbit!: OrbitControls;
   // orbit!: ArcballControls;
-  angRenderer!: Renderer2;
   dialogShow = false;
   dialogModal = false;
   dialogType = "";
@@ -98,6 +97,9 @@ export class AnimationService {
         else if (item.type == "PlaneHelper") {
           keyframeTrack.type = "Plane";
         }
+        else if (item.type == "Annotation") {
+          keyframeTrack.type = "Annotation";
+        }
       }
     }
   }
@@ -158,13 +160,7 @@ export class AnimationService {
         act.paused = false;
       });
     this.actions.push(newAction);
-    if (type == ".plane.constant") {
-      let act = newAction as any;
-      act._propertyBindings[0].binding.propertyName = "constant";
-      let pl = action.trackDOM.object as any;
-      act._propertyBindings[0].binding.parsedPath.objectName = "plane";
-      act._propertyBindings[0].binding.targetObject = pl.plane;
-    }
+    this.UpdatePropertyBinding(newAction, keyframe.action.trackDOM);
     newAction.setLoop(THREE.LoopRepeat, 1);
     newAction.play();
     newAction.clampWhenFinished = true;
@@ -211,25 +207,28 @@ export class AnimationService {
     let newTrack: any;
     switch (type) {
       case ".position":
-        newTrack = new THREE.VectorKeyframeTrack('.position', times, values);
+        newTrack = new THREE.VectorKeyframeTrack(type, times, values);
         break;
       case ".quaternion":
-        newTrack = new THREE.QuaternionKeyframeTrack('.quaternion', times, values);
+        newTrack = new THREE.QuaternionKeyframeTrack(type, times, values);
         break;
       case ".material.opacity":
-        newTrack = new THREE.NumberKeyframeTrack('.material.opacity', times, values);
+        newTrack = new THREE.NumberKeyframeTrack(type, times, values);
         break;
       case ".visible":
-        newTrack = new THREE.BooleanKeyframeTrack('.visible', times, values);
+        newTrack = new THREE.BooleanKeyframeTrack(type, times, values);
         break;
       case ".color":
-        newTrack = new THREE.ColorKeyframeTrack('.color', times, values);
+        newTrack = new THREE.ColorKeyframeTrack(type, times, values);
         break;
       case ".intensity":
-        newTrack = new THREE.NumberKeyframeTrack('.intensity', times, values);
+        newTrack = new THREE.NumberKeyframeTrack(type, times, values);
         break;
       case ".plane.constant":
-        newTrack = new THREE.NumberKeyframeTrack('.plane.constant', times, values);
+        newTrack = new THREE.NumberKeyframeTrack(type, times, values);
+        break;
+      case ".element.innerHTML":
+        newTrack = new THREE.StringKeyframeTrack(type, times, values);
         break;
     }
     return newTrack;
@@ -276,18 +275,12 @@ export class AnimationService {
       keyframe.clip.resetDuration();
       this.actions.find((action, index) => {
         if (action.getClip() == keyframe.clip) {
-          // console.log(action);
+          console.log(action);
           action.stop();
           let mixer = action.getMixer();
           mixer.uncacheAction(keyframe.clip);
           let newAction = mixer.clipAction(keyframe.clip);
-          if (keyframe.action.type == ".plane.constant") {
-            let act = newAction as any;
-            act._propertyBindings[0].binding.propertyName = "constant";
-            let pl = newAction.getRoot() as any;
-            act._propertyBindings[0].binding.parsedPath.objectName = "plane";
-            act._propertyBindings[0].binding.targetObject = pl.plane;
-          }
+          this.UpdatePropertyBinding(newAction, keyframe.action.trackDOM);
           newAction.setLoop(THREE.LoopRepeat, 1);
           newAction.play();
           newAction.clampWhenFinished = true;
@@ -303,6 +296,28 @@ export class AnimationService {
       })
     }
   }
+
+  UpdatePropertyBinding(action: any, track: AnimationModel.KeyframeTrackModel) {
+    track.actions.forEach(act => {
+      let i = action._propertyBindings.findIndex((mixer: THREE.PropertyMixer) => mixer.binding.path == act.type);
+      if (i != undefined) {
+        if (act.type == ".plane.constant") {
+          let pl = track.object as any;
+          action._propertyBindings[i].binding.propertyName = "constant";
+          action._propertyBindings[i].binding.parsedPath.objectName = "plane";
+          action._propertyBindings[i].binding.targetObject = pl.plane;
+        }
+        if (act.type == ".element.innerHTML") {
+          let css2d = track.object as any;
+          console.log(action._propertyBindings);
+          action._propertyBindings[i].binding.propertyName = "innerHTML";
+          action._propertyBindings[i].binding.parsedPath.objectName = "element";
+          action._propertyBindings[i].binding.targetObject = css2d.element;
+        }
+      }
+    })
+  }
+
   DeleteKeyframe(keyframe: AnimationModel.KeyframeModel) {
     let i = keyframe.clip.tracks.findIndex(track => track.name == keyframe.action.type);
     if (i != undefined) {
@@ -343,6 +358,13 @@ export class AnimationService {
               act._propertyBindings[0].binding.targetObject = pl.plane;
             }
           });
+          if (keyframe.action.type == ".element.innerHTML") {
+            let act = newAction as any;
+            act._propertyBindings[0].binding.propertyName = "innerHTML";
+            let css2d = newAction.getRoot() as any;
+            act._propertyBindings[0].binding.parsedPath.objectName = "element";
+            act._propertyBindings[0].binding.targetObject = css2d.element;
+          }
           newAction.setLoop(THREE.LoopRepeat, 1);
           newAction.play();
           newAction.clampWhenFinished = true;

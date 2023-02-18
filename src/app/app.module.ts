@@ -11,6 +11,7 @@ import { ViewcubeComponent } from './components/viewcube/viewcube.component';
 import { ContextmenuComponent } from './components/contextmenu/contextmenu.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MenubarComponent } from './components/menubar/menubar.component';
+import { QuillModule, } from 'ngx-quill';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,21 @@ import { MenubarComponent } from './components/menubar/menubar.component';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    ScrollingModule
+    ScrollingModule,
+    QuillModule.forRoot({
+      modules: {
+        toolbar: [
+          [{ font: [] }],
+          [{ size: ['small', 'normal', 'large'] }],
+          ['bold', 'italic', 'underline'],
+          [{ background: [] }, { color: [] }],
+          [{ align: [] }],
+          [{ list: 'ordered' }, { list: 'bullet' }],
+        ]
+      },
+      placeholder: 'Annotation',
+      theme: 'snow'  // or 'bubble'
+    })
   ],
   providers: [],
   bootstrap: [AppComponent]

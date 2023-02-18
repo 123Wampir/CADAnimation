@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { AnimationCreatorService } from 'src/app/services/animation/animation.creator.service';
 import { AnimationService } from 'src/app/services/animation/animation.service';
 import { SceneUtilsService } from 'src/app/services/utils/scene.utils.service';
@@ -25,6 +25,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
   dirLight = false;
   ambLight = false;
   cutPlane = false;
+  annotation = false;
   shadowWidth = 5;
   shadowHeight = 5;
   shadowDist = 300;
@@ -44,33 +45,41 @@ export class PropertiesComponent implements OnInit, OnChanges {
           this.posParam = true;
           this.rotParam = true;
           this.opacityParam = true;
+
+          this.camera = false;
+
+          this.light = false;
+          this.dirLight = false;
+          this.ambLight = false;
+
+          this.cutPlane = false;
+
+          this.annotation = false;
+
           this.propertiesObject = this.SceneUtilsService.selected[0];
           if (/(Camera)/g.exec(this.propertiesObject.type) != undefined) {
             this.camera = true;
             this.opacityParam = false;
           }
-          else this.camera = false;
-          if (/(Light)/g.exec(this.propertiesObject.type) != undefined) {
+          else if (/(Light)/g.exec(this.propertiesObject.type) != undefined) {
             this.light = true;
             this.opacityParam = false;
             this.hex = "#" + this.propertiesObject.color.getHexString();
             if (this.propertiesObject.type == "DirectionalLight") {
               this.dirLight = true;
+              this.rotParam = false;
               this.shadowWidth = -this.propertiesObject.shadow.camera.left + this.propertiesObject.shadow.camera.right;
               this.shadowHeight = -this.propertiesObject.shadow.camera.bottom + this.propertiesObject.shadow.camera.top;
               this.shadowDist = this.propertiesObject.shadow.camera.far;
             }
-            else this.dirLight = false;
-            if (this.propertiesObject.type == "AmbientLight") {
+            else if (this.propertiesObject.type == "AmbientLight") {
               this.ambLight = true;
               this.posParam = false;
               this.rotParam = false;
               this.opacityParam = false;
             }
-            else this.ambLight = false;
           }
-          else this.light = false;
-          if (this.propertiesObject.type == "PlaneHelper") {
+          else if (this.propertiesObject.type == "PlaneHelper") {
             {
               this.cutPlane = true;
               this.posParam = false;
@@ -78,7 +87,11 @@ export class PropertiesComponent implements OnInit, OnChanges {
               this.opacityParam = false;
             }
           }
-          else this.cutPlane = false;
+          else if (this.propertiesObject.type == "Annotation") {
+            this.annotation = true;
+            this.rotParam = false;
+            this.opacityParam = false;
+          }
         }
         else {
           this.propertiesObject = new THREE.Mesh();
@@ -112,6 +125,16 @@ export class PropertiesComponent implements OnInit, OnChanges {
         }
       }
     }
+  }
+
+  OnEditorCreated(event: any) {
+    event.root.innerHTML = (this.SceneUtilsService.selected[0] as any).element.innerHTML;
+  }
+  OnTextChange(event: any) {
+    (this.SceneUtilsService.selected[0] as any).element.innerHTML = event.html;
+  }
+  OnTextSave(event: Event) {
+    this.AnimationCreatorService.OnTextChange(this.propertiesObject);
   }
 
   OnPositionChange(event: Event) {

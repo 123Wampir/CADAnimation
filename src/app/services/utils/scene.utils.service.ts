@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Renderer2 } from '@angular/core';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import THREE = require('three');
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls';
@@ -7,6 +7,7 @@ import Stats from 'three/examples/jsm/libs/stats.module';
 import { AnimationService } from '../animation/animation.service';
 import { ModelloaderService } from '../model/modelloader.service';
 import { AppComponent } from 'src/app/app.component';
+import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,9 @@ export class SceneUtilsService {
   scene!: THREE.Scene;
   model!: THREE.Object3D;
   renderer!: THREE.WebGLRenderer;
+  CSSRenderer!: CSS2DRenderer;
+
+  angRenderer!: Renderer2;
 
   zeroPlane: any;
   zeroPlaneGrid: any;
@@ -68,6 +72,7 @@ export class SceneUtilsService {
   SwitchCamera() {
     if (this.orthographic) {
       this.currentCamera = this.orthographicCamera;
+      this.onResize()
       this.orthographicCamera.updateProjectionMatrix();
     }
     else {
@@ -330,7 +335,11 @@ export class SceneUtilsService {
       this.selected = [];
       this.selected.push(obj);
       this.transform.detach();
-      // this.transform.attach(obj);
+    }
+    else if (obj.type == "Annotation") {
+      this.selected = [];
+      this.selected.push(obj);
+      this.transform.attach(obj);
     }
     if (this.selected.length > 1) {
       this.startPos = [];
@@ -400,7 +409,7 @@ export class SceneUtilsService {
     }
   }
 
-  onResize(event: any) {
+  onResize(event?: any) {
     let aspect = window.innerWidth / window.innerHeight;
     let width = window.innerWidth * 0.99;
     let height = window.innerHeight * 0.99;
@@ -416,6 +425,7 @@ export class SceneUtilsService {
       this.orthographicCamera.updateProjectionMatrix();
     }
     this.renderer.setSize(width, height);
+    this.CSSRenderer.setSize(width, height);
     this.renderer.setPixelRatio(window.devicePixelRatio * this.renderScale);
   }
 }

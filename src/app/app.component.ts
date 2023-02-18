@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import * as THREE from 'three';
-import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect.js'
+import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect'
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import Stats from 'three/examples/jsm/libs/stats.module';
@@ -9,6 +9,7 @@ import { degToRad } from 'three/src/math/MathUtils';
 import { ModelloaderService } from './services/model/modelloader.service';
 import { SceneUtilsService } from './services/utils/scene.utils.service';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
+import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 
 @Component({
@@ -96,6 +97,48 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.SceneUtilsService.zeroPlane = plane;
     this.SceneUtilsService.planeHelpers.name = "CuttingPlanes";
     this.scene.add(this.SceneUtilsService.planeHelpers);
+
+
+    this.SceneUtilsService.annotationGroup = new THREE.Group();
+    this.SceneUtilsService.annotationGroup.name = "Annotations";
+    this.scene.add(this.SceneUtilsService.annotationGroup);
+    let annDiv = this.SceneUtilsService.angRenderer.createElement('div');
+    this.SceneUtilsService.angRenderer.addClass(annDiv, "annotation-container");
+    annDiv.innerText = "WOOOOOW";
+    let annotation = new CSS2DObject(annDiv);
+    annotation.type = "Annotation";
+    annotation.name = "Annotation-1";
+    this.SceneUtilsService.annotationGroup.add(annotation);
+    annotation.position.set(10, -10, 30);
+    let pts = [];
+    annotation.updateMatrixWorld(true);
+    pts.push(annotation.worldToLocal(new THREE.Vector3(0)));
+    pts.push(new THREE.Vector3(0));
+    let geom = new THREE.BufferGeometry().setFromPoints(pts);
+    // geom.userData = { target: new THREE.Vector3(0)  };
+    geom.userData = { target: directionalLight };
+    let mat = new THREE.LineBasicMaterial({ color: 0x000000 });
+    let line = new THREE.Line(geom, mat);
+    line.type = "Ignore";
+    line.onAfterRender = function (renderer, scene, camera, geometry) {
+      this.updateMatrixWorld(true);
+      let vec!: THREE.Vector3;
+      if ((geometry.userData['target'].isVector3 == true)) {
+        vec = this.worldToLocal(geometry.userData['target'].clone());
+      }
+      else {
+        let pos = new THREE.Vector3().setFromMatrixPosition(geometry.userData['target'].matrixWorld);
+        vec = this.worldToLocal(pos);
+      }
+      let points = [];
+      points.push(vec);
+      points.push(new THREE.Vector3(0));
+      geometry.setFromPoints(points);
+      geometry.attributes['position'].needsUpdate = true;
+    }
+    // (this.annotationGroup.children[0].children[0] as THREE.Line).geometry.userData["target"] = obj; КАК ЗАДАТЬ ЦЕЛЬ ДЛЯ АННОТАЦИИ
+    console.log(annotation);
+    annotation.add(line);
   }
   startRenderingLoop() {
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: false, failIfMajorPerformanceCaveat: true });
@@ -107,6 +150,14 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.renderer.setSize(window.innerWidth * 0.99, window.innerHeight * 0.99);
     // this.renderer.sortObjects = false;
     this.renderer.setClearColor(0xffffff);
+    let rendererDOM = this.SceneUtilsService.angRenderer.createElement('div');
+    this.SceneUtilsService.CSSRenderer = new CSS2DRenderer({ element: rendererDOM });
+    this.SceneUtilsService.CSSRenderer.setSize(window.innerWidth, window.innerHeight);
+    this.SceneUtilsService.CSSRenderer.domElement.style.position = 'absolute';
+    this.SceneUtilsService.CSSRenderer.domElement.style.top = '0px';
+    this.SceneUtilsService.CSSRenderer.domElement.style.pointerEvents = 'none';
+    this.SceneUtilsService.angRenderer.addClass(this.SceneUtilsService.CSSRenderer.domElement, "annotation-renderer");
+    document.body.appendChild(this.SceneUtilsService.CSSRenderer.domElement);
 
     this.effect = new OutlineEffect(this.renderer);
 
@@ -189,6 +240,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
       component.SceneUtilsService.CopyCameraPlacement();
       component.renderer.render(component.scene, component.SceneUtilsService.currentCamera);
+      component.SceneUtilsService.CSSRenderer.render(component.scene, component.SceneUtilsService.currentCamera);
 
       //effects
       // component.AnimationService.planeHelpers.removeFromParent();

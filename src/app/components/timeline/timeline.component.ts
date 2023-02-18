@@ -34,7 +34,7 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   ngOnInit(): void {
   }
   ngAfterViewInit(): void {
-    this.AnimationService.angRenderer = this.renderer;
+    this.SceneUtilsService.angRenderer = this.renderer;
     const ro = new ResizeObserver(entries => {
       for (let entry of entries) {
         const height = entry.contentBoxSize ? entry.contentBoxSize[0].blockSize : entry.contentRect.height;
