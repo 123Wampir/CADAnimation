@@ -11,10 +11,6 @@ import { SceneUtilsService } from 'src/app/services/utils/scene.utils.service';
 export class MenubarComponent {
   posX = 0;
   posY = 0;
-  disableStyle = {
-    'pointer-events': 'none',
-    'opacity': '0.5'
-  }
   @ViewChild('file') fileRef!: ElementRef;
   get file(): HTMLCanvasElement {
     return this.fileRef.nativeElement;
@@ -25,16 +21,6 @@ export class MenubarComponent {
   NewProject() {
     // this.AnimationService.ClearAnimation();
     this.SceneUtilsService.ClearScene();
-  }
-  SeDisableStyle() {
-    if (this.SceneUtilsService.model != undefined) {
-      if (this.SceneUtilsService.model.children.length == 0)
-        return this.disableStyle;
-    }
-    else {
-      return this.disableStyle;
-    }
-    return {};
   }
   SetZeroPlaneGrid(event: Event) {
     let e = event?.target as any;

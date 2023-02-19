@@ -1,39 +1,34 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { AnimationService } from 'src/app/services/animation/animation.service';
+import { AfterViewChecked } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { SceneUtilsService } from 'src/app/services/utils/scene.utils.service';
 
 @Component({
   selector: 'app-contextmenu',
   templateUrl: './contextmenu.component.html',
   styleUrls: ['./contextmenu.component.css']
 })
-export class ContextmenuComponent implements OnInit, AfterViewInit {
-
-
+export class ContextmenuComponent implements OnInit, AfterViewInit, AfterViewChecked {
   @ViewChild('context') contextRef!: ElementRef;
   get context(): HTMLCanvasElement {
     return this.contextRef.nativeElement;
   }
+  @Input() object!: any;
+  @Input() component!: any;
   @Input() posX = 0;
   @Input() posY = 0;
   @Input() type = "";
-  @Output() SetAsView = new EventEmitter<number>();
-  constructor(public AnimationService: AnimationService) { }
-  ngAfterViewInit(): void {
+  constructor(public SceneUtilsService: SceneUtilsService) { }
+  ngAfterViewChecked(): void {
     this.context.style.left = `${this.posX}px`;
     this.context.style.top = `${this.posY}px`;
+  }
+  ngAfterViewInit(): void {
+    this.SceneUtilsService.ContextmenuComponent = this;
   }
 
   ngOnInit(): void {
   }
-
   Click(event: MouseEvent) {
-    this.AnimationService.contextMenu = false;
-  }
-
-  SetFrontView(event: MouseEvent) {
-    this.SetAsView.emit(0);
-  }
-  SetTopView(event: MouseEvent) {
-    this.SetAsView.emit(1);
+    this.component.contextMenu = false;
   }
 }

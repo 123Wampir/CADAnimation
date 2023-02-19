@@ -38,7 +38,6 @@ export function GetArrayTimeLine(timeline: TimelineModel) {
     timeline.array = Array(timeline.tracks.length).fill(0);
     let arr: any[] = [];
     arr = timeline.tracks.filter(track => track.level == 0);
-    console.log(arr);
     i = 0;
     arr.forEach(item => {
         CreateArrayTimeLine(timeline, item);

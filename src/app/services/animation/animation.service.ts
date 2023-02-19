@@ -26,9 +26,6 @@ export class AnimationService {
   dialogModal = false;
   dialogType = "";
 
-  contextMenu = false;
-
-
   async LoadAnimationFile(event: Event) {
     console.log(event);
     let f = event.target as any;
@@ -87,10 +84,10 @@ export class AnimationService {
         else if (item.type == "Mesh") {
           keyframeTrack.type = "Mesh";
         }
-        else if (/(Camera)/g.exec(item.type) != undefined) {
+        else if (item.type.includes("Camera")) {
           keyframeTrack.type = "Camera";
         }
-        else if (/(Light)/g.exec(item.type) != undefined) {
+        else if (item.type.includes("Light")) {
           keyframeTrack.type = "Light";
         }
         else if (item.type == "zeroPlane") {
@@ -116,6 +113,22 @@ export class AnimationService {
     }
     else if (obj.type == "Annotation") {
       keyframeTrack.type = "Annotation";
+    }
+  }
+
+  DeleteTrack(track: AnimationModel.KeyframeTrackModel) {
+    this.ClearTrack(track);
+    this.SceneUtilsService.ClearSelection();
+    let parent = this.timeLine.tracks.find(item => item.id == track.parent);
+    let n = this.timeLine.tracks.findIndex(item => item.name == track.name);
+    let id = parent?.children.findIndex(item => item == track.id);
+    parent?.children.splice(id!, 1);
+    this.timeLine.tracks.splice(n, 1);
+    AnimationModel.GetArrayTimeLine(this.timeLine);
+  }
+  ClearTrack(track: AnimationModel.KeyframeTrackModel) {
+    for (let i = track.actions.length - 1; i >= 0; i--) {
+      this.DeleteAction(track.actions[i]);
     }
   }
 

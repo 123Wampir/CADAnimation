@@ -30,6 +30,10 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   center!: THREE.Vector3;
   point!: THREE.Object3D;
   offsets: any[] = [];
+  contextMenu = false;
+  posX = 0;
+  posY = 0;
+  contextObject: any;
 
   ngOnInit(): void {
   }
@@ -171,6 +175,16 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     }
     this.keyframeClick = false;
     this.actionClick = false;
+  }
+  ShowContextMenu(event: MouseEvent, id: number) {
+    event.preventDefault();
+    if (this.SceneUtilsService.ContextmenuComponent != undefined)
+      this.SceneUtilsService.ContextmenuComponent.component.contextMenu = false;
+    this.contextObject = this.AnimationService.timeLine.tracks.find(track => track.id == id)!;
+    this.posX = event.clientX - 5;
+    this.posY = event.clientY - 5;
+    console.log(this.posX, this.posY);
+    this.contextMenu = true;
   }
   ActionClick(action: AnimationModel.KeyframeActionModel) {
     this.actionClick = true;

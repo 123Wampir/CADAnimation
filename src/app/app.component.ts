@@ -395,7 +395,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
   }
   onClick(event: MouseEvent) {
-    this.AnimationService.contextMenu = false;
+    if (this.SceneUtilsService.ContextmenuComponent != undefined)
+      this.SceneUtilsService.ContextmenuComponent.component.contextMenu = false;
     if (!this.firstClick) {
       if (this.intersection != undefined) {
         this.SceneUtilsService.Select(this.intersection, this.SceneUtilsService.CTRLPressed);

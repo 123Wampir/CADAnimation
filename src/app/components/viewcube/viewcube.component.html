@@ -67,6 +67,6 @@
             <div class="corner" (click)="setView(-1,-1,-1)"></div>
         </div>
     </div>
-    <app-contextmenu *ngIf="AnimationService.contextMenu" [posX]="posX" [posY]="posY" [type]="'viewcube'"
-        (SetAsView)="SetAsView($event)"></app-contextmenu>
+    <app-contextmenu *ngIf="contextMenu" [component]="this" [posX]="posX" [posY]="posY"
+        [type]="'viewcube'" [object]="this"></app-contextmenu>
 </div>

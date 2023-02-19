@@ -44,7 +44,8 @@
             </div>
             <div class="line" *cdkVirtualFor="let track of AnimationService.timeLine.array; trackBy:TrackByFunction"
                 [ngStyle]="ShowLine(track.show)" [id]="track.id">
-                <div [ngClass]="track.type" (click)="OnLineClick(track.id)">
+                <div [ngClass]="track.type" (contextmenu)="ShowContextMenu($event,track.id)"
+                    (click)="OnLineClick(track.id)">
                     <div class="linename">{{" ".repeat(track.level*3)+track.name}}</div>
                     <button *ngIf="track.type=='Part'" [ngClass]="SetLineExpandClass(track.expand)"
                         (click)="OnExpandLineClick(track)">▼</button>
@@ -60,4 +61,6 @@
             </div>
         </div>
     </cdk-virtual-scroll-viewport>
+    <app-contextmenu *ngIf="contextMenu" [component]="this" [object]="contextObject" [posX]="posX"
+        [type]="'timeline-track'" [posY]="posY"></app-contextmenu>
 </div>

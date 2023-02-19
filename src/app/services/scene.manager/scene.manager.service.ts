@@ -87,39 +87,29 @@ export class SceneManagerService {
 
   DeleteObject(obj: any) {
     if (obj != undefined) {
-      if (/(Light)/g.exec(obj.type) != undefined) {
+      if (obj.type.includes("Light")) {
         let light = obj as THREE.Light;
         light.removeFromParent();
         light.dispose();
-        let n = this.SceneUtilsService.AnimationService.timeLine.tracks.findIndex(item => item.name == light.name);
-        let track = this.SceneUtilsService.AnimationService.timeLine.tracks[n];
-        for (let i = track.actions.length - 1; i > 0; i--) {
-          this.SceneUtilsService.AnimationService.DeleteAction(track.actions[i]);
-        }
-        this.SceneUtilsService.ClearSelection();
-        let parent = this.SceneUtilsService.AnimationService.timeLine.tracks.find(item => item.id == track.parent);
-        let id = parent?.children.findIndex(item => item == track.id);
-        parent?.children.splice(id!, 1);
-        this.SceneUtilsService.AnimationService.timeLine.tracks.splice(n, 1);
-        AnimationModel.GetArrayTimeLine(this.SceneUtilsService.AnimationService.timeLine);
+        let track = this.SceneUtilsService.AnimationService.timeLine.tracks.find(item => item.name == light.name);
+        if (track != undefined)
+          this.SceneUtilsService.AnimationService.DeleteTrack(track);
+        let i = this.SceneUtilsService.AnimationService.mixers.findIndex(mixer => mixer.getRoot() == light);
+        if (i != -1)
+          this.SceneUtilsService.AnimationService.mixers.splice(i, 1);
       }
       else if (obj.type == "Annotation") {
         let css2d = obj as CSS2DObject;
         css2d.removeFromParent();
         (css2d.children[0] as THREE.Line).geometry.dispose();
         (css2d.children[0] as any).material.dispose();
-        let n = this.SceneUtilsService.AnimationService.timeLine.tracks.findIndex(item => item.name == css2d.name);
-        let track = this.SceneUtilsService.AnimationService.timeLine.tracks[n];
-        for (let i = track.actions.length - 1; i > 0; i--) {
-          this.SceneUtilsService.AnimationService.DeleteAction(track.actions[i]);
-        }
-        this.SceneUtilsService.ClearSelection();
         css2d.clear();
-        let parent = this.SceneUtilsService.AnimationService.timeLine.tracks.find(item => item.id == track.parent);
-        let id = parent?.children.findIndex(item => item == track.id);
-        parent?.children.splice(id!, 1);
-        this.SceneUtilsService.AnimationService.timeLine.tracks.splice(n, 1);
-        AnimationModel.GetArrayTimeLine(this.SceneUtilsService.AnimationService.timeLine);
+        let track = this.SceneUtilsService.AnimationService.timeLine.tracks.find(item => item.name == css2d.name);
+        if (track != undefined)
+          this.SceneUtilsService.AnimationService.DeleteTrack(track);
+        let i = this.SceneUtilsService.AnimationService.mixers.findIndex(mixer => mixer.getRoot() == css2d);
+        if (i != -1)
+          this.SceneUtilsService.AnimationService.mixers.splice(i, 1);
       }
     }
   }

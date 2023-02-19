@@ -9,6 +9,7 @@ import { ModelloaderService } from '../model/modelloader.service';
 import { AppComponent } from 'src/app/app.component';
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { SceneManagerService } from '../scene.manager/scene.manager.service';
+import { ContextmenuComponent } from 'src/app/components/contextmenu/contextmenu.component';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,6 @@ export class SceneUtilsService {
 
   lightGroup!: THREE.Group;
   annotationGroup!: THREE.Group;
-
 
   planes: THREE.Plane[] = [];
   planeHelpers = new THREE.Group();
@@ -61,6 +61,7 @@ export class SceneUtilsService {
   SceneManagerService!: SceneManagerService;
   ModelloaderService!: ModelloaderService;
   AppComponent!: AppComponent;
+  ContextmenuComponent!: ContextmenuComponent;
 
   CTRLPressed: boolean = false;
   SHIFTPressed: boolean = false;
@@ -86,14 +87,29 @@ export class SceneUtilsService {
     }
   }
   CopyCameraPlacement() {
-
     this.orthographicCamera.position.set(this.perspectiveCamera.position.x, this.perspectiveCamera.position.y, this.perspectiveCamera.position.z);
     this.orthographicCamera.rotation.setFromQuaternion(this.perspectiveCamera.quaternion);
     this.zoom = this.orbit.position0.lengthSq() / this.perspectiveCamera.position.lengthSq();
     this.orthographicCamera.zoom = this.zoom;
-    // this.orthographicCamera.zoom = Math.log1p(this.zoom * 2);
     this.orthographicCamera.updateProjectionMatrix();
     this.orthographicCamera.up = this.perspectiveCamera.up;
+  }
+
+  SetDisableStyle() {
+    if (this.model != undefined) {
+      if (this.model.children.length == 0)
+        return {
+          'pointer-events': 'none',
+          'opacity': '0.5'
+        };
+    }
+    else {
+      return {
+        'pointer-events': 'none',
+        'opacity': '0.5'
+      };
+    }
+    return {};
   }
 
   createPlaneStencilGroup(geometry: any, plane: THREE.Plane, renderOrder: number) {

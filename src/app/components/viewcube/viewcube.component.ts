@@ -1,5 +1,4 @@
 import { AfterViewChecked, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { AnimationService } from 'src/app/services/animation/animation.service';
 import { SceneUtilsService } from 'src/app/services/utils/scene.utils.service';
 import THREE = require('three');
 
@@ -10,13 +9,14 @@ import THREE = require('three');
 })
 export class ViewcubeComponent implements OnInit, AfterViewChecked {
   line = new THREE.Line();
+  contextMenu = false;
   posX = 0;
   posY = 0;
   @ViewChild('cube') cubeRef!: ElementRef;
   get cube(): HTMLCanvasElement {
     return this.cubeRef.nativeElement;
   }
-  constructor(public AnimationService: AnimationService, private renderer: Renderer2, private SceneUtilsService: SceneUtilsService) { }
+  constructor(public SceneUtilsService: SceneUtilsService) { }
   ngAfterViewChecked(): void {
     if (this.SceneUtilsService.perspectiveCamera != undefined) {
       let matrix = new THREE.Matrix4();
@@ -70,9 +70,11 @@ export class ViewcubeComponent implements OnInit, AfterViewChecked {
 
   ShowContextMenu(event: MouseEvent) {
     event.preventDefault();
+    if (this.SceneUtilsService.ContextmenuComponent != undefined)
+      this.SceneUtilsService.ContextmenuComponent.component.contextMenu = false;
     this.posX = event.clientX - this.cube.parentElement?.offsetLeft! + 5;
     this.posY = event.clientY - this.cube.parentElement?.offsetTop! + 5;
-    this.AnimationService.contextMenu = true;
+    this.contextMenu = true;
   }
   SetAsView(type: number) {
     switch (type) {

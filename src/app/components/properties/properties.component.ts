@@ -62,11 +62,11 @@ export class PropertiesComponent implements OnInit, OnChanges {
           this.targetName = "None";
 
           this.propertiesObject = this.SceneUtilsService.selected[0];
-          if (/(Camera)/g.exec(this.propertiesObject.type) != undefined) {
+          if (this.propertiesObject.type.includes("Camera")) {
             this.camera = true;
             this.opacityParam = false;
           }
-          else if (/(Light)/g.exec(this.propertiesObject.type) != undefined) {
+          else if (this.propertiesObject.type.includes("Light")) {
             this.light = true;
             this.opacityParam = false;
             this.hex = "#" + this.propertiesObject.color.getHexString();

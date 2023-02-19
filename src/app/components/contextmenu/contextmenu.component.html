@@ -5,9 +5,17 @@
             <div>></div>
         </label>
         <div class="container menu-items">
-            <div class="basic-line" (click)="SetFrontView($event)">Вид спереди</div>
-            <div class="basic-line" (click)="SetTopView($event)">Вид сверху</div>
+            <div class="basic-line" [ngStyle]="SceneUtilsService.SetDisableStyle()" (click)="object.SetAsView(0)">Вид
+                спереди</div>
+            <div class="basic-line" [ngStyle]="SceneUtilsService.SetDisableStyle()" (click)="object.SetAsView(1)">Вид
+                сверху</div>
         </div>
+    </div>
+    <div *ngIf="type=='timeline-track'" class="container menu-items">
+        <div class="basic-line" [ngStyle]="SceneUtilsService.SetDisableStyle()"
+            (click)="SceneUtilsService.AnimationService.ClearTrack(object)">Очистить дорожку</div>
+        <div class="basic-line" *ngIf="object.type=='Annotation' || object.type.includes('Light')"
+            (click)="SceneUtilsService.SceneManagerService.DeleteObject(object.object)">Удалить</div>
     </div>
     <!-- <div *ngIf="type=='menubar-file'" class="menu-line">
         <label class="menu-label">

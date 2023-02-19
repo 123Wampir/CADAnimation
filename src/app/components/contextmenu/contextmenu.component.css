@@ -37,7 +37,7 @@
 }
 
 .container {
-    position: absolute;
+    position: fixed;
     left: 100%;
     border-radius: 2px;
     
