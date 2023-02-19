@@ -137,8 +137,8 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   OnLineClick(id: number) {
-    console.log(this.AnimationService.timeLine.tracks[id]);
-    let item = this.AnimationService.timeLine.tracks[id].object;
+    console.log(id);
+    let item = this.AnimationService.timeLine.tracks.find(track => track.id == id)!.object;
     console.log(item);
     this.SceneUtilsService.Select(item, this.SceneUtilsService.CTRLPressed);
   }

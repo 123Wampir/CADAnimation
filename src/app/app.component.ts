@@ -89,7 +89,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.pointer = new THREE.Vector2();
 
     const planeGeometry = new THREE.PlaneGeometry(10000, 10000, 32, 32);
-    const planeMaterial = new THREE.ShadowMaterial({ color: 0x000000, side: THREE.DoubleSide })
+    const planeMaterial = new THREE.ShadowMaterial({ color: 0x000000, side: THREE.DoubleSide, alphaToCoverage: true })
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.name = "Zero Plane";
     plane.type = "zeroPlane";
@@ -106,41 +106,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.SceneUtilsService.annotationGroup = new THREE.Group();
     this.SceneUtilsService.annotationGroup.name = "Annotations";
     this.scene.add(this.SceneUtilsService.annotationGroup);
-    let annDiv = this.SceneUtilsService.angRenderer.createElement('div');
-    this.SceneUtilsService.angRenderer.addClass(annDiv, "annotation-container");
-    annDiv.innerText = "WOOOOOW";
-    let annotation = new CSS2DObject(annDiv);
-    annotation.type = "Annotation";
-    annotation.name = "Annotation-1";
-    this.SceneUtilsService.annotationGroup.add(annotation);
-    annotation.position.set(10, -10, 30);
-    let pts = [];
-    annotation.updateMatrixWorld(true);
-    pts.push(annotation.worldToLocal(new THREE.Vector3(0)));
-    pts.push(new THREE.Vector3(0));
-    let geom = new THREE.BufferGeometry().setFromPoints(pts);
-    // geom.userData = { target: new THREE.Vector3(0)  };
-    geom.userData = { target: directionalLight };
-    let mat = new THREE.LineBasicMaterial({ color: 0x000000 });
-    let line = new THREE.Line(geom, mat);
-    line.type = "Ignore";
-    line.onAfterRender = function (renderer, scene, camera, geometry) {
-      this.updateMatrixWorld(true);
-      let vec!: THREE.Vector3;
-      if ((geometry.userData['target'].isVector3 == true)) {
-        vec = this.worldToLocal(geometry.userData['target'].clone());
-      }
-      else {
-        let pos = new THREE.Vector3().setFromMatrixPosition(geometry.userData['target'].matrixWorld);
-        vec = this.worldToLocal(pos);
-      }
-      let points = [];
-      points.push(vec);
-      points.push(new THREE.Vector3(0));
-      geometry.setFromPoints(points);
-      geometry.attributes['position'].needsUpdate = true;
-    }
-    annotation.add(line);
   }
   startRenderingLoop() {
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: false, failIfMajorPerformanceCaveat: true });
@@ -245,13 +210,9 @@ export class AppComponent implements OnInit, AfterViewInit {
       component.SceneUtilsService.CSSRenderer.render(component.scene, component.SceneUtilsService.currentCamera);
 
       //effects
-      // component.SceneUtilsService.planeHelpers.removeFromParent();
-      // component.SceneUtilsService.zeroPlane.removeFromParent();
       if (component.SceneUtilsService.outline)
         if (component.SceneUtilsService.model != undefined)
           component.effect.renderOutline(component.SceneUtilsService.model as any, component.SceneUtilsService.currentCamera);
-      // component.scene.add(component.AnimationService.planeHelpers);
-      // component.scene.add(component.AnimationService.zeroPlane);
     }());
   }
   ngOnInit() {

@@ -24,6 +24,7 @@ export interface KeyframeTrackModel {
     type: string;
     level: number;
     children: number[];
+    parent: number;
 }
 export interface TimelineModel {
     tracks: KeyframeTrackModel[];
@@ -33,18 +34,7 @@ export interface TimelineModel {
 }
 let i = 0;
 export function GetArrayTimeLine(timeline: TimelineModel) {
-    // timeline.array = Array(timeline.tracks.length).fill(0).map((v, i) => {
-    //     return {
-    //         name: timeline.tracks[i].name,
-    //         type: timeline.tracks[i].type,
-    //         level: timeline.tracks[i].level,
-    //         actions: timeline.tracks[i].actions,
-    //         id: timeline.tracks[i].id,
-    //         children: timeline.tracks[i].children,
-    //         expand: true,
-    //         show: true
-    //     }
-    // })
+    timeline.array = [];
     timeline.array = Array(timeline.tracks.length).fill(0);
     let arr: any[] = [];
     arr = timeline.tracks.filter(track => track.level == 0);
@@ -68,7 +58,7 @@ function CreateArrayTimeLine(timeline: TimelineModel, item: KeyframeTrackModel) 
     i++;
     if (item.children.length != 0) {
         item.children.forEach(child => {
-            CreateArrayTimeLine(timeline, timeline.tracks[child]);
+            CreateArrayTimeLine(timeline, timeline.tracks.find(track => track.id == child)!);
         })
     }
 }

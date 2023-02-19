@@ -76,7 +76,7 @@
                                 <div class="arrow-right">🞂</div>
                             </label>
                             <div class="container side-menu-items">
-                                <div class="basic-line">Добавить</div>
+                                <div class="basic-line" (click)="SceneManagerService.AddAnnotation()">Добавить</div>
                                 <div class="basic-line">Удалить</div>
                             </div>
                         </div>
@@ -121,8 +121,7 @@
         </div>
         <div class="vert-separator"></div>
         <div class="toolbar-tool">
-            <input class="checkbox" (change)="SetZeroPlaneGrid($event)" type="checkbox"
-                id="ground">
+            <input class="checkbox" (change)="SetZeroPlaneGrid($event)" type="checkbox" id="ground">
             <label for="ground"><img src="../../../assets/grid.png" width="20px" height="20px"></label>
         </div>
         <div class="vert-separator"></div>
@@ -157,6 +156,11 @@
             <input class="checkbox" type="checkbox" id="wireframe" [(ngModel)]="SceneUtilsService.wireframe"
                 (change)="SetWireframe($event)">
             <label for="wireframe"><img src="../../../assets/wireframe.png" width="20px" height="20px"></label>
+        </div>
+        <div class="toolbar-tool" [ngStyle]="SeDisableStyle()">
+            <input class="checkbox" type="checkbox" id="delete" (change)="
+                SceneManagerService.DeleteObject(SceneUtilsService.selected[0])">
+            <label for="delete"><img src="../../../assets/wireframe.png" width="20px" height="20px"></label>
         </div>
     </div>
 </div>

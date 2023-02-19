@@ -121,10 +121,10 @@ body {
     max-width: 500px;
     text-align: justify;
     white-space: break-spaces;
-    transition: all 0.1s;
+    transition: all 0.05s;
 }
 
-.annotation-container>p {
-    padding: 5px 10px;
-    margin: 0;
+.annotation-container>* {
+    /* padding: 5px 10px; */
+    margin: 5px 10px;
 }

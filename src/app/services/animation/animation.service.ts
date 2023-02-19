@@ -68,11 +68,13 @@ export class AnimationService {
         if (item.type == "Ignore") {
           continue;
         }
-        let keyframeTrack: AnimationModel.KeyframeTrackModel = { id: this.id, children: [], object: item, name: item.name, type: "Part", actions: [], level: tabIndex };
-        this.id++;
+        let keyframeTrack: AnimationModel.KeyframeTrackModel;
         if (parent != undefined) {
+          keyframeTrack = { id: this.id, children: [], object: item, name: item.name, type: "Part", actions: [], level: tabIndex, parent: parent!.id };
           parent.children.push(keyframeTrack.id);
         }
+        else keyframeTrack = { id: this.id, children: [], object: item, name: item.name, type: "Part", actions: [], level: tabIndex, parent: -1 };
+        this.id++;
         this.timeLine.tracks.push(keyframeTrack);
 
         if (item.type == "Object3D" || item.type == "Group") {
@@ -105,7 +107,7 @@ export class AnimationService {
   }
   CreateTreeViewElement(obj: THREE.Object3D, parent: AnimationModel.KeyframeTrackModel) {
 
-    let keyframeTrack: AnimationModel.KeyframeTrackModel = { id: this.id, children: [], object: obj, name: obj.name, type: "Part", actions: [], level: parent.level + 1 };
+    let keyframeTrack: AnimationModel.KeyframeTrackModel = { id: this.id, children: [], object: obj, name: obj.name, type: "Part", actions: [], level: parent.level + 1, parent: parent.id };
     this.id++;
     parent.children.push(keyframeTrack.id);
     this.timeLine.tracks.push(keyframeTrack);
