@@ -1,18 +1,21 @@
 .container {
-    width: 300px;
-    height: 400px;
-    top: 50px;
+    width: 350px;
+    height: 555px;
+    top: 100px;
     right: 0;
+    box-shadow: -2px 3px 3px 0px var(--third-color);
     transition: width 1s;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+    border-top: 1px solid var(--third-color);
     z-index: 3;
 }
 
 .header {
     display: flex;
     flex-direction: row;
-    border-bottom: 1px solid gray;
+    border-bottom: 1px solid var(--third-color);
+    box-shadow: 0px 2px 3px 0px var(--third-color);
     align-items: center;
 }
 
@@ -22,20 +25,20 @@
 
 button {
     text-shadow: none;
+    padding: 0;
+    width: 25px;
 }
 
 .expand {
-    color: white;
-    width: auto;
-    height: 100%;
-    font-size: 20px;
-    position: relative;
-    background: red;
-    right: 30px;
-    /* border-color: lightblue; */
-    border-bottom-left-radius: 15px;
-    border-top-left-radius: 15px;
-    background: #ff000055;
+    position: absolute;
+    right: 100%;
+    font-size: 100%;
+    transform: none;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+    margin: 0;
+    box-sizing: border-box;
 }
 
 .form {
@@ -49,6 +52,7 @@ button {
     display: flex;
     flex-direction: column;
 }
-.target-name{
+
+.target-name {
     overflow: hidden;
 }

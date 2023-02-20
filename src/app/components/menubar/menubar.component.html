@@ -122,45 +122,40 @@
         <div class="vert-separator"></div>
         <div class="toolbar-tool">
             <input class="checkbox" (change)="SetZeroPlaneGrid($event)" type="checkbox" id="ground">
-            <label for="ground"><img src="../../../assets/grid.png" width="20px" height="20px"></label>
+            <label for="ground"><img src="../../../assets/grid.png" width="19px" height="19px"></label>
         </div>
         <div class="vert-separator"></div>
         <div class="toolbar-tool" [ngStyle]="SceneUtilsService.SetDisableStyle()">
             <input class="checkbox" type="checkbox" id="cut" (change)="SetClipping($event)">
-            <label for="cut"><img src="../../../assets/cut.png" width="20px" height="20px"></label>
+            <label for="cut"><img src="../../../assets/cut.png" width="19px" height="19px"></label>
         </div>
         <div class="toolbar-tool" [ngStyle]="SceneUtilsService.SetDisableStyle()">
             <input class="checkbox" type="checkbox" id="planeX" (change)="ShowPlaneX($event)">
-            <label for="planeX"><img src="../../../assets/planeX.png" class="plane" width="20px" height="20px"></label>
+            <label for="planeX"><img src="../../../assets/planeX.png" class="plane" width="19px" height="19px"></label>
         </div>
         <div class="toolbar-tool" [ngStyle]="SceneUtilsService.SetDisableStyle()">
             <input class="checkbox" type="checkbox" id="planeY" (change)="ShowPlaneY($event)">
-            <label for="planeY"><img src="../../../assets/planeY.png" class="plane" width="20px" height="20px"></label>
+            <label for="planeY"><img src="../../../assets/planeY.png" class="plane" width="19px" height="19px"></label>
         </div>
         <div class="toolbar-tool" [ngStyle]="SceneUtilsService.SetDisableStyle()">
             <input class="checkbox" type="checkbox" id="planeZ" (change)="ShowPlaneZ($event)">
-            <label for="planeZ"><img src="../../../assets/planeZ.png" class="plane" width="20px" height="20px"></label>
+            <label for="planeZ"><img src="../../../assets/planeZ.png" class="plane" width="19px" height="19px"></label>
         </div>
         <div class="vert-separator"></div>
         <div class="toolbar-tool">
             <input class="checkbox" type="checkbox" id="cameraType" [(ngModel)]="SceneUtilsService.orthographic"
                 (change)="SceneUtilsService.SwitchCamera()">
-            <label for="cameraType"><img src="../../../assets/orthCamera.png" width="20px" height="20px"></label>
+            <label for="cameraType"><img src="../../../assets/orthCamera.png" width="19px" height="19px"></label>
         </div>
         <div class="vert-separator"></div>
         <div class="toolbar-tool" [ngStyle]="SceneUtilsService.SetDisableStyle()">
             <input class="checkbox" type="checkbox" id="outline" [(ngModel)]="SceneUtilsService.outline">
-            <label for="outline"><img src="../../../assets/outline.png" width="20px" height="20px"></label>
+            <label for="outline"><img src="../../../assets/outline.png" width="19px" height="19px"></label>
         </div>
         <div class="toolbar-tool" [ngStyle]="SceneUtilsService.SetDisableStyle()">
             <input class="checkbox" type="checkbox" id="wireframe" [(ngModel)]="SceneUtilsService.wireframe"
                 (change)="SetWireframe($event)">
-            <label for="wireframe"><img src="../../../assets/wireframe.png" width="20px" height="20px"></label>
-        </div>
-        <div class="toolbar-tool" [ngStyle]="SceneUtilsService.SetDisableStyle()">
-            <input class="checkbox" type="checkbox" id="delete" (change)="
-                SceneManagerService.DeleteObject(SceneUtilsService.selected[0])">
-            <label for="delete"><img src="../../../assets/wireframe.png" width="20px" height="20px"></label>
+            <label for="wireframe"><img src="../../../assets/wireframe.png" width="19px" height="19px"></label>
         </div>
     </div>
 </div>

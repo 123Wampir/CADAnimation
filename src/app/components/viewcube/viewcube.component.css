@@ -1,63 +1,76 @@
 .scene {
-    width: 100px;
-    height: 100px;
-    /* margin: 80px; */
-    perspective: 400px;
-    left: 2%;
-    top: 11%;
-    position: absolute;
-    z-index: 2;
-  }
-  
-  .cube {
-    width: 100px;
-    height: 100px;
-    position: relative;
-    transform-style: preserve-3d;
-    transform: translateZ(-100px);
-    /* transition: transform 0.2s; */
-  }
-  .cube__face {
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    border: 2px solid black;
-    line-height: 100px;
-    font-size: 24px;
-    font-weight: bold;
-    color: black;
-    text-align: center;
-    user-select: none;
-    cursor: pointer;
-    display: grid;
-    grid-template-columns: 25% 50% 25%;
-    grid-template-rows: 25% 50% 25%;
-  }
-  .cube__face>div:hover{
-    background-color: gray;
-    color: white;
-    transition: all 0.2s;
-  }
-  
-  .cube__face--front  { background: lightgray; }
-  .cube__face--right  { background: lightgray; }
-  .cube__face--back   { background: lightgray; }
-  .cube__face--left   { background: lightgray; }
-  .cube__face--top    { background: lightgray; }
-  .cube__face--bottom { background: lightgray; }
-  
-  .cube__face--front  { transform: rotateZ(180deg) rotateX( -90deg) translateZ(-50px); }
-  .cube__face--right  { transform: rotateX(-90deg) rotateY(90deg) translateZ(-50px); }
-  .cube__face--back   { transform: rotateX( -90deg) translateZ(-50px); }
-  .cube__face--left   { transform: rotateX(-90deg) rotateY(-90deg) translateZ(-50px); }
-  .cube__face--top    { transform: rotateZ(180deg) rotateX(180deg) translateZ(-50px); }
-  .cube__face--bottom { transform: rotateZ(180deg) translateZ(-50px); }
-  
-  .center{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: -1;
-  }
+  width: 100px;
+  height: 100px;
+  perspective: 400px;
+  left: 2%;
+  top: 11%;
+  position: absolute;
+  z-index: 2;
+}
 
-  label { margin-right: 10px; }
+.cube {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: translateZ(-100px);
+}
+
+.cube__face {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border: 2px solid black;
+  background: lightgray;
+  line-height: 100px;
+  font-size: 24px;
+  font-weight: bold;
+  color: black;
+  text-align: center;
+  user-select: none;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 25% 50% 25%;
+  grid-template-rows: 25% 50% 25%;
+}
+
+.cube__face>div:hover {
+  background-color: gray;
+  color: var(--main-color);
+  transition: all 0.2s;
+}
+
+.cube__face--front {
+  transform: rotateZ(180deg) rotateX(-90deg) translateZ(-50px);
+}
+
+.cube__face--right {
+  transform: rotateX(-90deg) rotateY(90deg) translateZ(-50px);
+}
+
+.cube__face--back {
+  transform: rotateX(-90deg) translateZ(-50px);
+}
+
+.cube__face--left {
+  transform: rotateX(-90deg) rotateY(-90deg) translateZ(-50px);
+}
+
+.cube__face--top {
+  transform: rotateZ(180deg) rotateX(180deg) translateZ(-50px);
+}
+
+.cube__face--bottom {
+  transform: rotateZ(180deg) translateZ(-50px);
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: -1;
+}
+
+label {
+  margin-right: 10px;
+}

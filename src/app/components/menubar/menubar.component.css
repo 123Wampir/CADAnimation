@@ -112,19 +112,6 @@
     background: lightgray;
 }
 
-.hor-separator {
-    border-bottom: 1px lightgray solid;
-    width: 95%;
-    margin: 2px;
-    align-self: center;
-}
-
-.vert-separator {
-    border-right: 1px lightgray solid;
-    height: 28px;
-    margin: 2px;
-}
-
 .arrow-right {
     padding-left: 30px;
 }
@@ -133,6 +120,7 @@
     display: flex;
     align-items: center;
     margin: 1px 5px;
+    padding-bottom: 1px;
 }
 
 .toolbar-tool {
@@ -161,7 +149,7 @@ input {
     cursor: pointer;
     user-select: none;
     box-shadow: inset 0px 0px 3px 0px lightskyblue;
-    border-radius: 3px;
+    border-radius: 5px;
 }
 
 .checkbox:checked+label {
@@ -169,6 +157,7 @@ input {
     background-color: lightskyblue;
     box-shadow: inset 0px 0px 3px 0px black;
 }
-.plane{
+
+.plane {
     filter: none;
 }

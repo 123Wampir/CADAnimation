@@ -8,6 +8,9 @@
     <button class="file-label" id="fileSave" (click)="SaveFile($event)">Сохранить модель </button>
 </div> -->
 <app-menubar></app-menubar>
+<app-properties [selected]="SceneUtilsService.selectionChange" [curTime]="AnimationService.currentTime"
+    [transformed]="SceneUtilsService.transformChange">
+</app-properties>
 <canvas #canvas class="canvas" (mousemove)="onPointerMove($event)" (click)="onClick($event)"
     (window:resize)="SceneUtilsService.onResize($event)" (window:keydown)="onKeyDown($event)"
     (window:keyup)="onKeyUp($event)"></canvas>
@@ -15,8 +18,5 @@
 <app-timeline [curTime]="AnimationService.currentTime" [selChange]="SceneUtilsService.selectionChange"
     [newFile]="SceneUtilsService.newFileLoading">
 </app-timeline>
-<app-properties [selected]="SceneUtilsService.selectionChange" [curTime]="AnimationService.currentTime"
-    [transformed]="SceneUtilsService.transformChange">
-</app-properties>
 <app-dialog [show]="AnimationService.dialogShow" [modal]="AnimationService.dialogModal"
     [type]="AnimationService.dialogType"></app-dialog>

@@ -8,8 +8,12 @@
                     (change)="SceneUtilsService.onResize($event)">
             </div>
             <div class="playback-controls">
-                <button class="playback-play" (click)="OnPlayClick($event)">▶</button>
-                <button class="playback-stop" (click)="OnStopClick($event)">⏹</button>
+                <button class="playback-play" (click)="OnPlayClick($event)">
+                    <img src="../../../assets/play.png" alt="play/pause button" width="19px" height="19px">
+                </button>
+                <button class="playback-stop" (click)="OnStopClick($event)">
+                    <img src="../../../assets/stop.png" alt="stop button" width="19px" height="19px">
+                </button>
                 <div class="timer">{{curTime.toPrecision(3)}}</div>
             </div>
             <div class="window-controls">
