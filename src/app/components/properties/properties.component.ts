@@ -205,11 +205,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
     // this.AnimationService.CopyCameraMixer();
   }
   OnCameraRotation($event: MouseEvent) {
-    console.log(this.SceneUtilsService.currentCamera.rotation);
-    console.log(this.SceneUtilsService.scene.position);
-
     this.SceneUtilsService.currentCamera.lookAt(this.SceneUtilsService.scene.position);
-    console.log(this.SceneUtilsService.currentCamera.rotation);
     this.AnimationService.dialogType = "CameraRotation";
     this.AnimationService.dialogShow = true;
   }

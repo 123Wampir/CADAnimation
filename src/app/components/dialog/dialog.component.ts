@@ -10,7 +10,7 @@ import THREE = require('three');
   styleUrls: ['./dialog.component.css']
 })
 export class DialogComponent implements OnInit, OnChanges {
-  constructor(public AnimationService: AnimationService, private AnimationCreatorService: AnimationCreatorService, private SceneUtilsService:SceneUtilsService) { }
+  constructor(public AnimationService: AnimationService, private AnimationCreatorService: AnimationCreatorService, private SceneUtilsService: SceneUtilsService) { }
 
   @ViewChild('container') containerRef!: ElementRef;
   get container(): HTMLCanvasElement {
@@ -37,13 +37,10 @@ export class DialogComponent implements OnInit, OnChanges {
   }
 
   OnCameraRotationCreate(event: MouseEvent) {
-    // console.log(this.AnimationService.currentTime, this.endTime, this.rotAngle, this.rotDirection);
-    this.SceneUtilsService.currentCamera.lookAt(this.SceneUtilsService.scene.position);
-    // this.AnimationService.orbit.enabled = false;
+    this.SceneUtilsService.perspectiveCamera.lookAt(this.SceneUtilsService.scene.position);
     if (this.endTime == this.AnimationService.currentTime)
       this.endTime += 1;
-    //this.AnimationCreatorService.OnRotationChange(this.AnimationService.currentCamera.parent!);
-    this.AnimationCreatorService.OnCameraChange(this.SceneUtilsService.currentCamera);
+    this.AnimationCreatorService.OnCameraChange(this.SceneUtilsService.perspectiveCamera);
     let ang = 0;
     if (!this.rotDirection)
       ang = this.rotAngle;
@@ -65,15 +62,12 @@ export class DialogComponent implements OnInit, OnChanges {
       let dt = duration * Math.abs(mult);
       time += dt;
       this.AnimationService.currentTime = time;
-      let pos = this.SceneUtilsService.currentCamera.position;
-      pos.applyAxisAngle(new THREE.Vector3(0, 0, 1), step * Math.PI / 180);
-      this.SceneUtilsService.currentCamera.position.set(pos.x, pos.y, pos.z);
-      this.SceneUtilsService.currentCamera.lookAt(new THREE.Vector3())
-      //this.AnimationService.currentCamera.rotateOnAxis(new THREE.Vector3(0, 1, 0), (step * Math.PI / 180));
-      //this.AnimationCreatorService.OnRotationChange(this.AnimationService.currentCamera.parent!);
-      this.AnimationCreatorService.OnCameraChange(this.SceneUtilsService.currentCamera);
+      let pos = this.SceneUtilsService.perspectiveCamera.position;
+      pos.applyAxisAngle(this.SceneUtilsService.perspectiveCamera.up, step * Math.PI / 180);
+      this.SceneUtilsService.perspectiveCamera.position.set(pos.x, pos.y, pos.z);
+      this.SceneUtilsService.perspectiveCamera.lookAt(this.SceneUtilsService.scene.position);
+      this.AnimationCreatorService.OnCameraChange(this.SceneUtilsService.perspectiveCamera);
     }
-    // this.AnimationService.orbit.enabled = true;
   }
 
   CancelClick(event: MouseEvent) {

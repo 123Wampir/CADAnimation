@@ -134,6 +134,19 @@ input {
     margin: 0;
 }
 
+.radio-line {
+    display: flex;
+    justify-content: space-between;
+}
+
+.radio {
+    margin: 1px 10px;
+}
+
+.radio-name {
+    padding: 1px 10px;
+}
+
 .checkbox {
     display: none;
 }

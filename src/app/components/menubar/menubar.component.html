@@ -35,6 +35,24 @@
                     <div class="container menu-items">
                         <div class="basic-line">Вид спереди</div>
                         <div class="basic-line">Вид сверху</div>
+                        <div class="menu-line">
+                            <label class="menu-label">
+                                <div class="menu-name">Внешний вид</div>
+                                <div class="arrow-right">🞂</div>
+                            </label>
+                            <div class="container side-menu-items">
+                                <div class="radio-line">
+                                    <input name="theme" type="radio" id="default" checked class="radio"
+                                        (click)="SetTheme(0)">
+                                    <label class="radio-name" for="default">Светлая</label>
+                                </div>
+                                <div class="radio-line">
+                                    <input name="theme" type="radio" id="dark" class="radio" (click)="SetTheme(1)">
+                                    <label class="radio-name" for="dark">Темная</label>
+                                </div>
+                                <div class="basic-line">Spot Light</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="menu-line">

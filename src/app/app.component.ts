@@ -92,7 +92,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     const planeMaterial = new THREE.ShadowMaterial({ color: 0x000000, side: THREE.DoubleSide, alphaToCoverage: true })
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.name = "Zero Plane";
-    plane.type = "zeroPlane";
+    plane.type = "Ignore";
     const planeHelper = new THREE.GridHelper(1000, 100, 0x000000, 0xaaaaaa);
     plane.add(planeHelper.rotateX(degToRad(90)));
     planeHelper.visible = false;

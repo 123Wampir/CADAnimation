@@ -9,8 +9,8 @@
             <div class="param" *ngIf="annotation">
                 <div class="param-label">
                     <div class="label">Текст аннотации</div>
-                    <button class="save-param" (click)="OnTextSave($event)">
-                        <img src="../../../assets/save.png" alt="save-param" width="19px" height="19px">
+                    <button class="button-icon" (click)="OnTextSave($event)">
+                        <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px">
                     </button>
                 </div>
                 <quill-editor (onEditorCreated)="OnEditorCreated($event)"
@@ -28,8 +28,8 @@
                 <div class="param-label">
                     <div class="label">Цель</div>
                     <div class="target-name">{{targetName}}</div>
-                    <button class="save-param" (click)="SelectTarget($event)">
-                        <img src="../../../assets/save.png" alt="save-param" width="19px" height="19px"></button>
+                    <button class="button-icon" (click)="SelectTarget($event)">
+                        <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px"></button>
                 </div>
                 <div class="hor-separator"></div>
             </div>
@@ -50,8 +50,8 @@
             <div class="param" *ngIf="posParam">
                 <div class="param-label">
                     <div class="label">Позиция</div>
-                    <button *ngIf="!camera" class="save-param" (click)="OnPositionChange($event)">
-                        <img src="../../../assets/save.png" alt="save-param" width="19px" height="19px">
+                    <button *ngIf="!camera" class="button-icon" (click)="OnPositionChange($event)">
+                        <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px">
                     </button>
                 </div>
                 <div class="inputs">
@@ -67,8 +67,8 @@
             <div class="param" *ngIf="rotParam">
                 <div class="param-label">
                     <div class="label">Вращение</div>
-                    <button class="save-param" *ngIf="!camera" (click)="OnRotationChange($event)">
-                        <img src="../../../assets/save.png" alt="save-param" width="19px" height="19px">
+                    <button class="button-icon" *ngIf="!camera" (click)="OnRotationChange($event)">
+                        <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px">
                     </button>
                 </div>
                 <div class="inputs">
@@ -84,8 +84,8 @@
             <div class="param" *ngIf="opacityParam">
                 <div class="param-label">
                     <div class="label">Прозрачность</div>
-                    <button class="save-param" *ngIf="!camera" (click)="OnOpacityChange($event)">
-                        <img src="../../../assets/save.png" alt="save-param" width="19px" height="19px">
+                    <button class="button-icon" *ngIf="!camera" (click)="OnOpacityChange($event)">
+                        <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px">
                     </button>
                 </div>
                 <div class="inputs">
@@ -103,9 +103,9 @@
             <div class="param" *ngIf="cutPlane">
                 <div class="param-label">
                     <div class="label">Смещение</div>
-                    <!-- <button class="save-param" *ngIf="!camera" (click)="OnCu($event)">
-                        <img src="../../../assets/save.png" alt="save-param" width="19px" height="19px">
-                    </button> -->
+                    <button class="button-icon" *ngIf="!camera" (click)="OnConstantChange($event)">
+                        <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px">
+                    </button>
                 </div>
                 <div class="inputs">
                     <input type="range" min="-1000" max="1000" step="1" class="input-range"
@@ -118,9 +118,6 @@
             <div class="param" *ngIf="camera && true">
                 <div class="param-label">
                     <div class="label">FOV</div>
-                    <!-- <button class="save-param" *ngIf="!camera" (click)="OnOpacityChange($event)">
-                        <img src="../../../assets/save.png" alt="save-param" width="19px" height="19px">
-                    </button> -->
                 </div>
                 <div class="inputs">
                     <input type="range" min="10" max="170" step="1" class="input-range"
@@ -132,8 +129,8 @@
             <div class="param" *ngIf="light && !group">
                 <div class="param-label">
                     <div class="label">Цвет</div>
-                    <button class="save-param" *ngIf="!camera" (click)="OnColorChange($event)">
-                        <img src="../../../assets/save.png" alt="save-param" width="19px" height="19px">
+                    <button class="button-icon" *ngIf="!camera" (click)="OnColorChange($event)">
+                        <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px">
                     </button>
                 </div>
                 <div class="inputs">
@@ -143,8 +140,8 @@
             <div class="param" *ngIf="light && !group">
                 <div class="param-label">
                     <div class="label">Интенсивность</div>
-                    <button class="save-param" *ngIf="!camera" (click)="OnIntensityChange($event)">
-                        <img src="../../../assets/save.png" alt="save-param" width="19px" height="19px">
+                    <button class="button-icon" *ngIf="!camera" (click)="OnIntensityChange($event)">
+                        <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px">
                     </button>
                 </div>
                 <div class="inputs">
@@ -157,8 +154,8 @@
             <div class="param" *ngIf="!camera && !cutPlane">
                 <div class="param-label">
                     <div class="label">Видимость</div>
-                    <button class="save-param" (click)="OnVisibleChange($event)">
-                        <img src="../../../assets/save.png" alt="save-param" width="19px" height="19px">
+                    <button class="button-icon" (click)="OnVisibleChange($event)">
+                        <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px">
                     </button>
                 </div>
                 <div class="inputs">
@@ -178,9 +175,6 @@
             <div class="param" *ngIf="cutPlane">
                 <div class="param-label">
                     <div class="label">Обратить</div>
-                    <!-- <button class="save-param" (click)="OnVisibleChange($event)">
-                        <img src="../../../assets/save.png" alt="save-param" width="19px" height="19px">
-                    </button> -->
                 </div>
                 <div class="inputs">
                     <input type="checkbox" class="input-checkbox" (change)="propertiesObject.plane.negate()">

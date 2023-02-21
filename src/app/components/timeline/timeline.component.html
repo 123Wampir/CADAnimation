@@ -8,10 +8,10 @@
                     (change)="SceneUtilsService.onResize($event)">
             </div>
             <div class="playback-controls">
-                <button class="playback-play" (click)="OnPlayClick($event)">
+                <button class="button-icon" (click)="OnPlayClick($event)">
                     <img src="../../../assets/play.png" alt="play/pause button" width="19px" height="19px">
                 </button>
-                <button class="playback-stop" (click)="OnStopClick($event)">
+                <button class="button-icon" (click)="OnStopClick($event)">
                     <img src="../../../assets/stop.png" alt="stop button" width="19px" height="19px">
                 </button>
                 <div class="timer">{{curTime.toPrecision(3)}}</div>
@@ -22,14 +22,17 @@
                     [(ngModel)]="AnimationService.timeLine.duration">
                 <input type="range" min="1" max="300" step="0.5" [(ngModel)]="AnimationService.timeLine.scale">
                 <input type="range" value="0" min="0" max="300" step="0.5" (mousemove)="OnExplode($event)">
-                <label class="file-label" for="load">
-                    <input class="file" type="file" name="load" id="load" accept=".xml"
-                        (change)="AnimationService.LoadAnimationFile($event)">
-                    Загрузить
-                </label>
+                <button class="button-icon">
+                    <label class="file-label" for="load">
+                        <input class="file" type="file" name="load" id="load" accept=".xml"
+                            (change)="AnimationService.LoadAnimationFile($event)">
+                        <img src="../../../assets/upload.png" alt="stop button" width="19px" height="19px">
+                    </label>
+                </button>
+                <input class="file" type="file" name="save" id="save" accept=".xml">
                 <label class="file-label" for="save">
-                    <input class="file" type="file" name="save" id="save" accept=".xml">
-                    Сохранить
+                    <button class="button-icon"><img src="../../../assets/save.png" alt="stop button" width="19px"
+                            height="19px"></button>
                 </label>
                 <button class="expand-first" (click)="OnTimelineExpand($event)">▼</button>
             </div>
