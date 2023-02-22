@@ -31,11 +31,8 @@ import { QuillModule, } from 'ngx-quill';
     QuillModule.forRoot({
       modules: {
         toolbar: [
-          [{ font: [] }],
-          [{ size: ['small', 'normal', 'large'] }],
           ['bold', 'italic', 'underline'],
           [{ background: [] }, { color: [] }],
-          [{ align: [] }],
           [{ list: 'ordered' }, { list: 'bullet' }],
         ]
       },

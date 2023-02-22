@@ -66,7 +66,7 @@ export class MenubarComponent {
       case 1:
         document.body.style.setProperty('--main-color', '#333');
         document.body.style.setProperty('--second-color', 'lightgray');
-        document.body.style.setProperty('--third-color', 'gray');
+        document.body.style.setProperty('--third-color', '#222');
         document.body.style.setProperty('--text-color', 'ghostwhite');
         document.body.style.setProperty('--invert', '1');
         break;

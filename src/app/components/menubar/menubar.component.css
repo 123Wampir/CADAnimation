@@ -144,7 +144,9 @@ input {
 }
 
 .radio-name {
-    padding: 1px 10px;
+    padding-right: 10px;
+    width: 100%;
+    text-align: end;
 }
 
 .checkbox {
