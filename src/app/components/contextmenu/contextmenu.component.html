@@ -5,14 +5,19 @@
             <div>></div>
         </label>
         <div class="container menu-items">
-            <div class="basic-line" [ngStyle]="SceneUtilsService.SetDisableStyle()" (click)="object.SetAsView(0)">Вид
+            <div class="basic-line"
+                [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.model.children.length!=0)"
+                (click)="object.SetAsView(0)">Вид
                 спереди</div>
-            <div class="basic-line" [ngStyle]="SceneUtilsService.SetDisableStyle()" (click)="object.SetAsView(1)">Вид
+            <div class="basic-line"
+                [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.model.children.length!=0)"
+                (click)="object.SetAsView(1)">Вид
                 сверху</div>
         </div>
     </div>
     <div *ngIf="type=='timeline-track'" class="container menu-items">
-        <div class="basic-line" [ngStyle]="SceneUtilsService.SetDisableStyle()"
+        <div class="basic-line"
+            [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.model.children.length!=0)"
             (click)="SceneUtilsService.AnimationService.ClearTrack(object)">Очистить дорожку</div>
         <div class="basic-line" *ngIf="object.type=='Annotation' || object.type.includes('Light')"
             (click)="SceneUtilsService.SceneManagerService.DeleteObject(object.object)">Удалить</div>

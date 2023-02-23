@@ -96,15 +96,8 @@ export class SceneUtilsService {
     this.orthographicCamera.up = this.perspectiveCamera.up;
   }
 
-  SetDisableStyle() {
-    if (this.model != undefined) {
-      if (this.model.children.length == 0)
-        return {
-          'pointer-events': 'none',
-          'opacity': '0.5'
-        };
-    }
-    else {
+  SetDisableStyle(value: boolean) {
+    if (!value) {
       return {
         'pointer-events': 'none',
         'opacity': '0.5'

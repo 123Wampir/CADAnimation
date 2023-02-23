@@ -64,7 +64,6 @@ export class AnimationCreatorService {
   OnOpacityChange(obj: any) {
     if (obj != undefined) {
       this.SceneUtilsService.selected.forEach((item) => {
-        (item as any).material.needsUpdate = true;
         let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, item.name);
         let action = AnimationModel.FindActionByType(track, ".material.opacity");
         if (action == undefined) {

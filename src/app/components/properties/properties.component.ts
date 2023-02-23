@@ -150,10 +150,10 @@ export class PropertiesComponent implements OnInit, OnChanges {
   }
   EnableAnnotationTarget(event: Event) {
     if (this.annotationTarget) {
-      this.posParam = false;
+      // this.posParam = false;
     }
     else {
-      this.posParam = true;
+      // this.posParam = true;
       this.SceneUtilsService.selectionChange = !this.SceneUtilsService.selectionChange;
       (this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"] = new THREE.Vector3(0);
     }
@@ -169,6 +169,14 @@ export class PropertiesComponent implements OnInit, OnChanges {
   }
   OnRotationChange(event: Event) {
     this.AnimationCreatorService.OnRotationChange(this.propertiesObject);
+  }
+  SetTransparancy(event: Event) {
+    this.SceneUtilsService.selected.forEach(item => {
+      if (item.type == "Mesh") {
+        (item as any).material.transparent = this.propertiesObject.material.transparent;
+        (item as any).material.needsUpdate = true;
+      }
+    })
   }
   OnOpacityChange(event: Event) {
     this.AnimationCreatorService.OnOpacityChange(this.propertiesObject);
@@ -200,16 +208,12 @@ export class PropertiesComponent implements OnInit, OnChanges {
   }
 
   OnCameraChange($event: MouseEvent) {
-
     this.AnimationCreatorService.OnCameraChange(this.SceneUtilsService.perspectiveCamera);
-    // this.AnimationService.CopyCameraMixer();
   }
   OnCameraRotation($event: MouseEvent) {
     this.SceneUtilsService.currentCamera.lookAt(this.SceneUtilsService.scene.position);
     this.AnimationService.dialogType = "CameraRotation";
     this.AnimationService.dialogShow = true;
-  }
-  OnShadowChange($event: Event) {
   }
   OnShadowCameraChange(event: Event) {
     this.propertiesObject.shadow.camera.left = -this.shadowWidth / 2;
@@ -217,12 +221,10 @@ export class PropertiesComponent implements OnInit, OnChanges {
     this.propertiesObject.shadow.camera.top = this.shadowHeight / 2;
     this.propertiesObject.shadow.camera.bottom = -this.shadowHeight / 2;
     this.propertiesObject.shadow.camera.far = this.shadowDist;
-    // this.propertiesObject.target.updateMatrixWorld();
     this.propertiesObject.shadow.camera.updateProjectionMatrix();
     this.propertiesObject.children[1].update();
   }
   ShowPlane(event: Event) {
-    // this.propertiesObject.material.visible = (event.target as any).checked;
     this.propertiesObject.children[0].material.visible = (event.target as any).checked;
   }
   OnFOVChange($event: Event) {

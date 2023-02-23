@@ -19,12 +19,41 @@
     align-items: center;
 }
 
+.header-label {
+    font-size: 1em;
+    padding: 2px 10px;
+}
+
+.label {
+    font-size: 0.8em;
+    white-space: nowrap;
+}
+
 .object-label {
     padding: 10px;
 }
 
 button {
     text-shadow: none;
+}
+
+.line {
+    display: flex;
+    align-items: center;
+    margin: 2px 0;
+}
+
+.param {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 35% 65%;
+    align-items: center;
+}
+
+.inputs {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
 }
 
 .save-param {
@@ -45,6 +74,11 @@ button {
     color: var(--text-color);
 }
 
+.editor {
+    display: flex;
+    flex-direction: column;
+}
+
 .form {
     display: flex;
     flex-direction: column;
@@ -59,4 +93,5 @@ button {
 
 .target-name {
     overflow: hidden;
+    text-align: center;
 }

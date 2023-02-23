@@ -5,6 +5,10 @@ rect {
     fill: var(--text-color) !important;
 }
 
+.ql-container {
+    height: auto;
+}
+
 .ql-snow .ql-picker {
     color: var(--text-color);
 }
@@ -25,9 +29,7 @@ rect {
     --invert: 0;
 }
 
-html {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
+
 
 body {
     margin: 0;
@@ -35,6 +37,7 @@ body {
     justify-content: center;
     height: 100%;
     background: var(--main-color);
+    font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
 button {
@@ -84,36 +87,14 @@ img {
     display: flex;
 }
 
-.param {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    flex-direction: column;
-}
-
-.param-label {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-}
-
 .label {
     margin: 2px 10px;
 }
 
-.inputs {
-    display: flex;
-    width: 100%;
-}
 
 input {
     margin: 2px 4px;
     align-self: center;
-}
-
-.input-number {
-    width: inherit;
 }
 
 input[type="range"] {
@@ -123,9 +104,20 @@ input[type="range"] {
     overflow: hidden;
 }
 
+input[type="number"] {
+    border-radius: 0;
+    background: var(--second-color);
+    min-width: 0;
+}
+
+input[type="color"] {
+    width: auto;
+    min-width: 50px;
+}
+
 .button-icon {
     padding: 0;
-    width: 25px;
+    aspect-ratio: 1;
 }
 
 ::-webkit-slider-thumb {
@@ -155,14 +147,6 @@ input[type="range"] {
     box-sizing: border-box;
 }
 
-
-
-
-
-body {
-    margin: 0;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
-}
 
 .hor-separator {
     border-bottom: 1px var(--second-color) solid;
