@@ -592,9 +592,7 @@ export class AnimationService {
   ClearAnimation() {
     if (this.SceneUtilsService.model != undefined) {
       this.SceneUtilsService.model.traverse(item => {
-        if (item.type == "Mesh" || item.type == "LineSegments") {
-          item.animations = [];
-        }
+        item.animations = [];
       })
     }
     this.timeLine.tracks.forEach(track => {

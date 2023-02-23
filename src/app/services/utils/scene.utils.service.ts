@@ -237,7 +237,6 @@ export class SceneUtilsService {
     for (let i = 0; i < 3; i++) {
       let stencil = this.createPlaneStencilGroup(mergedGeom, this.planes[i], i + 1);
       let po = new THREE.Mesh(planeGeom, planeMat);
-      po.type = "Ignore";
       po.onAfterRender = function (render) {
         render.clearStencil();
       };
@@ -395,13 +394,12 @@ export class SceneUtilsService {
 
   ClearScene() {
     if (this.model != undefined) {
-      console.log(this.model);
+      console.log(this.scene);
       this.model.traverse(item => {
         if (item.type == "Mesh" || item.type == "LineSegments") {
           // console.log(item);
           (item as any).geometry.dispose();
           (item as any).material.dispose();
-          item.animations = [];
         }
       })
       this.model.clear();
