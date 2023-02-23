@@ -23,8 +23,8 @@ rect {
 
 :root {
     --main-color: ghostwhite;
-    --second-color: lightgray;
-    --third-color: gray;
+    --second-color: gray;
+    --third-color: #eee;
     --text-color: black;
     --invert: 0;
 }
@@ -41,14 +41,14 @@ body {
 }
 
 button {
-    border: 1px var(--third-color) solid;
+    border: 1px var(--second-color) solid;
     background: var(--main-color);
     color: var(--text-color);
     border-radius: 5px;
     height: 25px;
     transform: translateY(-2px);
-    text-shadow: 1px 1px 2px var(--third-color);
-    box-shadow: 0px 2px 2px 0px var(--third-color);
+    text-shadow: 1px 1px 2px var(--second-color);
+    box-shadow: 0px 2px 2px 0px var(--second-color);
     margin: 0px 5px;
     box-sizing: content-box;
     display: flex;
@@ -57,12 +57,12 @@ button {
 }
 
 button:hover {
-    background-color: var(--second-color);
+    background-color: var(--third-color);
 }
 
 button:active {
     transform: translateY(0px);
-    box-shadow: 0px 0px 2px 0px var(--third-color);
+    box-shadow: 0px 0px 2px 0px var(--second-color);
 }
 
 img {
@@ -74,7 +74,7 @@ img {
     flex-direction: column;
     background-color: var(--main-color);
     position: fixed;
-    box-shadow: 0px 2px 3px 0px var(--third-color);
+    box-shadow: 0px 2px 3px 0px var(--second-color);
     z-index: 2;
     color: var(--text-color);
 }
@@ -100,13 +100,16 @@ input {
 input[type="range"] {
     border-radius: 0;
     appearance: none;
-    background: var(--second-color);
+    background: var(--third-color);
     overflow: hidden;
 }
 
 input[type="number"] {
     border-radius: 0;
-    background: var(--second-color);
+    background: var(--third-color);
+    color: var(--text-color);
+    border-color: var(--main-color);
+    box-shadow: inset 0px 0px 3px 0px var(--second-color);
     min-width: 0;
 }
 

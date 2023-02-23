@@ -58,15 +58,15 @@ export class MenubarComponent {
     switch (type) {
       case 0:
         document.body.style.setProperty('--main-color', 'ghostwhite');
-        document.body.style.setProperty('--second-color', 'lightgray');
-        document.body.style.setProperty('--third-color', 'gray');
+        document.body.style.setProperty('--second-color', 'gray');
+        document.body.style.setProperty('--third-color', '#eee');
         document.body.style.setProperty('--text-color', 'black');
         document.body.style.setProperty('--invert', '0');
         break;
       case 1:
         document.body.style.setProperty('--main-color', '#333');
-        document.body.style.setProperty('--second-color', 'lightgray');
-        document.body.style.setProperty('--third-color', '#222');
+        document.body.style.setProperty('--second-color', '#222');
+        document.body.style.setProperty('--third-color', 'gray');
         document.body.style.setProperty('--text-color', 'ghostwhite');
         document.body.style.setProperty('--invert', '1');
         break;

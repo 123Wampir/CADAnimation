@@ -8,15 +8,15 @@
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     z-index: 3;
-    border-top: 1px solid var(--third-color);
+    border-top: 1px solid var(--second-color);
 }
 
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid var(--third-color);
-    box-shadow: 0px 2px 3px 0px var(--third-color);
+    border-bottom: 1px solid var(--second-color);
+    box-shadow: 0px 2px 3px 0px var(--second-color);
     z-index: 2;
     padding: 4px 0 2px 0;
 }
@@ -104,73 +104,42 @@
     align-items: center;
     display: flex;
     justify-content: space-between;
-    border-left: 1px solid var(--third-color);
-    border-bottom: 1px solid var(--third-color);
+    border-left: 1px solid var(--second-color);
+    border-bottom: 1px solid var(--second-color);
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
 }
 
 .Mesh {
-    align-items: center;
-    display: flex;
-    /* justify-content: left; */
-    justify-content: space-between;
     background-color: bisque;
-    border-left: 1px solid var(--third-color);
-    border-bottom: 1px solid var(--third-color);
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
+    color: black;
 }
 
 .Light {
-    align-items: center;
-    display: flex;
-    justify-content: left;
     background-color: mediumturquoise;
-    border-left: 1px solid var(--third-color);
-    border-bottom: 1px solid var(--third-color);
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
+    color: black;
 }
 
 .Camera {
-    align-items: center;
-    display: flex;
-    justify-content: left;
     background-color: rgb(173, 230, 182);
-    border-left: 1px solid var(--third-color);
-    border-bottom: 1px solid var(--third-color);
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
+    color: black;
 }
 
 .Plane {
-    align-items: center;
-    display: flex;
-    justify-content: left;
     background-color: plum;
-    border-left: 1px solid var(--third-color);
-    border-bottom: 1px solid var(--third-color);
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
+    color: black;
 }
 
 .Annotation {
-    align-items: center;
-    display: flex;
-    justify-content: left;
     background-color: lightcoral;
-    border-left: 1px solid var(--third-color);
-    border-bottom: 1px solid var(--third-color);
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
+    color: black;
 }
 
 .track {
     width: 80%;
-    border-bottom: 1px solid var(--third-color);
-    border-left: 1px solid var(--third-color);
-    border-right: 1px solid var(--third-color);
+    border-bottom: 1px solid var(--second-color);
+    border-left: 1px solid var(--second-color);
+    border-right: 1px solid var(--second-color);
     /* background-color: antiquewhite; */
     display: flex;
     flex-direction: column;
@@ -184,7 +153,7 @@
 }
 
 .track:hover {
-    background-color: var(--second-color);
+    background-color: var(--third-color);
 }
 
 .track:active {
@@ -193,9 +162,9 @@
 
 .ruler-track {
     background-color: black;
-    border-bottom: 1px solid var(--third-color);
-    border-left: 1px solid var(--third-color);
-    border-right: 1px solid var(--third-color);
+    border-bottom: 1px solid var(--second-color);
+    border-left: 1px solid var(--second-color);
+    border-right: 1px solid var(--second-color);
     /* background-color: antiquewhite; */
     display: flex;
     /* align-items: center; */

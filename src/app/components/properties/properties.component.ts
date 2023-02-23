@@ -36,6 +36,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
   height = 300;
   opacity = 1;
   hex = "";
+  editMaterial = false;
   constructor(public AnimationService: AnimationService, public AnimationCreatorService: AnimationCreatorService, public SceneUtilsService: SceneUtilsService) { }
 
   ngOnInit(): void {
@@ -61,7 +62,12 @@ export class PropertiesComponent implements OnInit, OnChanges {
           this.annotationTarget = false;
           this.targetName = "None";
 
+          this.editMaterial = false;
+
           this.propertiesObject = this.SceneUtilsService.selected[0];
+          if (this.propertiesObject.material != undefined) {
+            this.hex = "#" + this.propertiesObject.material.color.getHexString();
+          }
           if (this.propertiesObject.type.includes("Camera")) {
             this.camera = true;
             this.opacityParam = false;
@@ -135,8 +141,35 @@ export class PropertiesComponent implements OnInit, OnChanges {
         if (this.propertiesObject.color != undefined) {
           this.hex = "#" + this.propertiesObject.color.getHexString();
         }
+        else if (this.propertiesObject.material != undefined && !this.cutPlane) {
+          console.log("re");
+
+          this.hex = "#" + this.propertiesObject.material.color.getHexString();
+        }
       }
     }
+  }
+
+  MatColorSet(event: Event) {
+    this.SceneUtilsService.selected.forEach(item => {
+      (item as any).material.color.set(this.hex);
+    })
+  }
+  MatRoughnessSet(event: Event) {
+    this.SceneUtilsService.selected.forEach(item => {
+      (item as any).material.roughness = (event as any).target.value;
+    })
+  }
+  MatMetalnessSet(event: Event) {
+    this.SceneUtilsService.selected.forEach(item => {
+      (item as any).material.metalness = (event as any).target.value;
+    })
+  }
+  MatVertColorSet(event: Event) {
+    this.SceneUtilsService.selected.forEach(item => {
+      (item as any).material.vertexColors = (event as any).target.checked;
+      (item as any).material.needsUpdate = true;
+    })
   }
 
   OnEditorCreated(event: any) {

@@ -254,5 +254,51 @@
         <div class="controls" *ngIf="AnimationService.selAction.length!=0">
             <button class="delete" (click)="DeleteAction($event)">Удалить действие</button>
         </div>
+        <div class="controls" *ngIf="propertiesObject.material!=undefined && !cutPlane">
+            <button class="material" (click)="editMaterial=!editMaterial">Изменить материал</button>
+        </div>
+        <div *ngIf="editMaterial">
+            <div class="line">
+                <div class="param">
+                    <div class="label">Цвет</div>
+                    <div class="inputs">
+                        <input type="color" class="input-color" [(ngModel)]="hex" (change)="MatColorSet($event)">
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">Шероховатость</div>
+                    <div class="inputs">
+                        <input type="range" min="0" max="1" step="0.01" class="input-range"
+                            [(ngModel)]="propertiesObject.material.roughness" placeholder="roughness"
+                            (change)="MatRoughnessSet($event)">
+                        <input type="number" class="input-number" [(ngModel)]="propertiesObject.material.roughness"
+                            min="0" max="1" step="0.01" placeholder="roughness" (change)="MatRoughnessSet($event)">
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">Металличность</div>
+                    <div class="inputs">
+                        <input type="range" min="0" max="1" step="0.01" class="input-range"
+                            [(ngModel)]="propertiesObject.material.metalness" placeholder="metalness"
+                            (change)="MatMetalnessSet($event)">
+                        <input type="number" class="input-number" [(ngModel)]="propertiesObject.material.metalness"
+                            min="0" max="1" step="0.01" placeholder="metalness" (change)="MatMetalnessSet($event)">
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">Цвет вершин</div>
+                    <div class="inputs">
+                        <input type="checkbox" [(ngModel)]="propertiesObject.material.vertexColors"
+                            (change)="MatVertColorSet($event)" class="input-checkbox">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
