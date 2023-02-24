@@ -10,7 +10,9 @@ import THREE = require('three');
   styleUrls: ['./dialog.component.css']
 })
 export class DialogComponent implements OnInit, OnChanges {
-  constructor(public AnimationService: AnimationService, private AnimationCreatorService: AnimationCreatorService, private SceneUtilsService: SceneUtilsService) { }
+  constructor(public AnimationService: AnimationService,
+    private AnimationCreatorService: AnimationCreatorService,
+    public SceneUtilsService: SceneUtilsService) { }
 
   @ViewChild('container') containerRef!: ElementRef;
   get container(): HTMLCanvasElement {
@@ -69,6 +71,34 @@ export class DialogComponent implements OnInit, OnChanges {
       this.AnimationCreatorService.OnCameraChange(this.SceneUtilsService.perspectiveCamera);
     }
   }
+
+
+  RotateOnAxis(id: string) {
+    let axis = this.SceneUtilsService.axisGroup.find(item => item.id == Number.parseInt(id));
+    if (axis != undefined) {
+      axis.updateWorldMatrix(true, true);
+      let axisPos = new THREE.Vector3().setFromMatrixPosition(axis.matrixWorld);
+      let direction: THREE.Vector3 = (axis as THREE.Line).userData['direction'];
+      let dir = direction.clone();
+      let q = new THREE.Quaternion().setFromRotationMatrix(axis.matrixWorld);
+      dir.applyQuaternion(q);
+      dir.normalize();
+      console.log(q, dir);
+      let rot = dir.clone().multiplyScalar(this.rotAngle * Math.PI / 180);
+      console.log(rot);
+      this.SceneUtilsService.selected.forEach(item => {
+        item.updateMatrixWorld(true);
+        let pos = new THREE.Vector3().setFromMatrixPosition(item.matrixWorld);
+        let diff = pos.clone().sub(axisPos!);
+        diff.applyAxisAngle(dir, this.rotAngle * Math.PI / 180);
+        diff.add(axisPos!);
+        item.position.set(diff.x, diff.y, diff.z);
+        item.rotateOnWorldAxis(dir, this.rotAngle * Math.PI / 180)
+        //how to rotate around axis
+      })
+    }
+  }
+
 
   CancelClick(event: MouseEvent) {
     this.container.style.visibility = "hidden";

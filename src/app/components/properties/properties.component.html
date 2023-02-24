@@ -152,6 +152,41 @@
                 <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px">
             </button>
         </div>
+        <div class="line" *ngIf="axisParams">
+            <div class="param">
+                <div class="label">Позиция</div>
+                <div class="inputs">
+                    <input type="number" class="input-number" placeholder="X" [(ngModel)]="propertiesObject.position.x">
+                    <input type="number" class="input-number" placeholder="Y" [(ngModel)]="propertiesObject.position.y">
+                    <input type="number" class="input-number" placeholder="Z" [(ngModel)]="propertiesObject.position.z">
+                </div>
+            </div>
+        </div>
+        <div class="line" *ngIf="axisParams">
+            <div class="param">
+                <div class="label">Цель</div>
+                <div class="inputs">
+                    <div class="target-name">{{targetName}}</div>
+                </div>
+            </div>
+            <button class="button-icon" (click)="SelectTarget($event)">
+                <img src="../../../assets/cursor.png" alt="button-icon" width="19px" height="19px">
+            </button>
+        </div>
+        <div class="line" *ngIf="axisParams">
+            <div class="param">
+                <div class="label">Направление</div>
+                <div class="inputs">
+                    <input type="number" class="input-number" placeholder="X" [(ngModel)]="targetVec.x"
+                        (ngModelChange)="OnDirectionChange($event)">
+                    <input type="number" class="input-number" placeholder="Y" [(ngModel)]="targetVec.y"
+                        (ngModelChange)="OnDirectionChange($event)">
+                    <input type="number" class="input-number" placeholder="Z" [(ngModel)]="targetVec.z"
+                        (ngModelChange)="OnDirectionChange($event)">
+                </div>
+            </div>
+            <button class="button-icon" style="visibility: hidden;"></button>
+        </div>
         <div class="line" *ngIf="!camera && !cutPlane">
             <div class="param">
                 <div class="label">Видимость</div>
@@ -244,8 +279,11 @@
             </div>
         </div>
         <div class="controls" *ngIf="camera && !group">
-            <button class="button" (click)="OnCameraChange($event)">Сохранить позицию</button>
-            <button class="button" (click)="OnCameraRotation($event)">Анимация вращения</button>
+            <button (click)="OnCameraChange($event)">Сохранить позицию</button>
+            <button (click)="OnCameraRotation($event)">Анимация вращения</button>
+        </div>
+        <div class="controls" *ngIf="propertiesObject.type=='Mesh' || propertiesObject.type=='Group'">
+            <button (click)="RotateOnAxis($event)">Вращать вокруг оси</button>
         </div>
         <div class="controls" *ngIf="AnimationService.selKeyframe.length!=0">
             <button class="delete" (click)="DeleteKeyframe($event)">Удалить ключевой
@@ -255,7 +293,7 @@
             <button class="delete" (click)="DeleteAction($event)">Удалить действие</button>
         </div>
         <div class="controls" *ngIf="propertiesObject.material!=undefined && !cutPlane">
-            <button class="material" (click)="editMaterial=!editMaterial">Изменить материал</button>
+            <button (click)="editMaterial=!editMaterial">Изменить материал</button>
         </div>
         <div *ngIf="editMaterial">
             <div class="line">

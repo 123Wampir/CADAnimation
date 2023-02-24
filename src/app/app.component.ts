@@ -344,9 +344,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     return window.innerWidth / window.innerHeight;
   }
   FindIntersection() {
-    this.raycaster.setFromCamera(this.pointer, this.SceneUtilsService.currentCamera);
+    this.raycaster.setFromCamera(this.pointer, this.SceneUtilsService.perspectiveCamera);
     // Рассчитывается какие объекты пересеклись с лучом
-    const intersects = this.raycaster.intersectObjects(this.mainObject.children);
+    let intersects = this.raycaster.intersectObjects(this.mainObject.children);
+    let axis = this.raycaster.intersectObjects(this.SceneUtilsService.axisGroup);
+    intersects.concat(axis);
     if (intersects.length != 0) {
       if (this.intersection != intersects[0].object) {
         if (this.intersection) {

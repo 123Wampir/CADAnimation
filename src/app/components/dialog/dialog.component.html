@@ -5,41 +5,71 @@
     <div class="form" [ngSwitch]="type">
         <div *ngSwitchCase="'CameraRotation'">
             <!--Лучше вывести в отдельный компонент-->
-            <div class="param">
-                <div class="param-label">
+            <div class="line">
+                <div class="param">
                     <div class="label">Начало анимации</div>
-                </div>
-                <div class="inputs">
-                    <input type="number" class="input-number" min="0" [max]="AnimationService.timeLine.duration"
-                        placeholder="Start time" [(ngModel)]="AnimationService.currentTime">
+                    <div class="inputs">
+                        <input type="number" class="input-number" min="0" [max]="AnimationService.timeLine.duration"
+                            placeholder="Start time" [(ngModel)]="AnimationService.currentTime">
+                    </div>
                 </div>
             </div>
-            <div class="param">
-                <div class="param-label">
+            <div class="line">
+                <div class="param">
                     <div class="label">Конец анимации</div>
-                </div>
-                <div class="inputs">
-                    <input type="number" class="input-number" [min]="AnimationService.currentTime"
-                        [max]="AnimationService.timeLine.duration" placeholder="End time" [(ngModel)]="endTime">
+                    <div class="inputs">
+                        <input type="number" class="input-number" [min]="AnimationService.currentTime"
+                            [max]="AnimationService.timeLine.duration" placeholder="End time" [(ngModel)]="endTime">
+                    </div>
                 </div>
             </div>
-            <div class="param">
-                <div class="param-label">
+            <div class="line">
+                <div class="param">
                     <div class="label">Угол</div>
-                </div>
-                <div class="inputs">
-                    <input type="number" class="input-number" placeholder="Angle" [(ngModel)]="rotAngle">
+                    <div class="inputs">
+                        <input type="number" class="input-number" placeholder="Angle" [(ngModel)]="rotAngle">
+                    </div>
                 </div>
             </div>
-            <div class="param">
-                <div class="param-label">
+            <div class="line">
+                <div class="param">
                     <div class="label">По часовой</div>
-                </div>
-                <div class="inputs">
-                    <input type="checkbox" class="input-number" placeholder="direction" [(ngModel)]="rotDirection">
+                    <div class="inputs">
+                        <input type="checkbox" class="input-number" placeholder="direction" [(ngModel)]="rotDirection">
+                    </div>
                 </div>
             </div>
             <button (click)="OnCameraRotationCreate($event)">Создать</button>
+        </div>
+        <div *ngSwitchCase="'RotateOnAxis'">
+            <div class="line">
+                <div class="param">
+                    <div class="label">Ось</div>
+                    <div class="inputs">
+                        <select #selectAxis id="axis">
+                            <option *ngFor="let item of SceneUtilsService.axisGroup" [value]="item.id">
+                                {{item.name}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">Угол</div>
+                    <div class="inputs">
+                        <input type="number" class="input-number" (ngModelChange)="RotateOnAxis(selectAxis.value)"
+                            placeholder="Angle" [(ngModel)]="rotAngle">
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">По часовой</div>
+                    <div class="inputs">
+                        <input type="checkbox" class="input-number" placeholder="direction" [(ngModel)]="rotDirection">
+                    </div>
+                </div>
+            </div>
         </div>
         <div *ngSwitchCase="'Settings'"></div>
         <div *ngSwitchCase="'Render'"></div>

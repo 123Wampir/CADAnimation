@@ -27,6 +27,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
   cutPlane = false;
   annotation = false;
   annotationTarget = false;
+  axisParams = false;
   targetName = "";
   targetVec = new THREE.Vector3(0);
   shadowWidth = 5;
@@ -61,6 +62,8 @@ export class PropertiesComponent implements OnInit, OnChanges {
           this.annotation = false;
           this.annotationTarget = false;
           this.targetName = "None";
+
+          this.axisParams = false;
 
           this.editMaterial = false;
 
@@ -98,6 +101,12 @@ export class PropertiesComponent implements OnInit, OnChanges {
               this.opacityParam = false;
             }
           }
+          else if (this.propertiesObject.type == "Axis") {
+            this.posParam = false;
+            this.rotParam = false;
+            this.opacityParam = false;
+            this.axisParams = true;
+          }
           else if (this.propertiesObject.type == "Annotation") {
             this.annotation = true;
             this.rotParam = false;
@@ -134,7 +143,8 @@ export class PropertiesComponent implements OnInit, OnChanges {
       }
     }
     if (changes["transformed"] != undefined) {
-      this.OnPositionChange(new Event(""));
+      if (!this.axisParams)
+        this.OnPositionChange(new Event(""));
     }
     if (changes["curTime"] != undefined) {
       if (this.propertiesObject != undefined) {
@@ -193,9 +203,19 @@ export class PropertiesComponent implements OnInit, OnChanges {
   }
   SelectTarget(event: Event) {
     this.SceneUtilsService.selectReturn = true;
+    this.SceneUtilsService.selectTarget = this.propertiesObject.type;
   }
   OnTargetChange(event: Event) {
     (this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"] = this.targetVec;
+  }
+  OnDirectionChange(event: Event) {
+    let points = [];
+    points.push(new THREE.Vector3(0));
+    let dir = this.targetVec.clone().normalize();
+    (this.SceneUtilsService.selected[0] as THREE.Line).userData["direction"] = dir;
+    points.push(dir.clone().multiplyScalar(500));
+    (this.SceneUtilsService.selected[0] as THREE.Line).geometry.setFromPoints(points);
+    (this.SceneUtilsService.selected[0] as THREE.Line).geometry.attributes['position'].needsUpdate = true;
   }
   OnPositionChange(event: Event) {
     this.AnimationCreatorService.OnPositionChange(this.propertiesObject);
@@ -246,6 +266,10 @@ export class PropertiesComponent implements OnInit, OnChanges {
   OnCameraRotation($event: MouseEvent) {
     this.SceneUtilsService.currentCamera.lookAt(this.SceneUtilsService.scene.position);
     this.AnimationService.dialogType = "CameraRotation";
+    this.AnimationService.dialogShow = true;
+  }
+  RotateOnAxis($event: Event) {
+    this.AnimationService.dialogType = "RotateOnAxis";
     this.AnimationService.dialogShow = true;
   }
   OnShadowCameraChange(event: Event) {

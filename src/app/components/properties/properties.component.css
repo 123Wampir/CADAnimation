@@ -45,19 +45,6 @@ button {
     margin: 2px 0;
 }
 
-.param {
-    display: grid;
-    width: 100%;
-    grid-template-columns: 35% 65%;
-    align-items: center;
-}
-
-.inputs {
-    display: grid;
-    width: 100%;
-    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-}
-
 .save-param {
     padding: 0;
     width: 25px;

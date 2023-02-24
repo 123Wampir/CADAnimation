@@ -28,6 +28,7 @@ export class SceneUtilsService {
 
   lightGroup!: THREE.Group;
   annotationGroup!: THREE.Group;
+  axisGroup: THREE.Line[] = [];
 
   planes: THREE.Plane[] = [];
   planeHelpers = new THREE.Group();
@@ -38,6 +39,7 @@ export class SceneUtilsService {
 
   selected: THREE.Object3D[] = [];
   selectReturn: boolean = false;
+  selectTarget: string = "";
   selectionChange: boolean = false;
   transform!: TransformControls;
   group: THREE.Mesh = new THREE.Mesh();
@@ -310,7 +312,14 @@ export class SceneUtilsService {
   }
   Select(obj: any, CTRLPressed: boolean) {
     if (this.selectReturn) {
-      (this.selected[0].children[0] as THREE.Line).geometry.userData["target"] = obj;
+      switch (this.selectTarget) {
+        case "Annotation":
+          (this.selected[0].children[0] as THREE.Line).geometry.userData["target"] = obj;
+          break;
+        case "Axis":
+          obj.attach(this.selected[0]);
+          break;
+      }
       this.selectionChange = !this.selectionChange;
       this.selectReturn = false;
       return obj;
@@ -347,8 +356,10 @@ export class SceneUtilsService {
       this.selected.push(obj);
       this.transform.detach();
     }
-    else if (obj.type == "Container") {
-      // this.selected.push(obj);
+    else if (obj.type == "Axis") {
+      this.selected = [];
+      this.selected.push(obj);
+      this.transform.attach(obj);
     }
     else if (obj.type == "PlaneHelper") {
       this.selected = [];

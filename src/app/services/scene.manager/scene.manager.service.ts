@@ -85,6 +85,19 @@ export class SceneManagerService {
     return annotation;
   }
 
+  AddAxis(): THREE.Line {
+    let pt = [new THREE.Vector3(0), new THREE.Vector3(0, 0, 10)];
+    let geom = new THREE.BufferGeometry().setFromPoints(pt);
+    let mat = new THREE.LineBasicMaterial({ color: 0x0000FF });
+    let line = new THREE.Line(geom, mat);
+    this.SceneUtilsService.scene.add(line);
+    this.SceneUtilsService.axisGroup.push(line);
+    line.name = `Axis_${this.SceneUtilsService.axisGroup.length}`
+    line.type = "Axis";
+    this.SceneUtilsService.Select(line, false);
+    return line
+  }
+
   DeleteObject(obj: any) {
     if (obj != undefined) {
       if (obj.type.includes("Light")) {
