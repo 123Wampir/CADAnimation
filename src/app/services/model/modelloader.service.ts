@@ -102,8 +102,8 @@ export class ModelloaderService {
         }
         let mesh = new THREE.Mesh(geom, mat);
         if (res.meshes[data.meshes[j]].name != "")
-          mesh.name = res.meshes[data.meshes[j]].name;
-        else mesh.name = `Mesh_${i}`;
+          mesh.name = res.meshes[data.meshes[j]].name + `${mesh.id}`;
+        else mesh.name = `Mesh_${mesh.id}`;
         obj.add(mesh);
       }
     }

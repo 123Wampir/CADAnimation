@@ -239,6 +239,7 @@ export class SceneUtilsService {
     for (let i = 0; i < 3; i++) {
       let stencil = this.createPlaneStencilGroup(mergedGeom, this.planes[i], i + 1);
       let po = new THREE.Mesh(planeGeom, planeMat);
+      po.layers.set(1);
       po.onAfterRender = function (render) {
         render.clearStencil();
       };

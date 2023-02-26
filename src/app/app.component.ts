@@ -9,7 +9,8 @@ import { degToRad } from 'three/src/math/MathUtils';
 import { ModelloaderService } from './services/model/modelloader.service';
 import { SceneUtilsService } from './services/utils/scene.utils.service';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
-import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
+import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
+import { Reflector } from './shared/Reflector/Reflector';
 import { SceneManagerService } from './services/scene.manager/scene.manager.service';
 
 
@@ -49,7 +50,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.scene = new THREE.Scene();
     this.SceneUtilsService.scene = this.scene;
     // Добавление и настройка камеры
-    this.SceneUtilsService.perspectiveCamera = new THREE.PerspectiveCamera(45, this.getAspectRatio(), 1.0, 100000.0);
+    this.SceneUtilsService.perspectiveCamera = new THREE.PerspectiveCamera(45, this.getAspectRatio(), 1.0, 50000.0);
+    this.SceneUtilsService.perspectiveCamera.layers.enable(1);
     this.SceneUtilsService.perspectiveCamera.name = "Camera";
     this.SceneUtilsService.perspectiveCamera.position.set(50.0, 150.0, 100.0);
     this.SceneUtilsService.perspectiveCamera.up.set(0.0, 0.0, 1.0);
@@ -62,6 +64,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.SceneUtilsService.frustumSize * aspect / 2,
       this.SceneUtilsService.frustumSize / 2,
       this.SceneUtilsService.frustumSize / - 2, 0, 100000.0);
+    this.SceneUtilsService.orthographicCamera.layers.enable(1);
     (this.SceneUtilsService.orthographicCamera.type as any) = "Ignore";
     this.scene.add(this.SceneUtilsService.orthographicCamera);
 
@@ -97,6 +100,19 @@ export class AppComponent implements OnInit, AfterViewInit {
     plane.add(planeHelper.rotateX(degToRad(90)));
     planeHelper.visible = false;
     plane.receiveShadow = true;
+    let mirror = new Reflector(planeGeometry, {
+      clipBias: 0.003,
+      textureWidth: window.innerWidth * window.devicePixelRatio,
+      textureHeight: window.innerHeight * window.devicePixelRatio,
+      color: 0xb5b5b5,
+    });
+    // mirror.getRenderTarget().depthBuffer = true;
+    // mirror.getRenderTarget().depthTexture = new THREE.DepthTexture(512, 512, THREE.UnsignedShortType);
+    // (mirror.material as THREE.ShaderMaterial).transparent = true;
+    console.log((mirror.material as THREE.ShaderMaterial));
+    // mirror.camera.far = 500;
+    mirror.camera.layers.set(0);
+    plane.add(mirror);
     this.scene.add(plane);
     this.SceneUtilsService.zeroPlane = plane;
     this.SceneUtilsService.planeHelpers.name = "CuttingPlanes";
@@ -344,7 +360,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     return window.innerWidth / window.innerHeight;
   }
   FindIntersection() {
-    this.raycaster.setFromCamera(this.pointer, this.SceneUtilsService.perspectiveCamera);
+    this.raycaster.setFromCamera(this.pointer, this.SceneUtilsService.currentCamera);
     // Рассчитывается какие объекты пересеклись с лучом
     let intersects = this.raycaster.intersectObjects(this.mainObject.children);
     let axis = this.raycaster.intersectObjects(this.SceneUtilsService.axisGroup);
