@@ -154,6 +154,10 @@
             <input class="checkbox" (change)="SetZeroPlaneGrid($event)" type="checkbox" id="ground">
             <label for="ground"><img src="../../../assets/grid.png" width="19px" height="19px"></label>
         </div>
+        <div class="toolbar-tool">
+            <input class="checkbox" (change)="SetReflection($event)" type="checkbox" id="reflection">
+            <label for="reflection"><img src="../../../assets/reflection.png" width="19px" height="19px"></label>
+        </div>
         <div class="vert-separator"></div>
         <div class="toolbar-tool"
             [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.model!=undefined && SceneUtilsService.model.children.length!=0)">

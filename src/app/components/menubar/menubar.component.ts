@@ -26,6 +26,10 @@ export class MenubarComponent {
     let e = event?.target as any;
     this.SceneUtilsService.zeroPlane.children[0].visible = e.checked;
   }
+  SetReflection(event: Event) {
+    let e = event?.target as any;
+    this.SceneUtilsService.zeroPlane.children[1].visible = e.checked;
+  }
   OnSceneColorChange(event: Event) {
     let e = event as any;
     this.SceneUtilsService.renderer.setClearColor(e.target.value);

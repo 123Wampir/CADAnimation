@@ -104,13 +104,9 @@ export class AppComponent implements OnInit, AfterViewInit {
       clipBias: 0.003,
       textureWidth: window.innerWidth * window.devicePixelRatio,
       textureHeight: window.innerHeight * window.devicePixelRatio,
-      color: 0xb5b5b5,
+      color: 0xb5b5b5
     });
-    // mirror.getRenderTarget().depthBuffer = true;
-    // mirror.getRenderTarget().depthTexture = new THREE.DepthTexture(512, 512, THREE.UnsignedShortType);
-    // (mirror.material as THREE.ShaderMaterial).transparent = true;
-    console.log((mirror.material as THREE.ShaderMaterial));
-    // mirror.camera.far = 500;
+    mirror.position.z = -0.05;
     mirror.camera.layers.set(0);
     plane.add(mirror);
     this.scene.add(plane);
