@@ -6,6 +6,11 @@
     "types": [
       "node"
     ],
+    "paths": {
+      "crypto": [
+        "node_modules/crypto-browserify"
+      ]
+    },
     "baseUrl": ".",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
