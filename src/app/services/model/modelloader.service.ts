@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import THREE = require('three');
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { SceneUtilsService } from '../utils/scene.utils.service';
-let occtimportjs = require("occt-import-js/dist/occt-import-js.js")();
+let occtimportjs = require("occt-import/occt-import-js.js")();
 
 @Injectable({
   providedIn: 'root'
