@@ -28,6 +28,7 @@
     "occt-import-js": "^0.0.15",
     "path": "^0.12.7",
     "rxjs": "~7.5.0",
+    "stream-browserify": "^3.0.0",
     "three": "^0.144.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
