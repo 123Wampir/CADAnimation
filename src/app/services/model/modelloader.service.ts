@@ -2,13 +2,15 @@ import { Injectable } from '@angular/core';
 import THREE = require('three');
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { SceneUtilsService } from '../utils/scene.utils.service';
-let occtimportjs = require("occt-import/occt-import-js.js")();
+let occtimportjs = require("occt-import/occt-import-js.js");
 
 @Injectable({
   providedIn: 'root'
 })
 export class ModelloaderService {
 
+  occt: any = undefined;
+  wasmUrl = 'https://cdn.jsdelivr.net/npm/occt-import-js@0.0.15/dist/occt-import-js.wasm';
   constructor(public AnimationService: SceneUtilsService) { }
 
   async LoadModel(url: string, fileName: string, obj: THREE.Object3D): Promise<boolean> {
@@ -35,47 +37,53 @@ export class ModelloaderService {
     else return false;
   }
 
+  async InitOCCT() {
+    console.log(this.occt);
+    if (this.occt == undefined)
+      this.occt = await occtimportjs({
+        locateFile: (name: any) => {
+          return this.wasmUrl;
+        }
+      })
+  }
+
   async LoadStepModel(url: string, obj: THREE.Object3D) {
     this.AnimationService.ClearScene();
-    await occtimportjs.then(async (occt: any) => {
-      let response = await fetch(url);
-      let buffer = await response.arrayBuffer();
-      let fileBuffer = new Uint8Array(buffer);
-      let result = occt.ReadStepFile(fileBuffer, null);
-      console.log(result);
-      let stp = this.CreateModel(result, result.root);
-      obj.add(stp);
-      console.log(obj);
+    await this.InitOCCT();
+    let response = await fetch(url);
+    let buffer = await response.arrayBuffer();
+    let fileBuffer = new Uint8Array(buffer);
+    let result = this.occt.ReadStepFile(fileBuffer, null);
+    console.log(result);
+    let stp = this.CreateModel(result, result.root);
+    obj.add(stp);
+    console.log(obj);
 
-    });
   }
   async LoadIgesModel(url: string, obj: THREE.Object3D) {
     this.AnimationService.ClearScene();
-    await occtimportjs.then(async (occt: any) => {
-      let response = await fetch(url);
-      let buffer = await response.arrayBuffer();
-      let fileBuffer = new Uint8Array(buffer);
-      let result = occt.ReadIgesFile(fileBuffer, null);
-      console.log(result);
-      let iges = this.CreateModel(result, result.root);
-      obj.add(iges);
-      console.log(obj);
+    this.InitOCCT();
+    let response = await fetch(url);
+    let buffer = await response.arrayBuffer();
+    let fileBuffer = new Uint8Array(buffer);
+    let result = this.occt.ReadIgesFile(fileBuffer, null);
+    console.log(result);
+    let iges = this.CreateModel(result, result.root);
+    obj.add(iges);
+    console.log(obj);
 
-    });
   }
   async LoadBrepModel(url: string, obj: THREE.Object3D) {
     this.AnimationService.ClearScene();
-    await occtimportjs.then(async (occt: any) => {
-      let response = await fetch(url);
-      let buffer = await response.arrayBuffer();
-      let fileBuffer = new Uint8Array(buffer);
-      let result = occt.ReadBrepFile(fileBuffer, null);
-      console.log(result);
-      let brep = this.CreateModel(result, result.root);
-      obj.add(brep);
-      console.log(obj);
-
-    });
+    this.InitOCCT();
+    let response = await fetch(url);
+    let buffer = await response.arrayBuffer();
+    let fileBuffer = new Uint8Array(buffer);
+    let result = this.occt.ReadBrepFile(fileBuffer, null);
+    console.log(result);
+    let brep = this.CreateModel(result, result.root);
+    obj.add(brep);
+    console.log(obj);
   }
   CreateModel(res: any, data: any, i = 0, root?: THREE.Object3D): THREE.Object3D {
     i++;
