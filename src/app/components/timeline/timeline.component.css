@@ -130,6 +130,18 @@
     color: black;
 }
 
+.PlaneX {
+    background-color: lightsalmon;
+}
+
+.PlaneY {
+    background-color: lightgreen;
+}
+
+.PlaneZ {
+    background-color: lightskyblue;
+}
+
 .Annotation {
     background-color: lightcoral;
     color: black;

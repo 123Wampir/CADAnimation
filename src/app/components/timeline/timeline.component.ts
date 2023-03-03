@@ -269,7 +269,7 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     if (this.onTimeLineExpand) {
       this.renderer.removeClass(event.target, "expand-first");
       this.renderer.addClass(event.target, "expand-second");
-      container!.style.height = "40px";
+      container!.style.height = "34px";
       this.onTimeLineExpand = false;
     }
     else {

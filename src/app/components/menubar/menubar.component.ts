@@ -74,6 +74,20 @@ export class MenubarComponent {
         document.body.style.setProperty('--text-color', 'ghostwhite');
         document.body.style.setProperty('--invert', '1');
         break;
+      case 2:
+        document.body.style.setProperty('--main-color', '#fb5');
+        document.body.style.setProperty('--second-color', '#b85');
+        document.body.style.setProperty('--third-color', '#ec7');
+        document.body.style.setProperty('--text-color', 'black');
+        document.body.style.setProperty('--invert', '0');
+        break;
+      case 3:
+        document.body.style.setProperty('--main-color', '#1a1a1d');
+        document.body.style.setProperty('--second-color', '#6f2232');
+        document.body.style.setProperty('--third-color', '#6a2232');
+        document.body.style.setProperty('--text-color', '#cc073f');
+        document.body.style.setProperty('--invert', '1');
+        break;
     }
   }
 }

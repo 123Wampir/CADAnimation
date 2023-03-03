@@ -25,8 +25,10 @@
                         <div class="menu-name">Edit</div>
                     </label>
                     <div class="container menu-items">
-                        <div class="basic-line">Вид спереди</div>
-                        <div class="basic-line">Вид сверху</div>
+                        <div class="basic-line">Отменить</div>
+                        <div class="basic-line">Вернуть</div>
+                        <div class="basic-line">Копировать</div>
+                        <div class="basic-line">Вставить</div>
                     </div>
                 </div>
                 <div class="menu-line">
@@ -34,8 +36,19 @@
                         <div class="menu-name">View</div>
                     </label>
                     <div class="container menu-items">
-                        <div class="basic-line">Вид спереди</div>
-                        <div class="basic-line">Вид сверху</div>
+                        <div class="basic-line" (click)="SceneUtilsService.ViewcubeComponent.setView(0,1,0)">Вид спереди
+                        </div>
+                        <div class="basic-line" (click)="SceneUtilsService.ViewcubeComponent.setView(0,-1,0)">Вид сзади
+                        </div>
+                        <div class="basic-line" (click)="SceneUtilsService.ViewcubeComponent.setView(1,0,0)">Вид слева
+                        </div>
+                        <div class="basic-line" (click)="SceneUtilsService.ViewcubeComponent.setView(-1,0,0)">Вид справа
+                        </div>
+                        <div class="basic-line" (click)="SceneUtilsService.ViewcubeComponent.setView(0,0,1)">Вид сверху
+                        </div>
+                        <div class="basic-line" (click)="SceneUtilsService.ViewcubeComponent.setView(0,0,-1)">Вид снизу
+                        </div>
+                        <div class="hor-separator"></div>
                         <div class="menu-line">
                             <label class="menu-label">
                                 <div class="menu-name">Внешний вид</div>
@@ -51,7 +64,14 @@
                                     <input name="theme" type="radio" id="dark" class="radio" (click)="SetTheme(1)">
                                     <label class="radio-name" for="dark">Темная</label>
                                 </div>
-                                <div class="basic-line">Spot Light</div>
+                                <div class="radio-line">
+                                    <input name="theme" type="radio" id="orange" class="radio" (click)="SetTheme(2)">
+                                    <label class="radio-name" for="orange">Оранжевая</label>
+                                </div>
+                                <div class="radio-line">
+                                    <input name="theme" type="radio" id="red&black" class="radio" (click)="SetTheme(3)">
+                                    <label class="radio-name" for="red&black">Киберпанк</label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -109,7 +129,7 @@
                                 <div class="basic-line">Удалить</div>
                             </div>
                         </div>
-                        
+
                     </div>
                 </div>
                 <div class="menu-line">
@@ -117,10 +137,11 @@
                         <div class="menu-name">Animation</div>
                     </label>
                     <div class="container menu-items">
-                        <div class="basic-line" (click)="NewProject()">Очистить</div>
-                        <label class="basic-line" for="fileUpload">
-                            <input class="file" type="file" name="file" id="fileUpload"
-                                accept=".step,.stp,.gltf,.brep,.igs" (change)="SceneUtilsService.LoadModelFile($event)">
+                        <div class="basic-line" (click)="AnimationService.ClearAnimation()">Очистить</div>
+                        <label class="basic-line" for="animUpload"
+                            [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.model!=undefined && SceneUtilsService.model.children.length!=0)">
+                            <input class="file" type="file" name="file" id="animUpload" accept=".xml"
+                                (change)="AnimationService.LoadAnimationFile($event)">
                             Открыть
                         </label>
                         <div class="basic-line"

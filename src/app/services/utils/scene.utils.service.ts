@@ -10,6 +10,7 @@ import { AppComponent } from 'src/app/app.component';
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { SceneManagerService } from '../scene.manager/scene.manager.service';
 import { ContextmenuComponent } from 'src/app/components/contextmenu/contextmenu.component';
+import { ViewcubeComponent } from 'src/app/components/viewcube/viewcube.component';
 
 @Injectable({
   providedIn: 'root'
@@ -64,6 +65,7 @@ export class SceneUtilsService {
   ModelloaderService!: ModelloaderService;
   AppComponent!: AppComponent;
   ContextmenuComponent!: ContextmenuComponent;
+  ViewcubeComponent!:ViewcubeComponent;
 
   CTRLPressed: boolean = false;
   SHIFTPressed: boolean = false;

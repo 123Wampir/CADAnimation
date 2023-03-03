@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { SceneUtilsService } from 'src/app/services/utils/scene.utils.service';
 import THREE = require('three');
 
@@ -7,7 +7,7 @@ import THREE = require('three');
   templateUrl: './viewcube.component.html',
   styleUrls: ['./viewcube.component.css']
 })
-export class ViewcubeComponent implements OnInit, AfterViewChecked {
+export class ViewcubeComponent implements AfterViewInit, AfterViewChecked {
   line = new THREE.Line();
   contextMenu = false;
   posX = 0;
@@ -25,7 +25,8 @@ export class ViewcubeComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
+    this.SceneUtilsService.ViewcubeComponent = this;
   }
 
   setView(x: number, y: number, z: number) {
