@@ -533,8 +533,6 @@ export class AnimationService {
                     }
                     // Добавление анимации прозрачности в миксер детали
                     if (transparancy) {
-                      (mesh as any).material.transparent = true;
-                      (mesh as any).material.needsUpdate = true;
                       let track = this.timeLine.tracks.find(track => track.object == mesh);
                       let action = AnimationModel.FindActionByType(track!, ".material.opacity");
                       if (action == undefined) {

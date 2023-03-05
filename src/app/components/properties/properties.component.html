@@ -86,14 +86,10 @@
             <div class="param">
                 <div class="label">Прозрачность</div>
                 <div class="inputs">
-                    <input type="checkbox" [(ngModel)]="propertiesObject.material.transparent"
-                        (change)="SetTransparancy($event)" class="input-checkbox">
-                    <input [ngStyle]="SceneUtilsService.SetDisableStyle(propertiesObject.material.transparent)"
-                        type="range" min="0" max="1" step="0.01" class="input-range"
+                    <input type="range" min="0" max="1" step="0.01" class="input-range"
                         [(ngModel)]="propertiesObject.material.opacity" placeholder="0"
                         (change)="OnOpacityChange($event)">
-                    <input [ngStyle]="SceneUtilsService.SetDisableStyle(propertiesObject.material.transparent)"
-                        type="number" class="input-number" min="0" step="0.01" max="1" placeholder="opacity"
+                    <input type="number" class="input-number" min="0" step="0.01" max="1" placeholder="opacity"
                         [(ngModel)]="propertiesObject.material.opacity" (change)="OnOpacityChange($event)">
                 </div>
             </div>

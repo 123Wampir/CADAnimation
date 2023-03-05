@@ -239,15 +239,15 @@ export class SceneUtilsService {
         clipIntersection: true
       });
     for (let i = 0; i < 3; i++) {
-      let stencil = this.createPlaneStencilGroup(mergedGeom, this.planes[i], i + 1);
-      let po = new THREE.Mesh(planeGeom, planeMat);
-      po.layers.set(1);
-      po.onAfterRender = function (render) {
-        render.clearStencil();
-      };
-      po.renderOrder = i + 2;
-      this.stencilGroups.add(stencil);
-      this.planeHelpers.children[i].add(po);
+      // let stencil = this.createPlaneStencilGroup(mergedGeom, this.planes[i], i + 1);
+      // let po = new THREE.Mesh(planeGeom, planeMat);
+      // po.layers.set(1);
+      // po.onAfterRender = function (render) {
+      //   render.clearStencil();
+      // };
+      // po.renderOrder = i + 2;
+      // this.stencilGroups.add(stencil);
+      // this.planeHelpers.children[i].add(po);
     }
     mergedGeom.dispose();
     planeGeom.dispose();

@@ -168,13 +168,13 @@ export class AppComponent implements OnInit, AfterViewInit {
     (function animate() {
       if (component.mainObject != undefined) {
         component.FindIntersection();
-        if (component.SceneUtilsService.stencilNeedUpdate && component.renderer.localClippingEnabled)
-          if (component.meshArr.length != 0) {
-            for (let i = 0; i < component.SceneUtilsService.stencilGroups.children.length; i++) {
-              component.SceneUtilsService.UpdateStencilGeometry(component.meshArr, component.SceneUtilsService.stencilGroups.children[i])
-            }
-            component.SceneUtilsService.stencilNeedUpdate = false;
-          }
+        // if (component.SceneUtilsService.stencilNeedUpdate && component.renderer.localClippingEnabled)
+        //   if (component.meshArr.length != 0) {
+        //     for (let i = 0; i < component.SceneUtilsService.stencilGroups.children.length; i++) {
+        //       component.SceneUtilsService.UpdateStencilGeometry(component.meshArr, component.SceneUtilsService.stencilGroups.children[i])
+        //     }
+        //     component.SceneUtilsService.stencilNeedUpdate = false;
+        //   }
       }
       requestAnimationFrame(animate);
       //component.renderer.shadowMap.needsUpdate = true;
@@ -334,12 +334,30 @@ export class AppComponent implements OnInit, AfterViewInit {
         if (mesh.geometry.hasAttribute('color')) {
           mesh.material.vertexColors = true;
         }
-        mesh.material.side = THREE.FrontSide;
-        //mesh.material.transparent = true;
+        mesh.material.side = THREE.DoubleSide;
         mesh.material.clipIntersection = true;
-        // mesh.material.wireframe = true;
+        mesh.material.forceSinglePass = true;
         mesh.receiveShadow = true;
         mesh.castShadow = true;
+        (mesh as THREE.Mesh).onBeforeRender = function (renderer, scene, camera, geometry, material) {
+          if (material.opacity != 1)
+            material.transparent = true;
+          else material.transparent = false;
+        }
+        mesh.material.onBeforeCompile = function (shader: any) {
+          shader.fragmentShader = shader.fragmentShader.replace(
+            `#include <output_fragment>`,
+            `#ifdef OPAQUE
+               diffuseColor.a = 1.0;
+               #endif
+               // https://github.com/mrdoob/three.js/pull/22425
+               #ifdef USE_TRANSMISSION
+               diffuseColor.a *= material.transmissionAlpha + 0.1;
+               #endif
+               gl_FragColor = ( gl_FrontFacing ) ? vec4( outgoingLight, opacity ) : vec4(diffuse*0.2, 1.0 );
+              `
+          );
+        };
       })
     }
   }
