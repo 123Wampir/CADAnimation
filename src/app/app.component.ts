@@ -335,6 +335,7 @@ export class AppComponent implements OnInit, AfterViewInit {
           mesh.material.vertexColors = true;
         }
         mesh.material.side = THREE.DoubleSide;
+        mesh.material.shadowSide = THREE.BackSide;
         mesh.material.clipIntersection = true;
         mesh.material.forceSinglePass = true;
         mesh.receiveShadow = true;
