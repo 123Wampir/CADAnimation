@@ -43,7 +43,7 @@ export class ViewcubeComponent implements AfterViewInit, AfterViewChecked {
       finishPosition = center.copy(offset.normalize().multiplyScalar(this.SceneUtilsService.boundingSphere.radius * 3));
     else finishPosition = center.copy(offset.normalize().multiplyScalar(this.SceneUtilsService.perspectiveCamera.position.length()));
     this.SceneUtilsService.perspectiveCamera.position.set(finishPosition.x, finishPosition.y, finishPosition.z);
-    this.SceneUtilsService.orbit.target.set(0, 0, 0);
+    this.SceneUtilsService.trackball.target.set(0, 0, 0);
     let rot = this.SceneUtilsService.perspectiveCamera.rotation.clone();
     // console.log(rot.x * 180 / Math.PI, rot.y * 180 / Math.PI, rot.z * 180 / Math.PI);
     // console.log(vec);

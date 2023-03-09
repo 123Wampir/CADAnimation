@@ -38,7 +38,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   intersection: any;
   pointer!: THREE.Vector2;
   raycaster!: THREE.Raycaster;
-  orbitControls!: TrackballControls;
+  trackballControls!: TrackballControls;
   transformControls!: TransformControls;
   meshArr: THREE.Mesh[] = [];
   counter = 0;
@@ -140,20 +140,20 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     this.effect = new OutlineEffect(this.renderer);
 
-    this.orbitControls = new TrackballControls(this.SceneUtilsService.currentCamera, this.renderer.domElement);
-    console.log(this.orbitControls);
-    this.orbitControls.rotateSpeed = 10;
-    this.orbitControls.panSpeed = 1.5;
-    this.orbitControls.staticMoving = true;
-    this.SceneUtilsService.orbit = this.orbitControls;
-    this.orbitControls.addEventListener('change', (event: any) => {
+    this.trackballControls = new TrackballControls(this.SceneUtilsService.currentCamera, this.renderer.domElement);
+    console.log(this.trackballControls);
+    this.trackballControls.rotateSpeed = 10;
+    this.trackballControls.panSpeed = 1.5;
+    this.trackballControls.staticMoving = true;
+    this.SceneUtilsService.trackball = this.trackballControls;
+    this.trackballControls.addEventListener('change', (event: any) => {
       this.firstClick = true;
     })
     this.transformControls = new TransformControls(this.SceneUtilsService.currentCamera, this.renderer.domElement);
     this.transformControls.type = "Ignore";
     this.transformControls.space = "local";
     this.transformControls.addEventListener('dragging-changed', (event) => {
-      this.orbitControls.enabled = !event["value"];
+      this.trackballControls.enabled = !event["value"];
     });
     this.transformControls.addEventListener('mouseUp', (event) => {
       this.firstClick = true;
@@ -179,7 +179,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       requestAnimationFrame(animate);
       //component.renderer.shadowMap.needsUpdate = true;
       component.SceneUtilsService.stats.update();
-      component.orbitControls.update()
+      component.trackballControls.update()
       if (component.AnimationService.play) {
         component.AnimationService.currentTime += component.delta;
         if (component.AnimationService.currentTime > component.AnimationService.timeLine.duration) {

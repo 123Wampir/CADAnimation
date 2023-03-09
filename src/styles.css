@@ -146,6 +146,10 @@ input[type="color"] {
     aspect-ratio: 1;
 }
 
+.no-filter {
+    filter: none;
+}
+
 ::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 20px;

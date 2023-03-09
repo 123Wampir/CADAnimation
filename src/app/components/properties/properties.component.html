@@ -11,10 +11,10 @@
             </button>
             <input type="text" *ngIf="rename" [(ngModel)]="propertiesObject.name">
             <button *ngIf="rename" class="button-icon" (click)="ApplyName()">
-                <img src="../../../assets/accept.png" alt="button-icon" width="19px" height="19px">
+                <img src="../../../assets/accept.png" class="no-filter" alt="button-icon" width="19px" height="19px">
             </button>
             <button *ngIf="rename" class="button-icon" (click)="DiscardName()">
-                <img src="../../../assets/cancel.png" alt="button-icon" width="19px" height="19px">
+                <img src="../../../assets/cancel.png" class="no-filter" alt="button-icon" width="19px" height="19px">
             </button>
         </div>
         <div class="editor">

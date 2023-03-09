@@ -55,7 +55,7 @@ export class SceneUtilsService {
   frustumSize = 150;
   zoom = 1;
   currentCamera!: THREE.Camera;
-  orbit!: TrackballControls;
+  trackball!: TrackballControls;
   renderScale: number = 1;
   stats!: Stats;
 
@@ -95,7 +95,7 @@ export class SceneUtilsService {
   CopyCameraPlacement() {
     this.orthographicCamera.position.set(this.perspectiveCamera.position.x, this.perspectiveCamera.position.y, this.perspectiveCamera.position.z);
     this.orthographicCamera.rotation.setFromQuaternion(this.perspectiveCamera.quaternion);
-    this.zoom = this.orbit.position0.length() / this.perspectiveCamera.position.length() / (2 * Math.atan(Math.PI * this.perspectiveCamera.fov / 360));
+    this.zoom = this.trackball.position0.length() / this.perspectiveCamera.position.length() / (2 * Math.atan(Math.PI * this.perspectiveCamera.fov / 360));
     this.zoom /= 1.2;
     this.orthographicCamera.zoom = this.zoom;
     this.orthographicCamera.updateProjectionMatrix();
