@@ -48,6 +48,8 @@ export class PropertiesComponent implements OnInit, OnChanges {
     if (changes["selected"] != undefined) {
       if (this.SceneUtilsService.selected.length != 0) {
         if (this.SceneUtilsService.selected.length == 1) {
+          this.rename = false;
+
           this.group = false;
           this.posParam = true;
           this.rotParam = true;
@@ -162,7 +164,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
     }
   }
 
-  Rename($event: Event) {
+  Rename() {
     this.rename = true;
     this.oldName = this.propertiesObject.name;
   }
