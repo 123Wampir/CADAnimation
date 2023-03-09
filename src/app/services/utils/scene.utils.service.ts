@@ -18,6 +18,7 @@ import { ViewcubeComponent } from 'src/app/components/viewcube/viewcube.componen
 export class SceneUtilsService {
 
   newFileLoading = false;
+  fileName = "";
   scene!: THREE.Scene;
   model!: THREE.Object3D;
   renderer!: THREE.WebGLRenderer;
@@ -65,7 +66,7 @@ export class SceneUtilsService {
   ModelloaderService!: ModelloaderService;
   AppComponent!: AppComponent;
   ContextmenuComponent!: ContextmenuComponent;
-  ViewcubeComponent!:ViewcubeComponent;
+  ViewcubeComponent!: ViewcubeComponent;
 
   CTRLPressed: boolean = false;
   SHIFTPressed: boolean = false;

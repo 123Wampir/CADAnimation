@@ -11,27 +11,31 @@ export class ModelloaderService {
 
   occt: any = undefined;
   wasmUrl = 'https://cdn.jsdelivr.net/npm/occt-import-js@0.0.15/dist/occt-import-js.wasm';
-  constructor(public AnimationService: SceneUtilsService) { }
+  constructor(public SceneUtilsService: SceneUtilsService) { }
 
   async LoadModel(url: string, fileName: string, obj: THREE.Object3D): Promise<boolean> {
     if (/(.(stp|STEP|step)$)/.test(fileName!)) {
       console.log(/(.(stp|STEP|step)$)/.exec(fileName!)![2]);
       await this.LoadStepModel(url, obj);
+      this.SceneUtilsService.fileName = fileName;
       return true;
     }
     else if (/(.(iges|igs)$)/.test(fileName!)) {
       console.log(/(.(iges|igs)$)/.exec(fileName!)![2]);
       await this.LoadIgesModel(url, obj);
+      this.SceneUtilsService.fileName = fileName;
       return true;
     }
     else if (/(.(brep|BREP|BRep|Brep)$)/.test(fileName!)) {
       console.log(/(.(brep|BREP|BRep|Brep)$)/.exec(fileName!)![2]);
       await this.LoadBrepModel(url, obj);
+      this.SceneUtilsService.fileName = fileName;
       return true;
     }
     else if (/(.(gltf|glb)$)/.test(fileName!)) {
       console.log(/(.(gltf|glb)$)/.exec(fileName!)![2]);
       await this.LoadGLTFModel(url, obj);
+      this.SceneUtilsService.fileName = fileName;
       return true;
     }
     else return false;
@@ -48,7 +52,7 @@ export class ModelloaderService {
   }
 
   async LoadStepModel(url: string, obj: THREE.Object3D) {
-    this.AnimationService.ClearScene();
+    this.SceneUtilsService.ClearScene();
     await this.InitOCCT();
     let response = await fetch(url);
     let buffer = await response.arrayBuffer();
@@ -61,7 +65,7 @@ export class ModelloaderService {
 
   }
   async LoadIgesModel(url: string, obj: THREE.Object3D) {
-    this.AnimationService.ClearScene();
+    this.SceneUtilsService.ClearScene();
     this.InitOCCT();
     let response = await fetch(url);
     let buffer = await response.arrayBuffer();
@@ -74,7 +78,7 @@ export class ModelloaderService {
 
   }
   async LoadBrepModel(url: string, obj: THREE.Object3D) {
-    this.AnimationService.ClearScene();
+    this.SceneUtilsService.ClearScene();
     this.InitOCCT();
     let response = await fetch(url);
     let buffer = await response.arrayBuffer();
@@ -145,7 +149,7 @@ export class ModelloaderService {
       }
     );
     if (gltf.scene.children.length != 0) {
-      this.AnimationService.ClearScene();
+      this.SceneUtilsService.ClearScene();
       // Добавление модели в контейнер
       obj.add(gltf.scene.children[0].clone());
       // Создание ребер для каждой детали модели
