@@ -38,6 +38,8 @@ export class PropertiesComponent implements OnInit, OnChanges {
   opacity = 1;
   hex = "";
   editMaterial = false;
+  rename = false;
+  oldName = "";
   constructor(public AnimationService: AnimationService, public AnimationCreatorService: AnimationCreatorService, public SceneUtilsService: SceneUtilsService) { }
 
   ngOnInit(): void {
@@ -158,6 +160,30 @@ export class PropertiesComponent implements OnInit, OnChanges {
         }
       }
     }
+  }
+
+  Rename($event: Event) {
+    this.rename = true;
+    this.oldName = this.propertiesObject.name;
+  }
+  ApplyName() {
+    let i = 0;
+    this.SceneUtilsService.selected.forEach(obj => {
+      this.AnimationService.timeLine.tracks.find(track => {
+        if (track.object == obj) {
+          if (i == 0)
+            this.SceneUtilsService.RenameObject(track, this.propertiesObject.name);
+          else this.SceneUtilsService.RenameObject(track, `${this.propertiesObject.name}_${i}`);
+          return true;
+        } else return false;
+      })
+      i++;
+    })
+    this.rename = false;
+  }
+  DiscardName() {
+    this.propertiesObject.name = this.oldName;
+    this.rename = false;
   }
 
   MatColorSet(event: Event) {

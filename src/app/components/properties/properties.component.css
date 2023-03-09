@@ -24,6 +24,11 @@
     padding: 2px 10px;
 }
 
+.name {
+    display: flex;
+    align-items: center;
+}
+
 .label {
     font-size: 0.8em;
     white-space: nowrap;

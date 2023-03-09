@@ -508,7 +508,6 @@ export class AnimationService {
               // Перебор деталей используемых в анимации
               parts.forEach((part: any) => {
                 let partMixer: any[] = [];
-                let edgeMixer: any[] = [];
                 // Поиск миксеров(дорожек) анимации
                 this.FindMixer(this.mixers, part, partMixer);
                 // this.FindMixer(this.edgeMixers, part, edgeMixer);

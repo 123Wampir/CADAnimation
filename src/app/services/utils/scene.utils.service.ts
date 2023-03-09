@@ -11,6 +11,7 @@ import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { SceneManagerService } from '../scene.manager/scene.manager.service';
 import { ContextmenuComponent } from 'src/app/components/contextmenu/contextmenu.component';
 import { ViewcubeComponent } from 'src/app/components/viewcube/viewcube.component';
+import * as AnimationModel from 'src/app/shared/animation.model';
 
 @Injectable({
   providedIn: 'root'
@@ -407,6 +408,22 @@ export class SceneUtilsService {
     this.selectionChange = !this.selectionChange;
   }
 
+  RenameObject(track: AnimationModel.KeyframeTrackModel, newName: string) {
+    if (newName.length != 0) {
+      this.AnimationService.timeLine.array?.find(item => {
+        if (item.name == track.name) {
+          item.name = newName;
+          return true;
+        } else return false
+      });
+      track.actions.forEach(action => {
+        action.keyframes[0].clip.name = newName;
+      })
+      track.object.name = newName;
+      track.name = newName;
+    }
+  }
+
   ClearScene() {
     if (this.model != undefined) {
       console.log(this.scene);
@@ -418,6 +435,7 @@ export class SceneUtilsService {
         }
       })
       this.model.clear();
+      this.fileName = "";
       this.startPos = [];
       this.AnimationService.ClearAnimation();
       this.planeHelpers.traverse(obj => {
