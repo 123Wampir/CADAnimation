@@ -195,7 +195,7 @@
             </div>
             <button class="button-icon" style="visibility: hidden;"></button>
         </div>
-        <div class="line" *ngIf="!camera && !cutPlane">
+        <div class="line" *ngIf="!camera && !cutPlane && propertiesObject.type!='Object3D'">
             <div class="param">
                 <div class="label">Видимость</div>
                 <div class="inputs">

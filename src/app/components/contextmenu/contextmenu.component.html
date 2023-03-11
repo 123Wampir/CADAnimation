@@ -19,7 +19,9 @@
         <div class="basic-line"
             [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.model.children.length!=0)"
             (click)="SceneUtilsService.AnimationService.ClearTrack(object)">Очистить дорожку</div>
-        <div class="basic-line" *ngIf="object.type=='Annotation' || object.type.includes('Light')"
+        <div class="basic-line" *ngIf="object.object.type!='Group' && object.type!='Camera' && object.type!='Plane'"
+            (click)="SelectReturn(object.object)">Переименовать</div>
+        <div class="basic-line" *ngIf="object.type=='Annotation' || object.type=='Light'"
             (click)="SceneUtilsService.SceneManagerService.DeleteObject(object.object)">Удалить</div>
     </div>
     <!-- <div *ngIf="type=='menubar-file'" class="menu-line">

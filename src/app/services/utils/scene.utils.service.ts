@@ -324,6 +324,11 @@ export class SceneUtilsService {
         case "Axis":
           obj.attach(this.selected[0]);
           break;
+        default:
+          this.ClearSelection();
+          this.selected.push(obj);
+          this.selectionChange = !this.selectionChange;
+          break;
       }
       this.selectionChange = !this.selectionChange;
       this.selectReturn = false;

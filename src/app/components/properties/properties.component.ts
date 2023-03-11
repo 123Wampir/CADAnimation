@@ -79,6 +79,12 @@ export class PropertiesComponent implements OnInit, OnChanges {
             this.camera = true;
             this.opacityParam = false;
           }
+          else if (this.propertiesObject.type == "Object3D") {
+            this.posParam = false;
+            this.rotParam = false;
+            this.opacityParam = false;
+            this.rename = true;
+          }
           else if (this.propertiesObject.type.includes("Light")) {
             this.light = true;
             this.opacityParam = false;

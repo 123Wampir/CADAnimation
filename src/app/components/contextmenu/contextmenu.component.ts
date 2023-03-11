@@ -31,4 +31,10 @@ export class ContextmenuComponent implements OnInit, AfterViewInit, AfterViewChe
   Click(event: MouseEvent) {
     this.component.contextMenu = false;
   }
+  SelectReturn(obj: any) {
+    this.SceneUtilsService.selectReturn = true;
+    this.SceneUtilsService.Select(obj, false);
+    console.log(this.SceneUtilsService.selected);
+    
+  }
 }
