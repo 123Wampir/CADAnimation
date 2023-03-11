@@ -83,6 +83,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
             this.posParam = false;
             this.rotParam = false;
             this.opacityParam = false;
+            this.oldName = this.propertiesObject.name;
             this.rename = true;
           }
           else if (this.propertiesObject.type.includes("Light")) {
