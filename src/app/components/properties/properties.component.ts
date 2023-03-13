@@ -30,6 +30,9 @@ export class PropertiesComponent implements OnInit, OnChanges {
   axisParams = false;
   targetName = "";
   targetVec = new THREE.Vector3(0);
+  targetSelect = false;
+  objectsSelect = false;
+  targetArray: THREE.Object3D[] = [];
   shadowWidth = 5;
   shadowHeight = 5;
   shadowDist = 300;
@@ -141,6 +144,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
           this.cutPlane = false;
           this.light = false;
           this.camera = false;
+          this.axisParams = false;
         }
       }
       else {
@@ -226,20 +230,59 @@ export class PropertiesComponent implements OnInit, OnChanges {
   OnTextSave(event: Event) {
     this.AnimationCreatorService.OnTextChange(this.propertiesObject);
   }
-  EnableAnnotationTarget(event: Event) {
-    if (this.annotationTarget) {
-      // this.posParam = false;
-    }
-    else {
-      // this.posParam = true;
-      this.SceneUtilsService.selectionChange = !this.SceneUtilsService.selectionChange;
-      (this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"] = new THREE.Vector3(0);
-    }
+  SelectTarget() {
+    this.SceneUtilsService.targetArray = this.targetArray;
+    this.SceneUtilsService.attachTransform = false;
+    this.targetSelect = true;
   }
-  SelectTarget(event: Event) {
-    this.SceneUtilsService.selectReturn = true;
-    this.SceneUtilsService.selectTarget = this.propertiesObject.type;
+  DiscardTargetSelect() {
+    this.targetSelect = false;
+    this.SceneUtilsService.attachTransform = true;
+    this.SceneUtilsService.targetArray = this.SceneUtilsService.selected;
   }
+  ApplyTargetSelect() {
+    this.targetSelect = false;
+    this.SceneUtilsService.attachTransform = true;
+    if (this.SceneUtilsService.targetArray.length != 0) {
+      switch (this.propertiesObject.type) {
+        case "Annotation":
+          (this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"] = this.SceneUtilsService.targetArray[0];
+          break;
+        case "Axis":
+          this.SceneUtilsService.targetArray[0].attach(this.propertiesObject);
+          // (this.SceneUtilsService.selected[0].children[0] as THREE.Line).userData["objects"] = this.SceneUtilsService.targetArray;
+          break;
+      }
+    }
+    this.SceneUtilsService.targetArray = this.SceneUtilsService.selected;
+    this.SceneUtilsService.selectionChange = !this.SceneUtilsService.selectionChange;
+  }
+  SelectObjects() {
+    this.SceneUtilsService.targetArray = this.targetArray;
+    this.SceneUtilsService.attachTransform = false;
+    this.objectsSelect = true;
+  }
+  DiscardObjectsSelect() {
+    this.objectsSelect = false;
+    this.SceneUtilsService.attachTransform = true;
+    this.SceneUtilsService.targetArray = this.SceneUtilsService.selected;
+  }
+  ApplyObjectsSelect() {
+    this.objectsSelect = false;
+    this.SceneUtilsService.attachTransform = true;
+    if (this.SceneUtilsService.targetArray.length != 0) {
+      switch (this.propertiesObject.type) {
+        case "Axis":
+          (this.propertiesObject as THREE.Line).userData["objects"] = this.SceneUtilsService.targetArray;
+          break;
+      }
+    }
+    console.log((this.propertiesObject as THREE.Line).userData["objects"]);
+    
+    this.SceneUtilsService.targetArray = this.SceneUtilsService.selected;
+    this.SceneUtilsService.selectionChange = !this.SceneUtilsService.selectionChange;
+  }
+
   OnTargetChange(event: Event) {
     (this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"] = this.targetVec;
   }

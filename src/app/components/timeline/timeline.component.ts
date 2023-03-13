@@ -144,7 +144,7 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     console.log(id);
     let item = this.AnimationService.timeLine.tracks.find(track => track.id == id)!.object;
     console.log(item);
-    this.SceneUtilsService.Select(item, this.SceneUtilsService.CTRLPressed);
+    this.SceneUtilsService.Select(this.SceneUtilsService.targetArray, item, this.SceneUtilsService.CTRLPressed);
   }
   ShowLine(show: boolean) {
     if (show)
@@ -247,7 +247,7 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
       this.AnimationService.selKeyframe.push(keyframe);
       this.AnimationService.ignore = true;
       // this.AnimationService.selectedKeyframe = keyframe;
-      this.SceneUtilsService.Select(keyframe.action.trackDOM.object, false);
+      this.SceneUtilsService.Select(this.SceneUtilsService.targetArray, keyframe.action.trackDOM.object, false);
       this.AnimationService.currentTime = keyframe.time;
       this.AnimationService.currentTimeChange = true;
     }

@@ -41,12 +41,12 @@ export class SceneUtilsService {
   stencilNeedUpdate: boolean = false;
 
   selected: THREE.Object3D[] = [];
-  selectReturn: boolean = false;
-  selectTarget: string = "";
+  targetArray: THREE.Object3D[] = this.selected;
   selectionChange: boolean = false;
-  transform!: TransformControls;
-  group: THREE.Mesh = new THREE.Mesh();
   transformChange: boolean = false;
+  transform!: TransformControls;
+  attachTransform = true;
+  group: THREE.Mesh = new THREE.Mesh();
   startPos: THREE.Vector3[] = [];
 
   orthographic = false;
@@ -302,115 +302,113 @@ export class SceneUtilsService {
     this.zeroPlane.position.set(this.zeroPlane.position.x, this.zeroPlane.position.y, this.boundingBox.min.z);
   }
 
-  ClearSelection() {
-    if (this.selected.length != 0) {
-      this.selected.forEach(item => {
+  ClearSelection(target: THREE.Object3D[]) {
+    if (target.length != 0) {
+      target.forEach(item => {
         let mesh = item as any;
         if (mesh.material != undefined)
           if (mesh.material.emissive != undefined)
             mesh.material.emissive.set(0x000000);
       })
-      this.selected = [];
+      target.splice(0, target.length);
     }
+    console.log("HERE");
+    
     this.selectionChange = !this.selectionChange;
     this.transform.detach();
   }
-  Select(obj: any, CTRLPressed: boolean) {
-    if (this.selectReturn) {
-      switch (this.selectTarget) {
-        case "Annotation":
-          (this.selected[0].children[0] as THREE.Line).geometry.userData["target"] = obj;
-          break;
-        case "Axis":
-          obj.attach(this.selected[0]);
-          break;
-        default:
-          this.ClearSelection();
-          this.selected.push(obj);
-          this.selectionChange = !this.selectionChange;
-          break;
-      }
-      this.selectionChange = !this.selectionChange;
-      this.selectReturn = false;
-      return obj;
-    }
+  Select(target: THREE.Object3D[], obj: any, CTRLPressed: boolean) {
+    let transform = false;
+    // if (this.selectReturn) {
+    //   switch (this.selectTarget) {
+    //     case "Annotation":
+    //       (this.selected[0].children[0] as THREE.Line).geometry.userData["target"] = obj;
+    //       break;
+    //     case "Axis":
+    //       obj.attach(this.selected[0]);
+    //       break;
+    //     default:
+    //       this.ClearSelection(target);
+    //       this.selected.push(obj);
+    //       this.selectionChange = !this.selectionChange;
+    //       break;
+    //   }
+    //   this.selectionChange = !this.selectionChange;
+    //   this.selectReturn = false;
+    //   return obj;
+    // }
     if (!CTRLPressed) {
       this.selectionChange = !this.selectionChange;
-      this.ClearSelection();
+      this.ClearSelection(target);
     }
-    if (obj.type == "Mesh") {
-      if (obj.material.emissive)
-        obj.material.emissive.set(0x004400);
-      let i = this.selected.findIndex(item => item == obj);
-      if (i == -1) {
-        this.selected.push(obj);
+    switch (obj.type) {
+      case "Mesh":
+        if (obj.material.emissive)
+          obj.material.emissive.set(0x004400);
+          console.log(obj.material);
+          
+        let i = target.findIndex(item => item == obj);
+        if (i == -1) {
+          target.push(obj);
+        }
+        transform = true;
+        break;
+      case "Object3D":
+        let arr: any[] = [];
+        this.FindMeshes(obj, arr);
+        arr.forEach(mesh => {
+          if (mesh.material.emissive != undefined)
+            mesh.material.emissive.set(0x004400);
+          target.push(mesh);
+        })
+        transform = true;
+        break;
+      default:
+        target.splice(0, target.length);
+        if (obj.type != "Group") {
+          target.push(obj);
+          if (obj.type.includes("Camera") || obj.type == "PlaneHelper")
+            transform = false;
+          else transform = true;
+        }
+        break;
+    }
+    if (this.attachTransform && transform) {
+      if (target.length > 1) {
+        this.startPos = [];
+        this.group.position.set(0, 0, 0);
+        this.group.rotation.set(0, 0, 0);
+        target.forEach(item => {
+          this.startPos.push(item.position.clone());
+        })
+        this.scene.add(this.group);
+        this.transform.attach(this.group);
+        (this.transform as any)._listeners["objectChange"] = [];
+        this.transform.addEventListener("objectChange", (e) => {
+          target.forEach((item, index) => {
+            let q = new THREE.Quaternion();
+            item.getWorldQuaternion(q);
+            let vec = this.group.position.clone().applyQuaternion(q.invert()).add(this.startPos[index]);
+            item.updateWorldMatrix(true, true)
+            item.position.set(vec.x, vec.y, vec.z);
+          })
+          this.transformChange = !this.transformChange;
+        })
+      }
+      else {
         this.transform.attach(obj);
+        (this.transform as any)._listeners["objectChange"] = [];
+        this.transform.addEventListener("objectChange", (e) => {
+          let vec = target[0].position;
+          target[0].position.set(vec.x, vec.y, vec.z);
+          this.transformChange = !this.transformChange;
+        })
       }
     }
-    else if (obj.type == "Object3D") {
-      let arr: any[] = [];
-      this.FindMeshes(obj, arr);
-      arr.forEach(mesh => {
-        if (mesh.material.emissive != undefined)
-          mesh.material.emissive.set(0x004400);
-        this.selected.push(mesh);
-      })
-    }
-    else if (/(Light)/g.exec(obj.type) != undefined) {
-      this.selected = [];
-      this.selected.push(obj);
-      this.transform.attach(obj);
-    }
-    else if (/(Camera)/g.exec(obj.type) != undefined) {
-      this.selected = [];
-      this.selected.push(obj);
-      this.transform.detach();
-    }
-    else if (obj.type == "Axis") {
-      this.selected = [];
-      this.selected.push(obj);
-      this.transform.attach(obj);
-    }
-    else if (obj.type == "PlaneHelper") {
-      this.selected = [];
-      this.selected.push(obj);
-      this.transform.detach();
-    }
-    else if (obj.type == "Annotation") {
-      this.selected = [];
-      this.selected.push(obj);
-      this.transform.attach(obj);
-    }
-    if (this.selected.length > 1) {
-      this.startPos = [];
-      this.group.position.set(0, 0, 0);
-      this.group.rotation.set(0, 0, 0);
-      this.selected.forEach(item => {
-        this.startPos.push(item.position.clone());
-      })
-      this.scene.add(this.group);
-      this.transform.attach(this.group);
-      (this.transform as any)._listeners["objectChange"] = [];
-      this.transform.addEventListener("objectChange", (e) => {
-        this.selected.forEach((item, index) => {
-          let q = new THREE.Quaternion();
-          item.getWorldQuaternion(q);
-          let vec = this.group.position.clone().applyQuaternion(q.invert()).add(this.startPos[index]);
-          item.updateWorldMatrix(true, true)
-          item.position.set(vec.x, vec.y, vec.z);
-        })
-        this.transformChange = !this.transformChange;
-      })
-    }
-    else {
-      (this.transform as any)._listeners["objectChange"] = [];
-      this.transform.addEventListener("objectChange", (e) => {
-        let vec = this.selected[0].position;
-        this.selected[0].position.set(vec.x, vec.y, vec.z);
-        this.transformChange = !this.transformChange;
-      })
-    }
-    this.selectionChange = !this.selectionChange;
+    console.log(this.selected);
+    console.log(this.targetArray);
+    if (this.attachTransform)
+      this.selectionChange = !this.selectionChange;
   }
 
   RenameObject(track: AnimationModel.KeyframeTrackModel, newName: string) {

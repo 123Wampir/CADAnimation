@@ -118,7 +118,7 @@ export class AnimationService {
 
   DeleteTrack(track: AnimationModel.KeyframeTrackModel) {
     this.ClearTrack(track);
-    this.SceneUtilsService.ClearSelection();
+    this.SceneUtilsService.ClearSelection(this.SceneUtilsService.targetArray);
     let parent = this.timeLine.tracks.find(item => item.id == track.parent);
     let n = this.timeLine.tracks.findIndex(item => item.name == track.name);
     let id = parent?.children.findIndex(item => item == track.id);

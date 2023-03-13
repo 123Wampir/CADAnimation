@@ -432,10 +432,10 @@ export class AppComponent implements OnInit, AfterViewInit {
       this.SceneUtilsService.ContextmenuComponent.component.contextMenu = false;
     if (!this.firstClick) {
       if (this.intersection != undefined) {
-        this.SceneUtilsService.Select(this.intersection, this.SceneUtilsService.CTRLPressed);
+        this.SceneUtilsService.Select(this.SceneUtilsService.targetArray, this.intersection, this.SceneUtilsService.CTRLPressed);
       }
       else {
-        this.SceneUtilsService.ClearSelection()
+        this.SceneUtilsService.ClearSelection(this.SceneUtilsService.targetArray);
       }
     }
     else { this.firstClick = false }

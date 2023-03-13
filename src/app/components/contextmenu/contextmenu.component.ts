@@ -32,9 +32,9 @@ export class ContextmenuComponent implements OnInit, AfterViewInit, AfterViewChe
     this.component.contextMenu = false;
   }
   SelectReturn(obj: any) {
-    this.SceneUtilsService.selectReturn = true;
-    this.SceneUtilsService.Select(obj, false);
+    // this.SceneUtilsService.selectReturn = true;
+    this.SceneUtilsService.Select(this.SceneUtilsService.targetArray, obj, false);
     console.log(this.SceneUtilsService.selected);
-    
+
   }
 }

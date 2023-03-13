@@ -9,12 +9,13 @@ import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
 })
 export class SceneManagerService {
 
+  id: number = 0;
   constructor(public SceneUtilsService: SceneUtilsService) { }
 
 
   AddDirectionalLight(): THREE.DirectionalLight {
     let light = new THREE.DirectionalLight(0xffffff, 2.2);
-    light.name = light.type + `_${this.SceneUtilsService.lightGroup.children.length}`;
+    light.name = light.type + `_${++this.id}`;
     let lightHelper = new THREE.DirectionalLightHelper(light, 10, light.color);
     lightHelper.matrixWorld = light.matrixWorld;
     light.add(lightHelper);
@@ -22,7 +23,7 @@ export class SceneManagerService {
     light.add(cameraHelper);
     cameraHelper.matrixWorld = light.shadow.camera.matrixWorld;
     this.SceneUtilsService.lightGroup.add(light);
-    this.SceneUtilsService.Select(light, false);
+    this.SceneUtilsService.Select(this.SceneUtilsService.targetArray, light, false);
     let track = AnimationModel.FindKeyframeTrack(this.SceneUtilsService.AnimationService.timeLine, this.SceneUtilsService.lightGroup.name);
     this.SceneUtilsService.AnimationService.CreateTreeViewElement(light, track);
     AnimationModel.GetArrayTimeLine(this.SceneUtilsService.AnimationService.timeLine);
@@ -30,13 +31,13 @@ export class SceneManagerService {
   }
   AddPointLight(): THREE.PointLight {
     let light = new THREE.PointLight(0xffffff, 2.2, 10000);
-    light.name = light.type + `_${this.SceneUtilsService.lightGroup.children.length}`;
+    light.name = light.type + `_${++this.id}`;
     let lightHelper = new THREE.PointLightHelper(light, 5, light.color);
     lightHelper.matrixWorld = light.matrixWorld;
     light.add(lightHelper);
     light.shadow.bias = - 0.005;
     this.SceneUtilsService.lightGroup.add(light);
-    this.SceneUtilsService.Select(light, false);
+    this.SceneUtilsService.Select(this.SceneUtilsService.targetArray, light, false);
     let track = AnimationModel.FindKeyframeTrack(this.SceneUtilsService.AnimationService.timeLine, this.SceneUtilsService.lightGroup.name);
     this.SceneUtilsService.AnimationService.CreateTreeViewElement(light, track);
     AnimationModel.GetArrayTimeLine(this.SceneUtilsService.AnimationService.timeLine);
@@ -49,7 +50,7 @@ export class SceneManagerService {
     annDiv.innerText = "Text";
     let annotation = new CSS2DObject(annDiv);
     annotation.type = "Annotation";
-    annotation.name = `Annotation_${this.SceneUtilsService.annotationGroup.children.length}`;
+    annotation.name = `Annotation_${++this.id}`;
     this.SceneUtilsService.annotationGroup.add(annotation);
     annotation.position.set(10, -10, 30);
     let pts = [];
@@ -78,7 +79,7 @@ export class SceneManagerService {
       geometry.attributes['position'].needsUpdate = true;
     }
     annotation.add(line);
-    this.SceneUtilsService.Select(annotation, false);
+    this.SceneUtilsService.Select(this.SceneUtilsService.targetArray, annotation, false);
     let track = AnimationModel.FindKeyframeTrack(this.SceneUtilsService.AnimationService.timeLine, this.SceneUtilsService.annotationGroup.name);
     this.SceneUtilsService.AnimationService.CreateTreeViewElement(annotation, track);
     AnimationModel.GetArrayTimeLine(this.SceneUtilsService.AnimationService.timeLine);
@@ -91,10 +92,43 @@ export class SceneManagerService {
     let mat = new THREE.LineBasicMaterial({ color: 0x0000FF });
     let line = new THREE.Line(geom, mat);
     this.SceneUtilsService.scene.add(line);
+    console.log(line);
+
     this.SceneUtilsService.axisGroup.push(line);
-    line.name = `Axis_${this.SceneUtilsService.axisGroup.length}`
+    line.name = `Axis_${++this.id}`;
     line.type = "Axis";
-    this.SceneUtilsService.Select(line, false);
+    line.userData['direction'] = new THREE.Vector3(0);
+    line.userData['objects'] = new Array<THREE.Object3D>(0);
+    // let arr: any[] = [];
+    // this.SceneUtilsService.FindMeshes(this.SceneUtilsService.model, arr);
+    // line.userData['objects'] = arr;
+    line.userData['angle'] = 0;
+    line.userData['oldAngle'] = 0;
+    line.onAfterRender = function (renderer, scene, camera, geometry) {
+      let offset = Number(this.userData['angle'].toFixed(3)) - Number(this.userData['oldAngle'].toFixed(3));
+      if (offset != 0) {
+        this.updateMatrixWorld(true);
+        let axisPos = new THREE.Vector3().setFromMatrixPosition(this.matrixWorld);
+        let direction: THREE.Vector3 = (this as THREE.Line).userData['direction'];
+        let dir = direction.clone();
+        let q = new THREE.Quaternion().setFromRotationMatrix(this.matrixWorld);
+        dir.applyQuaternion(q);
+        dir.normalize();
+        let rot = dir.clone().multiplyScalar(offset * Math.PI / 180);
+        (this.userData['objects'] as Array<THREE.Object3D>).forEach(item => {
+          // item.updateMatrixWorld(true);
+          let pos = new THREE.Vector3().setFromMatrixPosition(item.matrixWorld);
+          let diff = pos.clone().sub(axisPos!);
+          diff.applyAxisAngle(dir, offset * Math.PI / 180);
+          diff.add(axisPos!);
+          item.position.set(diff.x, diff.y, diff.z);
+          item.rotateOnWorldAxis(dir, offset * Math.PI / 180);
+        })
+      }
+      this.userData['oldAngle'] = this.userData['angle'];
+    }
+
+    this.SceneUtilsService.Select(this.SceneUtilsService.targetArray, line, false);
     return line
   }
 

@@ -32,8 +32,7 @@
         <div class="line" *ngIf="annotation">
             <div class="param">
                 <div class="label">Задать через смещение к цели</div>
-                <input type="checkbox" [(ngModel)]="annotationTarget" class="input-checkbox"
-                    (change)="EnableAnnotationTarget($event)">
+                <input type="checkbox" [(ngModel)]="annotationTarget" class="input-checkbox">
             </div>
             <button class="button-icon" style="visibility: hidden;"></button>
         </div>
@@ -44,8 +43,14 @@
                     <div class="target-name">{{targetName}}</div>
                 </div>
             </div>
-            <button class="button-icon" (click)="SelectTarget($event)">
+            <button *ngIf="!targetSelect" class="button-icon" (click)="SelectTarget()">
                 <img src="../../../assets/cursor.png" alt="button-icon" width="19px" height="19px">
+            </button>
+            <button *ngIf="targetSelect" class="button-icon" (click)="ApplyTargetSelect()">
+                <img src="../../../assets/accept.png" class="no-filter" alt="button-icon" width="19px" height="19px">
+            </button>
+            <button *ngIf="targetSelect" class="button-icon" (click)="DiscardTargetSelect()">
+                <img src="../../../assets/cancel.png" class="no-filter" alt="button-icon" width="19px" height="19px">
             </button>
         </div>
         <div class="line" *ngIf="annotation && !annotationTarget">
@@ -177,8 +182,31 @@
                     <div class="target-name">{{targetName}}</div>
                 </div>
             </div>
-            <button class="button-icon" (click)="SelectTarget($event)">
+            <button *ngIf="!targetSelect" class="button-icon" (click)="SelectTarget()">
                 <img src="../../../assets/cursor.png" alt="button-icon" width="19px" height="19px">
+            </button>
+            <button *ngIf="targetSelect" class="button-icon" (click)="ApplyTargetSelect()">
+                <img src="../../../assets/accept.png" class="no-filter" alt="button-icon" width="19px" height="19px">
+            </button>
+            <button *ngIf="targetSelect" class="button-icon" (click)="DiscardTargetSelect()">
+                <img src="../../../assets/cancel.png" class="no-filter" alt="button-icon" width="19px" height="19px">
+            </button>
+        </div>
+        <div class="line" *ngIf="axisParams">
+            <div class="param">
+                <div class="label">Объекты</div>
+                <div class="inputs">
+                    <div class="target-name">{{targetName}}</div>
+                </div>
+            </div>
+            <button *ngIf="!objectsSelect" class="button-icon" (click)="SelectObjects()">
+                <img src="../../../assets/cursor.png" alt="button-icon" width="19px" height="19px">
+            </button>
+            <button *ngIf="objectsSelect" class="button-icon" (click)="ApplyObjectsSelect()">
+                <img src="../../../assets/accept.png" class="no-filter" alt="button-icon" width="19px" height="19px">
+            </button>
+            <button *ngIf="objectsSelect" class="button-icon" (click)="DiscardObjectsSelect()">
+                <img src="../../../assets/cancel.png" class="no-filter" alt="button-icon" width="19px" height="19px">
             </button>
         </div>
         <div class="line" *ngIf="axisParams">
@@ -191,6 +219,16 @@
                         (ngModelChange)="OnDirectionChange($event)">
                     <input type="number" class="input-number" placeholder="Z" [(ngModel)]="targetVec.z"
                         (ngModelChange)="OnDirectionChange($event)">
+                </div>
+            </div>
+            <button class="button-icon" style="visibility: hidden;"></button>
+        </div>
+        <div class="line" *ngIf="axisParams">
+            <div class="param">
+                <div class="label">Угол поворота</div>
+                <div class="inputs">
+                    <input type="number" class="input-number" placeholder="X"
+                        [(ngModel)]="propertiesObject.userData.angle">
                 </div>
             </div>
             <button class="button-icon" style="visibility: hidden;"></button>
