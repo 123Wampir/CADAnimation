@@ -31,7 +31,8 @@ export class SceneUtilsService {
 
   lightGroup!: THREE.Group;
   annotationGroup!: THREE.Group;
-  axisGroup: THREE.Line[] = [];
+  axisGroup!: THREE.Group;
+  axisArray: THREE.Line[] = [];
 
   planes: THREE.Plane[] = [];
   planeHelpers = new THREE.Group();
@@ -313,7 +314,7 @@ export class SceneUtilsService {
       target.splice(0, target.length);
     }
     console.log("HERE");
-    
+
     this.selectionChange = !this.selectionChange;
     this.transform.detach();
   }
@@ -345,8 +346,8 @@ export class SceneUtilsService {
       case "Mesh":
         if (obj.material.emissive)
           obj.material.emissive.set(0x004400);
-          console.log(obj.material);
-          
+        console.log(obj.material);
+
         let i = target.findIndex(item => item == obj);
         if (i == -1) {
           target.push(obj);

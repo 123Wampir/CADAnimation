@@ -170,6 +170,23 @@ export class AnimationCreatorService {
       }
     }
   }
+  OnAxisAngleChange(obj: any) {
+    if (obj != undefined) {
+      let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
+      let action = AnimationModel.FindActionByType(track, ".userData.angle");
+      if (action == undefined) {
+        action = this.AnimationService.CreateAction(track, ".userData.angle");
+      }
+      let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
+      if (keyframe != undefined) {
+        keyframe.value = [obj.userData.angle];
+        this.AnimationService.ChangeKeyframe(keyframe);
+      }
+      else {
+        this.AnimationService.CreateKeyframe(action, ".userData.angle", this.AnimationService.currentTime, [obj.userData.angle]);
+      }
+    }
+  }
   DeleteKeyframe(obj: THREE.Object3D) {
     // if (obj != undefined) {
     //   if (this.AnimationService.selected.length == 1) {

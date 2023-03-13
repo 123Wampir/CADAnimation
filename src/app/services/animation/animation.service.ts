@@ -258,6 +258,9 @@ export class AnimationService {
       case ".element.innerHTML":
         newTrack = new THREE.StringKeyframeTrack(type, times, values);
         break;
+      case ".userData.angle":
+        newTrack = new THREE.NumberKeyframeTrack(type, times, values);
+        break;
     }
     return newTrack;
   }
@@ -329,17 +332,25 @@ export class AnimationService {
     track.actions.forEach(act => {
       let i = action._propertyBindings.findIndex((mixer: THREE.PropertyMixer) => mixer.binding.path == act.type);
       if (i != undefined) {
-        if (act.type == ".plane.constant") {
-          let pl = track.object as any;
-          action._propertyBindings[i].binding.propertyName = "constant";
-          action._propertyBindings[i].binding.parsedPath.objectName = "plane";
-          action._propertyBindings[i].binding.targetObject = pl.plane;
-        }
-        if (act.type == ".element.innerHTML") {
-          let css2d = track.object as any;
-          action._propertyBindings[i].binding.propertyName = "innerHTML";
-          action._propertyBindings[i].binding.parsedPath.objectName = "element";
-          action._propertyBindings[i].binding.targetObject = css2d.element;
+        switch (act.type) {
+          case ".plane.constant":
+            let pl = track.object as any;
+            action._propertyBindings[i].binding.propertyName = "constant";
+            action._propertyBindings[i].binding.parsedPath.objectName = "plane";
+            action._propertyBindings[i].binding.targetObject = pl.plane;
+            break;
+          case ".element.innerHTML":
+            let css2d = track.object as any;
+            action._propertyBindings[i].binding.propertyName = "innerHTML";
+            action._propertyBindings[i].binding.parsedPath.objectName = "element";
+            action._propertyBindings[i].binding.targetObject = css2d.element;
+            break;
+          case ".userData.angle":
+            let axis = track.object as any;
+            action._propertyBindings[i].binding.propertyName = "angle";
+            action._propertyBindings[i].binding.parsedPath.objectName = "userData";
+            action._propertyBindings[i].binding.targetObject = axis.userData;
+            break;
         }
       }
     })

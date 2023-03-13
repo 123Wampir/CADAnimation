@@ -88,6 +88,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     cameraHelper.matrixWorld = directionalLight.shadow.camera.matrixWorld;
     this.SceneUtilsService.lightGroup.add(directionalLight);
 
+    this.SceneUtilsService.axisGroup = new THREE.Group();
+    this.SceneUtilsService.axisGroup.name = "Axis";
+    this.scene.add(this.SceneUtilsService.axisGroup);
+
+
     this.raycaster = new THREE.Raycaster();
     this.pointer = new THREE.Vector2();
 
@@ -378,8 +383,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.raycaster.setFromCamera(this.pointer, this.SceneUtilsService.currentCamera);
     // Рассчитывается какие объекты пересеклись с лучом
     let intersects = this.raycaster.intersectObjects(this.mainObject.children);
-    let axis = this.raycaster.intersectObjects(this.SceneUtilsService.axisGroup);
-    intersects.concat(axis);
+    // let axis = this.raycaster.intersectObjects(this.SceneUtilsService.axisArray);
+    // intersects.concat(axis);
     if (intersects.length != 0) {
       if (this.intersection != intersects[0].object) {
         if (this.intersection) {

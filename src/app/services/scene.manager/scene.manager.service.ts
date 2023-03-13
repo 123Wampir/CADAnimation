@@ -94,7 +94,7 @@ export class SceneManagerService {
     this.SceneUtilsService.scene.add(line);
     console.log(line);
 
-    this.SceneUtilsService.axisGroup.push(line);
+    this.SceneUtilsService.axisArray.push(line);
     line.name = `Axis_${++this.id}`;
     line.type = "Axis";
     line.userData['direction'] = new THREE.Vector3(0);
@@ -116,19 +116,24 @@ export class SceneManagerService {
         dir.normalize();
         let rot = dir.clone().multiplyScalar(offset * Math.PI / 180);
         (this.userData['objects'] as Array<THREE.Object3D>).forEach(item => {
-          // item.updateMatrixWorld(true);
+          item.updateMatrixWorld(true);
           let pos = new THREE.Vector3().setFromMatrixPosition(item.matrixWorld);
           let diff = pos.clone().sub(axisPos!);
           diff.applyAxisAngle(dir, offset * Math.PI / 180);
           diff.add(axisPos!);
           item.position.set(diff.x, diff.y, diff.z);
           item.rotateOnWorldAxis(dir, offset * Math.PI / 180);
+          item.updateMatrixWorld(true);
         })
+        this.updateMatrixWorld(true);
       }
       this.userData['oldAngle'] = this.userData['angle'];
     }
 
     this.SceneUtilsService.Select(this.SceneUtilsService.targetArray, line, false);
+    let track = AnimationModel.FindKeyframeTrack(this.SceneUtilsService.AnimationService.timeLine, this.SceneUtilsService.axisGroup.name);
+    this.SceneUtilsService.AnimationService.CreateTreeViewElement(line, track);
+    AnimationModel.GetArrayTimeLine(this.SceneUtilsService.AnimationService.timeLine);
     return line
   }
 

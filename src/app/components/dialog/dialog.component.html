@@ -41,36 +41,6 @@
             </div>
             <button (click)="OnCameraRotationCreate($event)">Создать</button>
         </div>
-        <div *ngSwitchCase="'RotateOnAxis'">
-            <div class="line">
-                <div class="param">
-                    <div class="label">Ось</div>
-                    <div class="inputs">
-                        <select #selectAxis id="axis">
-                            <option *ngFor="let item of SceneUtilsService.axisGroup" [value]="item.id">
-                                {{item.name}}</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="line">
-                <div class="param">
-                    <div class="label">Угол</div>
-                    <div class="inputs">
-                        <input type="number" class="input-number" (ngModelChange)="RotateOnAxis(selectAxis.value)"
-                            placeholder="Angle" [(ngModel)]="rotAngle">
-                    </div>
-                </div>
-            </div>
-            <div class="line">
-                <div class="param">
-                    <div class="label">По часовой</div>
-                    <div class="inputs">
-                        <input type="checkbox" class="input-number" placeholder="direction" [(ngModel)]="rotDirection">
-                    </div>
-                </div>
-            </div>
-        </div>
         <div *ngSwitchCase="'Settings'"></div>
         <div *ngSwitchCase="'Render'"></div>
     </div>

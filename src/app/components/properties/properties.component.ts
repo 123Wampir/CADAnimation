@@ -250,7 +250,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
           break;
         case "Axis":
           this.SceneUtilsService.targetArray[0].attach(this.propertiesObject);
-          // (this.SceneUtilsService.selected[0].children[0] as THREE.Line).userData["objects"] = this.SceneUtilsService.targetArray;
+          this.propertiesObject.rotation.set(0, 0, 0);
           break;
       }
     }
@@ -273,16 +273,18 @@ export class PropertiesComponent implements OnInit, OnChanges {
     if (this.SceneUtilsService.targetArray.length != 0) {
       switch (this.propertiesObject.type) {
         case "Axis":
-          (this.propertiesObject as THREE.Line).userData["objects"] = this.SceneUtilsService.targetArray;
+          (this.propertiesObject as THREE.Line).userData["objects"] = this.SceneUtilsService.targetArray.slice();
           break;
       }
     }
     console.log((this.propertiesObject as THREE.Line).userData["objects"]);
-    
+
     this.SceneUtilsService.targetArray = this.SceneUtilsService.selected;
     this.SceneUtilsService.selectionChange = !this.SceneUtilsService.selectionChange;
   }
-
+  OnAxisAngleChange(event: Event) {
+    this.AnimationCreatorService.OnAxisAngleChange(this.propertiesObject);
+  }
   OnTargetChange(event: Event) {
     (this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"] = this.targetVec;
   }
@@ -344,10 +346,6 @@ export class PropertiesComponent implements OnInit, OnChanges {
   OnCameraRotation($event: MouseEvent) {
     this.SceneUtilsService.currentCamera.lookAt(this.SceneUtilsService.scene.position);
     this.AnimationService.dialogType = "CameraRotation";
-    this.AnimationService.dialogShow = true;
-  }
-  RotateOnAxis($event: Event) {
-    this.AnimationService.dialogType = "RotateOnAxis";
     this.AnimationService.dialogShow = true;
   }
   OnShadowCameraChange(event: Event) {

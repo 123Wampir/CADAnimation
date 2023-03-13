@@ -231,7 +231,9 @@
                         [(ngModel)]="propertiesObject.userData.angle">
                 </div>
             </div>
-            <button class="button-icon" style="visibility: hidden;"></button>
+            <button class="button-icon" *ngIf="!camera" (click)="OnAxisAngleChange($event)">
+                <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px">
+            </button>
         </div>
         <div class="line" *ngIf="!camera && !cutPlane && propertiesObject.type!='Object3D'">
             <div class="param">
@@ -327,9 +329,6 @@
         <div class="controls" *ngIf="camera && !group">
             <button (click)="OnCameraChange($event)">Сохранить позицию</button>
             <button (click)="OnCameraRotation($event)">Анимация вращения</button>
-        </div>
-        <div class="controls" *ngIf="propertiesObject.type=='Mesh' || propertiesObject.type=='Group'">
-            <button (click)="RotateOnAxis($event)">Вращать вокруг оси</button>
         </div>
         <div class="controls" *ngIf="AnimationService.selKeyframe.length!=0">
             <button class="delete" (click)="DeleteKeyframe($event)">Удалить ключевой
