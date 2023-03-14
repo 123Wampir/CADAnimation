@@ -1,27 +1,48 @@
-# CADAnimation
+# CADAnimation (Name still in work)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.2.
+This repo is my graduation work. Web application for creating a 3D models animation! Created with Angular and Three.js. Also i use Angular Materials and Quill.
 
-## Development server
+You can already try it by following the [link](https://cad-animation.vercel.app/) (Most of the inscriptions are in Russian and will be translated later).
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+![Animation](readme/Кран%20анимация%20loosyMax.gif)
 
-## Code scaffolding
+## Import/Export
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+You can import files such as GLTF/GLB wich is natively supported by Three.js, but most important that you can load STEP/IGES and BREP files thanks to awesome [occt-import-js](https://github.com/kovacsv/occt-import-js) from [@kovacsv](https://github.com/kovacsv).
+- [x] GLTF/GLB
+- [x] STEP
+- [x] IGES
+- [x] BREP
+- [ ] (maybe in the future) OBJ
+- [ ] (maybe in the future) IFC
 
-## Build
+![Animation](readme/Анимация%20осей%20F35.gif) 
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+This app also support animation import from CAD Kompas3D (but only translation and opacity animation).
 
-## Running unit tests
+## Features
+- :muscle: Select and edit multiple parts at once with <kbd>CTRL</kbd>
+- :art: Change the look of every part of your model
+- :floppy_disk: Export your models to GLTF
+- :ice_cube: Navigate with the handy ViewCube
+- :city_sunset: Make your scene look better with background color, grid, ground reflection, orthographic camera, outlines and wireframes
+- :bulb: Add and animate different types of light
+- :speech_balloon: Add and animate annotation
+- :scissors: Create animation with cutting planes
+- :camera: Create camera animation
+- :milky_way: Add axes to your scene and rotate parts around them
+- :film_strip: Edit the created animation with actions and keyframes on the timeline (Use <kbd>CTRL</kbd> to select multiple objects and <kbd>SHIFT</kbd> to move actions across tracks)
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+![Animation](readme/Анимация%20осей%20роборука.gif) 
 
-## Running end-to-end tests
+## To Do
+- [ ] Model explode animation
+- [ ] Animation saving/loading
+- [ ] Scene record and export to your PC
+- [ ] How to use tutorials
+- [ ] (maybe in the future) Three PathTracing support
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+![Animation](readme/Анимация%20разрезов.gif)
 
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Contact
+If you have any questions please email me Dimaworonin@gmail.com.
