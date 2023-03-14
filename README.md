@@ -44,5 +44,9 @@ This app also support animation import from CAD Kompas3D (but only translation a
 
 ![Animation](readme/Анимация%20разрезов.gif)
 
+## Examples
+
+You can see more examples of animations made with this app in this [folder](readme/).
+
 ## Contact
 If you have any questions please email me Dimaworonin@gmail.com.
