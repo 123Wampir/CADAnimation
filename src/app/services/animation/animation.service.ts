@@ -114,6 +114,9 @@ export class AnimationService {
     else if (obj.type == "Annotation") {
       keyframeTrack.type = "Annotation";
     }
+    else if (obj.type == "Axis") {
+      keyframeTrack.type = "Axis";
+    }
   }
 
   DeleteTrack(track: AnimationModel.KeyframeTrackModel) {

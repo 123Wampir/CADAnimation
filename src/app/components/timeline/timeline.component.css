@@ -147,6 +147,11 @@
     color: black;
 }
 
+.Axis {
+    background-color: khaki;
+    color: black;
+}
+
 .track {
     width: 80%;
     border-bottom: 1px solid var(--second-color);
