@@ -41,6 +41,8 @@ export class PropertiesComponent implements OnInit, OnChanges {
   opacity = 1;
   hex = "";
   editMaterial = false;
+  editExplode = false;
+  explodeOffset = 0;
   rename = false;
   oldName = "";
   constructor(public AnimationService: AnimationService, public AnimationCreatorService: AnimationCreatorService, public SceneUtilsService: SceneUtilsService) { }
@@ -73,6 +75,8 @@ export class PropertiesComponent implements OnInit, OnChanges {
           this.axisParams = false;
 
           this.editMaterial = false;
+          this.editExplode = false;
+          this.explodeOffset = 0;
 
           this.propertiesObject = this.SceneUtilsService.selected[0];
           if (this.propertiesObject.material != undefined) {
@@ -197,6 +201,23 @@ export class PropertiesComponent implements OnInit, OnChanges {
   DiscardName() {
     this.propertiesObject.name = this.oldName;
     this.rename = false;
+  }
+  
+  InitExplode() {
+    this.SceneUtilsService.CalculateCenter(this.SceneUtilsService.selected);
+    this.SceneUtilsService.CalculateOffsets(this.SceneUtilsService.selected);
+    this.editExplode = !this.editExplode;
+  }
+  OnExplodeChange(event: Event) {
+    this.SceneUtilsService.OnExplode(this.SceneUtilsService.selected, this.explodeOffset);
+  }
+  ApplyExplode() {
+    this.AnimationCreatorService.OnPositionChange(this.propertiesObject);
+    this.editExplode = false;
+  }
+  DiscardExplode() {
+    this.SceneUtilsService.OnExplode(this.SceneUtilsService.selected, 0);
+    this.editExplode = false;
   }
 
   MatColorSet(event: Event) {

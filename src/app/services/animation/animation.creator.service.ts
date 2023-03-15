@@ -19,15 +19,7 @@ export class AnimationCreatorService {
           action = this.AnimationService.CreateAction(track, ".position");
         }
         let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
-        let position!: THREE.Vector3;
-        if (obj.type != "Group") {
-          position = obj.position;
-        }
-        else {
-          let q = new THREE.Quaternion();
-          item.getWorldQuaternion(q);
-          position = obj.position.clone().applyQuaternion(q.invert()).add(this.SceneUtilsService.startPos[index]);
-        }
+        let position = item.position;
         if (keyframe != undefined) {
           keyframe.value = position.toArray();
           this.AnimationService.ChangeKeyframe(keyframe);
@@ -36,10 +28,6 @@ export class AnimationCreatorService {
           this.AnimationService.CreateKeyframe(action, ".position", this.AnimationService.currentTime, position.toArray());
         }
       })
-      if (obj.type == "Group") {
-        let vec = this.SceneUtilsService.group.position;
-        obj.position.set(vec.x, vec.y, vec.z)
-      }
     }
   }
   OnRotationChange(obj: THREE.Object3D) {

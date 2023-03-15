@@ -337,6 +337,27 @@
         <div class="controls" *ngIf="AnimationService.selAction.length!=0">
             <button class="delete" (click)="DeleteAction($event)">Удалить действие</button>
         </div>
+        <div class="controls" *ngIf="group">
+            <button (click)="InitExplode()">Разлет деталей</button>
+        </div>
+        <div class="line" *ngIf="editExplode">
+            <div class="param">
+                <div class="label">Разлет</div>
+                <div class="inputs">
+                    <input type="range" min="0" max="1000" step="1" class="input-range" placeholder="0"
+                        [(ngModel)]="explodeOffset" (ngModelChange)="OnExplodeChange($event)">
+                    <input type="number" class="input-number" min="0" max="1000" step="1" placeholder="explode"
+                        [(ngModel)]="explodeOffset" (ngModelChange)="OnExplodeChange($event)">
+                </div>
+            </div>
+            <button class="button-icon" (click)="ApplyExplode()">
+                <img src="../../../assets/accept.png" class="no-filter" alt="button-icon" width="19px" height="19px">
+            </button>
+            <button class="button-icon" (click)="DiscardExplode()">
+                <img src="../../../assets/cancel.png" class="no-filter" alt="button-icon" width="19px" height="19px">
+            </button>
+        </div>
+
         <div class="controls" *ngIf="propertiesObject.material!=undefined && !cutPlane">
             <button (click)="editMaterial=!editMaterial">Изменить материал</button>
         </div>

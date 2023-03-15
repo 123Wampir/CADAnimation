@@ -50,6 +50,9 @@ export class SceneUtilsService {
   group: THREE.Mesh = new THREE.Mesh();
   startPos: THREE.Vector3[] = [];
 
+  localCenter!: THREE.Vector3;
+  offsets: THREE.Vector3[] = [];
+
   orthographic = false;
   perspectiveCamera!: THREE.PerspectiveCamera;
   orthographicCamera!: THREE.OrthographicCamera;
@@ -101,6 +104,43 @@ export class SceneUtilsService {
     this.orthographicCamera.zoom = this.zoom;
     this.orthographicCamera.updateProjectionMatrix();
     this.orthographicCamera.up = this.perspectiveCamera.up;
+  }
+
+  CalculateCenter(arr: THREE.Object3D[]) {
+    let geomArr: THREE.BufferGeometry[] = [];
+    for (let i = 0; i < arr.length; i++) {
+      arr[i].updateWorldMatrix(true, true);
+      let newGeom = (arr[i] as THREE.Mesh).geometry.clone().applyMatrix4(arr[i].matrixWorld);
+      geomArr.push(newGeom);
+    }
+    if (geomArr.length != 0) {
+      let mergedGeom = BufferGeometryUtils.mergeBufferGeometries(geomArr);
+      for (let i = 0; i < geomArr.length; i++) {
+        geomArr[i].dispose();
+      }
+      mergedGeom.computeBoundingBox();
+      this.localCenter = new THREE.Vector3();
+      mergedGeom.boundingBox?.getCenter(this.localCenter);
+      mergedGeom.dispose();
+    }
+  }
+  CalculateOffsets(arr: THREE.Object3D[]) {
+    this.offsets = [];
+    arr.forEach(item => {
+      let wPos = new THREE.Vector3();
+      item.getWorldPosition(wPos);
+      let offset = wPos.clone().sub(this.localCenter).normalize();
+      this.offsets.push(offset);
+    })
+  }
+  OnExplode(arr: THREE.Object3D[], length: number) {
+    arr.forEach((item, index) => {
+      let ps = new THREE.Vector3();
+      item.getWorldPosition(ps);
+      let pos = item.worldToLocal(ps.clone().add(this.offsets[index].clone().multiplyScalar(length))).add(this.startPos[index])
+      item.position.set(pos.x, pos.y, pos.z);
+      item.updateMatrixWorld(true);
+    })
   }
 
   SetDisableStyle(value: boolean) {
