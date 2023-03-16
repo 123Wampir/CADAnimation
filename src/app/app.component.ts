@@ -44,6 +44,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   counter = 0;
   delta = 0.016;
   effect!: OutlineEffect;
+  selectBox!: THREE.BoxHelper;
 
 
   CreateScene() {
@@ -68,6 +69,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     (this.SceneUtilsService.orthographicCamera.type as any) = "Ignore";
     this.scene.add(this.SceneUtilsService.orthographicCamera);
 
+    this.SceneUtilsService.selectBox = new THREE.BoxHelper(new THREE.Mesh(), 0x000000);
+    this.SceneUtilsService.selectBox.type = "Ignore";
+    this.scene.add(this.SceneUtilsService.selectBox);
 
     // Добавление глобального освещения
     this.SceneUtilsService.lightGroup = new THREE.Group();
@@ -387,18 +391,22 @@ export class AppComponent implements OnInit, AfterViewInit {
     // intersects.concat(axis);
     if (intersects.length != 0) {
       if (this.intersection != intersects[0].object) {
-        if (this.intersection) {
-          if (this.SceneUtilsService.selected.find((item) => (item == this.intersection)) == undefined)
-            if (this.intersection.material.emissive)
-              this.intersection.material.emissive.set(0x000000);
-        }
+        // if (this.intersection) {
+        //   if (this.SceneUtilsService.selected.find((item) => (item == this.intersection)) == undefined)
+        //     if (this.intersection.material.emissive)
+        //       this.intersection.material.emissive.set(0x000000);
+        // }
+        this.SceneUtilsService.selectBox.visible = true;
         this.intersection = intersects[0].object;
-        if (this.intersection.material.emissive)
-          this.intersection.material.emissive.set(0x004400);
+        this.SceneUtilsService.selectBox.setFromObject(this.intersection);
+        // if (this.intersection.material.emissive)
+        //   this.intersection.material.emissive.set(0x004400);
       }
     }
     else {
+      this.SceneUtilsService.selectBox.visible = false;
       if (this.intersection) {
+        // this.box.update();
         if (this.SceneUtilsService.selected.find((item) => (item == this.intersection)) == undefined)
           if (this.intersection.material.emissive)
             this.intersection.material.emissive.set(0x000000);

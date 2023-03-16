@@ -42,6 +42,7 @@ export class SceneUtilsService {
   stencilNeedUpdate: boolean = false;
 
   selected: THREE.Object3D[] = [];
+  selectBox!: THREE.BoxHelper;
   targetArray: THREE.Object3D[] = this.selected;
   selectionChange: boolean = false;
   transformChange: boolean = false;

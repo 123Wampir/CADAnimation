@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { AnimationService } from 'src/app/services/animation/animation.service';
 import { SceneManagerService } from 'src/app/services/scene.manager/scene.manager.service';
 import { SceneUtilsService } from 'src/app/services/utils/scene.utils.service';
+import THREE = require('three');
 
 @Component({
   selector: 'app-menubar',
@@ -31,8 +32,12 @@ export class MenubarComponent {
     this.SceneUtilsService.zeroPlane.children[1].visible = e.checked;
   }
   OnSceneColorChange(event: Event) {
-    let e = event as any;
-    this.SceneUtilsService.renderer.setClearColor(e.target.value);
+    let color: THREE.Color = new THREE.Color((event as any).target.value);
+    let target: any = {};
+    color.getHSL(target);
+    let l = Math.abs(Math.round(target.l) - 1);
+    this.SceneUtilsService.renderer.setClearColor(color);
+    (this.SceneUtilsService.selectBox.material as THREE.LineBasicMaterial).color.setHSL(0, 0, l);
   }
   SetClipping(event: Event) {
     let e = event?.target as any;
