@@ -20,11 +20,8 @@
     cursor: move;
 }
 
-.footer {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    margin-bottom: 5px;
+.param {
+    grid-template-columns: 1fr 100px;
 }
 
 .form {
