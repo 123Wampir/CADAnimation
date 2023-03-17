@@ -1,6 +1,9 @@
 <div class="container" #container id="container" (mousemove)="OnMouseMove($event)" (mouseup)="OnMouseUp($event)">
     <div class="header" (mousedown)="OnMouseDown($event)">
         <div class="label">Диалоговое окно</div>
+        <button class="button-icon" (click)="CloseClick($event)">
+            <img src="../../../assets/cancel.png" class="no-filter" alt="button-icon" width="19px" height="19px">
+        </button>
     </div>
     <div class="form" [ngSwitch]="type">
         <div *ngSwitchCase="'CameraRotation'">
@@ -43,9 +46,5 @@
         </div>
         <div *ngSwitchCase="'Settings'"></div>
         <div *ngSwitchCase="'Render'"></div>
-    </div>
-    <div class="footer">
-        <button class="accept" (click)="AcceptClick($event)">OK</button>
-        <button class="cancel" (click)="CancelClick($event)">Cancel</button>
     </div>
 </div>

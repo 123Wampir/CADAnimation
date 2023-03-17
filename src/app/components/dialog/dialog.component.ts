@@ -100,12 +100,7 @@ export class DialogComponent implements OnInit, OnChanges {
   }
 
 
-  CancelClick(event: MouseEvent) {
-    this.container.style.visibility = "hidden";
-    this.show = false;
-    this.AnimationService.dialogShow = false;
-  }
-  AcceptClick(event: MouseEvent) {
+  CloseClick(event: MouseEvent) {
     this.container.style.visibility = "hidden";
     this.show = false;
     this.AnimationService.dialogShow = false;

@@ -1,22 +1,20 @@
 .container {
     display: grid;
     grid-template-rows: 50px auto 30px;
-    width: 300px;
-    height: 400px;
     top: 200px;
     left: 200px;
     /* border: 2px solid black; */
-    resize: both;
-    overflow: auto;
-    min-width: 300px;
-    min-height: 400px;
+    min-width: min-content;
+    min-height: min-content;
     visibility: hidden;
+    z-index: 5;
 }
 
 .header {
     user-select: none;
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
     border-bottom: 2px solid black;
     padding: 10px 5px;
     cursor: move;

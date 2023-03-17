@@ -16,7 +16,7 @@ You can import files such as GLTF/GLB wich is natively supported by Three.js, bu
 - [ ] (maybe in the future) OBJ
 - [ ] (maybe in the future) IFC
 
-![Animation](readme/Анимация%20осей%20F35.gif) 
+![Animation](readme/Анимация%20осей%20роборука.gif) 
 
 This app also support animation import from CAD Kompas3D (but only translation and opacity animation).
 
@@ -33,10 +33,10 @@ This app also support animation import from CAD Kompas3D (but only translation a
 - :milky_way: Add axes to your scene and rotate parts around them
 - :film_strip: Edit the created animation with actions and keyframes on the timeline (Use <kbd>CTRL</kbd> to select multiple objects and <kbd>SHIFT</kbd> to move actions across tracks)
 
-![Animation](readme/Анимация%20осей%20роборука.gif) 
+![Animation](readme/Анимация%20разлёта%20и%20поворотом%20камеры.gif)
 
 ## To Do
-- [ ] Model explode animation
+- [x] Model explode animation (Select group of objects and them press button for exploded view)
 - [ ] Animation saving/loading
 - [ ] Scene record and export to your PC
 - [ ] How to use tutorials
