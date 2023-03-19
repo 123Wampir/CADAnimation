@@ -20,8 +20,6 @@ export class AnimationService {
   actions: THREE.AnimationAction[] = [];
   mixers: THREE.AnimationMixer[] = [];
   timeLine: AnimationModel.TimelineModel = { tracks: [], duration: 30, scale: 50 };
-  //orbit!: OrbitControls;
-  // orbit!: ArcballControls;
   dialogShow = false;
   dialogModal = false;
   dialogType = "";
@@ -37,7 +35,7 @@ export class AnimationService {
       this.id = 0;
       this.CreateTreeViewElements(this.SceneUtilsService.scene);
       this.CreateMixers(this.SceneUtilsService.model);
-      await this.LoadAnimation(str, this.SceneUtilsService.model, this.mixers);
+      await this.LoadAnimation(str);
       //this.SceneUtilsService.newFileLoading = !this.SceneUtilsService.newFileLoading;
       console.log("LOAD ANIMATION!");
       (event.target as any).value = "";
@@ -142,7 +140,6 @@ export class AnimationService {
     return action;
   }
   UpdateAction(action: AnimationModel.KeyframeActionModel) {
-    //console.log(action);
     if (action.track != undefined) {
       action.start = action.track!.times[0];
       action.length = action.track!.times[action.track!.times.length - 1] - action.start;
@@ -171,31 +168,10 @@ export class AnimationService {
       action.trackDOM.object.animations.push(clip);
     }
     clip = action.trackDOM.object.animations[0];
-    let keyframe: AnimationModel.KeyframeModel = { action: action, time: time, clip: clip, value: value, active: false }
+    let keyframe: AnimationModel.KeyframeModel = { action: action, time: time, clip: clip, value: value, active: false };
     this.ChangeKeyframe(keyframe);
     action.keyframes.push(keyframe);
     action.track = clip.tracks.find(tr => tr.name == type);
-    let mixers: any[] = [];
-    this.FindMixer(this.mixers, action.trackDOM.object, mixers);
-    let mixer!: THREE.AnimationMixer;
-    if (mixers.length != 0)
-      mixer = mixers[0] as THREE.AnimationMixer;
-    else {
-      mixer = new THREE.AnimationMixer(action.trackDOM.object);
-      this.mixers.push(mixer);
-    }
-    let newAction = mixer.clipAction(clip);
-    if ((mixer as any)._listeners == undefined)
-      mixer.addEventListener('finished', function (e) {
-        let act = e["action"];
-        act.paused = false;
-      });
-    this.actions.push(newAction);
-    this.UpdatePropertyBinding(newAction, keyframe.action.trackDOM);
-    newAction.setLoop(THREE.LoopRepeat, 1);
-    newAction.play();
-    newAction.clampWhenFinished = true;
-    mixer.setTime(time);
     this.UpdateAction(action);
   }
   ChangeKeyframe(keyframe: AnimationModel.KeyframeModel) {
@@ -230,9 +206,10 @@ export class AnimationService {
     keyframe.clip.resetDuration()
   }
   AddTrackToClip(keyframe: AnimationModel.KeyframeModel) {
-    let track = this.CreateKeyframeTrack(keyframe.action.type, [keyframe.time], keyframe.value)
+    let track = this.CreateKeyframeTrack(keyframe.action.type, [keyframe.time], keyframe.value);
     keyframe.clip.tracks.push(track);
     keyframe.clip.resetDuration();
+    this.UpdateAnimationAction(keyframe);
   }
   CreateKeyframeTrack(type: string, times: number[], values: any[]): THREE.KeyframeTrack {
     let newTrack: any;
@@ -268,15 +245,12 @@ export class AnimationService {
     return newTrack;
   }
   AddValuesToTrack(keyframe: AnimationModel.KeyframeModel) {
-    // console.log(clip);
     let times: any[] = [];
     let values: any[] = [];
     let insert = false;
-    // console.log(track.times);
     let track = keyframe.clip.tracks.find(track => (track.name == keyframe.action.type))
     if (track != undefined) {
       for (let i = 0; i < track.times.length; i++) {
-        // console.log(track.times[i]);
         if (!insert)
           if (Number(track.times[i].toFixed(3)) > Number(keyframe.time.toFixed(3))) {
             times.push(Number(keyframe.time.toFixed(3)));
@@ -293,7 +267,6 @@ export class AnimationService {
         }
       }
       if (!insert) {
-        // console.log("!insert");
         times.push(keyframe.time);
         insert = true;
         let n = keyframe.value.length;
@@ -307,28 +280,41 @@ export class AnimationService {
           keyframe.clip.tracks.splice(index, 1, newTrack);
       })
       keyframe.clip.resetDuration();
-      this.actions.find((action, index) => {
-        if (action.getClip() == keyframe.clip) {
-          // console.log(action);
-          action.stop();
-          let mixer = action.getMixer();
-          mixer.uncacheAction(keyframe.clip);
-          let newAction = mixer.clipAction(keyframe.clip);
-          this.UpdatePropertyBinding(newAction, keyframe.action.trackDOM);
-          newAction.setLoop(THREE.LoopRepeat, 1);
-          newAction.play();
-          newAction.clampWhenFinished = true;
-          this.actions.splice(index, 1, newAction);
-          mixer.setTime(keyframe.time);
-          if ((mixer as any)._listeners == undefined)
-            mixer.addEventListener('finished', function (e) {
-              let act = e["action"];
-              act.paused = false;
-              // console.log(act);
-            });
-        }
-      })
+      this.UpdateAnimationAction(keyframe);
     }
+  }
+
+  UpdateAnimationAction(keyframe: AnimationModel.KeyframeModel) {
+    let mixer!: THREE.AnimationMixer;
+    let i = this.actions.findIndex(action => action.getClip() == keyframe.clip);
+    if (i != -1) {
+      let action = this.actions[i];
+      action.stop();
+      mixer = action.getMixer();
+      mixer.uncacheAction(keyframe.clip);
+    }
+    else {
+      mixer = this.mixers.find(mixer => mixer.getRoot() == keyframe.action.trackDOM.object)!;
+      if (mixer == undefined) {
+        mixer = new THREE.AnimationMixer(keyframe.action.trackDOM.object);
+        this.mixers.push(mixer);
+      }
+    }
+    let newAction = mixer.clipAction(keyframe.clip);
+    if (i != -1)
+      this.actions.splice(i, 1, newAction);
+    else this.actions.push(newAction);
+    this.UpdatePropertyBinding(newAction, keyframe.action.trackDOM);
+    newAction.setLoop(THREE.LoopRepeat, 1);
+    newAction.play();
+    newAction.clampWhenFinished = true;
+    mixer.setTime(keyframe.time);
+    if ((mixer as any)._listeners == undefined)
+      mixer.addEventListener('finished', function (e) {
+        let act = e["action"];
+        act.paused = false;
+      });
+    this.UpdateAction(keyframe.action);
   }
 
   UpdatePropertyBinding(action: any, track: AnimationModel.KeyframeTrackModel) {
@@ -383,21 +369,7 @@ export class AnimationService {
         keyframe.action.track = undefined;
       }
       keyframe.clip.resetDuration();
-      this.actions.find((action, index) => {
-        if (action.getClip() == keyframe.clip) {
-          // console.log(action);
-          action.stop();
-          let mixer = action.getMixer();
-          mixer.uncacheAction(keyframe.clip);
-          let newAction = mixer.clipAction(keyframe.clip);
-          this.UpdatePropertyBinding(newAction, keyframe.action.trackDOM)
-          newAction.setLoop(THREE.LoopRepeat, 1);
-          newAction.play();
-          newAction.clampWhenFinished = true;
-          this.actions.splice(index, 1, newAction);
-          mixer.setTime(keyframe.time);
-        }
-      });
+      this.UpdateAnimationAction(keyframe);
       let index = keyframe.action.keyframes.findIndex(key => key == keyframe);
       keyframe.action.keyframes.splice(index, 1);
       this.UpdateAction(keyframe.action);
@@ -444,7 +416,7 @@ export class AnimationService {
     return arr;
   }
 
-  async LoadAnimation(URL: string, mainObject: THREE.Object3D, mixers: THREE.AnimationMixer[]) {
+  async LoadAnimation(URL: string) {
     // Чтение анимации
     // Создание объекта парсера XML/HTML-файлов
     let parser = new DOMParser();
@@ -600,6 +572,23 @@ export class AnimationService {
     }
     console.log(this.timeLine);
   }
+
+  SaveAnimationAsJSON() {
+    let arr: any[] = [];
+    console.log(this.actions);
+    this.actions.forEach(action => {
+      let clip = action.getClip();
+      let json = THREE.AnimationClip.toJSON(clip);
+      arr.push(JSON.stringify(json))
+      console.log(json);
+    })
+    const a = document.createElement("a");
+    const file = new Blob(arr, { type: "application/json" });
+    a.href = URL.createObjectURL(file);
+    a.download = "Animation";
+    a.click();
+  }
+
   ClearAnimation() {
     if (this.SceneUtilsService.model != undefined) {
       this.SceneUtilsService.model.traverse(item => {
