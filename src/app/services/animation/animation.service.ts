@@ -31,13 +31,8 @@ export class AnimationService {
     let str = window.URL.createObjectURL(f.files[0]);
     console.log(str);
     if (str.length != 0) {
-      this.ClearAnimation();
-      this.id = 0;
-      this.CreateTreeViewElements(this.SceneUtilsService.scene);
-      this.CreateMixers(this.SceneUtilsService.model);
-      await this.LoadAnimation(str);
-      //this.SceneUtilsService.newFileLoading = !this.SceneUtilsService.newFileLoading;
-      console.log("LOAD ANIMATION!");
+      this.ClearAnimation(true);
+      await this.LoadAnimation(str, f.files[0].name);
       (event.target as any).value = "";
     }
   }
@@ -314,7 +309,6 @@ export class AnimationService {
         let act = e["action"];
         act.paused = false;
       });
-    this.UpdateAction(keyframe.action);
   }
 
   UpdatePropertyBinding(action: any, track: AnimationModel.KeyframeTrackModel) {
@@ -416,17 +410,69 @@ export class AnimationService {
     return arr;
   }
 
-  async LoadAnimation(URL: string) {
+  async LoadAnimation(url: string, fileName: string): Promise<boolean> {
+    if (/(.(xml|xmla)$)/.test(fileName!)) {
+      console.log(/(.(xml|xmla)$)/.exec(fileName!)![2]);
+      await this.LoadAnimationFromKompasXML(url);
+      return true;
+    }
+    else if (/(.(json|JSON)$)/.test(fileName!)) {
+      console.log(/(.(json|JSON)$)/.exec(fileName!)![2]);
+      await this.LoadAnimationFromThreeJSON(url);
+      return true;
+    }
+    else return false;
+  }
+
+  async LoadAnimationFromThreeJSON(url: string) {
+    let response = await fetch(url);
+    let buffer = await response.text();
+    let json = JSON.parse(buffer);
+    (json as Array<any>).forEach(item => {
+      switch (item["type"]) {
+        case "Mesh":
+          let clip: THREE.AnimationClip = THREE.AnimationClip.parse(item);
+          let mixer!: THREE.AnimationMixer;
+          mixer = this.mixers.find(mixer => (mixer.getRoot() as THREE.Object3D).name == item.name)!;
+          if (mixer == undefined) {
+            let arr: any[] = [];
+            this.SceneUtilsService.FindMeshes(this.SceneUtilsService.model, arr);
+            let object = arr.find(mesh => mesh.name == item.name);
+            if (object != undefined) {
+              mixer = new THREE.AnimationMixer(object);
+              this.mixers.push(mixer);
+            }
+          }
+          let animTrack = this.timeLine.tracks.find(track => track.object == mixer.getRoot());
+          clip.tracks.forEach(track => {
+            let action = this.CreateAction(animTrack!, track.name);
+            let n = track.getValueSize();
+            track.times.forEach((time, i) => {
+              let values: any[] = [];
+              for (let j = 0; j < n; j++) {
+                values.push(track.values[i * n + j]);
+              }
+              this.CreateKeyframe(action, track.name, time, values);
+            })
+          })
+          // if (mixer == undefined) {
+          //   mixer = new THREE.AnimationMixer(keyframe.action.trackDOM.object);
+          //   this.mixers.push(mixer);
+          // }
+          break;
+      }
+
+    })
+  }
+
+  async LoadAnimationFromKompasXML(url: string) {
     // Чтение анимации
     // Создание объекта парсера XML/HTML-файлов
     let parser = new DOMParser();
-    let fileUrl1 = URL;
-    // let fileUrl1 = 'http://127.0.0.1:5500/src/Animations/Разрез.xml';
-    let response1 = await fetch(fileUrl1);
-    let buffer1 = await response1.text();
+    let response = await fetch(url);
+    let buffer = await response.text();
     // Преобразование файла в DOM элемент
-    let dom = parser.parseFromString(buffer1, "text/xml");
-    // console.log(dom);
+    let dom = parser.parseFromString(buffer, "text/xml");
     // Текущий шаг анимации
     let currentStep = 0;
     let stepTime = 0;
@@ -434,7 +480,6 @@ export class AnimationService {
     //перебор шагов анимации
     dom.children[0].childNodes.forEach(step => {
       if (step.nodeName == "Step") {
-        //console.log(step)
         let stepHTML = step as HTMLElement;
         currentStep = Number.parseInt(stepHTML.attributes.getNamedItem("Number")?.nodeValue!);
         // Поиск деталей в шаге
@@ -468,7 +513,6 @@ export class AnimationService {
                 dx = Number.parseFloat(/[X][=](-?\d+.\d+)/.exec(line!)![1]);
                 dy = Number.parseFloat(/[Y][=](-?\d+.\d+)/.exec(line!)![1]);
                 dz = Number.parseFloat(/[Z][=](-?\d+.\d+)/.exec(line!)![1]);
-                // console.log(dx, dy, dz)
               }
               // Анимация прозрачности
               if (partNode.nodeName == "Transparency") {
@@ -486,7 +530,6 @@ export class AnimationService {
                 let dir = Number.parseInt(axis.attributes.getNamedItem("Direct")?.nodeValue!) * 2 - 1;
                 angle = Number.parseFloat(axis.attributes.getNamedItem("Angle")?.nodeValue!) * dir;
                 par = Number.parseFloat(axis.attributes.getNamedItem("Param")?.nodeValue!);
-                //console.log(axis, dir, angle)
               }
               if (par! > maxTime) {
                 maxTime = par!;
@@ -496,15 +539,14 @@ export class AnimationService {
                 let partMixer: any[] = [];
                 // Поиск миксеров(дорожек) анимации
                 this.FindMixer(this.mixers, part, partMixer);
-                // this.FindMixer(this.edgeMixers, part, edgeMixer);
                 if (partMixer.length != 0) {
                   partMixer.forEach(mixer => {
                     // Добавление анимации перемещения в миксер детали
                     let mesh = mixer.getRoot() as THREE.Mesh;
                     if (move) {
-                      mesh.updateWorldMatrix(true, true)
+                      mesh.updateWorldMatrix(true, true);
                       let vec = new THREE.Vector3(dx, dy, dz);
-                      vec.add(part.position)
+                      vec.add(part.position);
                       let startPos = mesh.position;
                       part.worldToLocal(vec);
                       let finalPos = vec.multiplyScalar(par).add(startPos);
@@ -564,12 +606,6 @@ export class AnimationService {
         stepTime += maxTime;
       }
     })
-    AnimationModel.GetArrayTimeLine(this.timeLine);
-    let i = this.timeLine.tracks.findIndex(item => item.object == this.SceneUtilsService.orthographicCamera)
-    console.log(i);
-    if (i != undefined) {
-      this.timeLine.array?.splice(i, 1);
-    }
     console.log(this.timeLine);
   }
 
@@ -579,17 +615,18 @@ export class AnimationService {
     this.actions.forEach(action => {
       let clip = action.getClip();
       let json = THREE.AnimationClip.toJSON(clip);
-      arr.push(JSON.stringify(json))
-      console.log(json);
+      json.type = action.getRoot().type;
+      arr.push(JSON.stringify(json));
+      console.log(JSON.stringify(json));
     })
     const a = document.createElement("a");
-    const file = new Blob(arr, { type: "application/json" });
+    const file = new Blob(["[" + arr.toString() + "]"], { type: "application/json" });
     a.href = URL.createObjectURL(file);
     a.download = "Animation";
     a.click();
   }
 
-  ClearAnimation() {
+  ClearAnimation(clearTree: boolean = false) {
     if (this.SceneUtilsService.model != undefined) {
       this.SceneUtilsService.model.traverse(item => {
         item.animations = [];
@@ -610,5 +647,11 @@ export class AnimationService {
     this.actions = [];
     this.mixers = [];
     this.timeLine.array = [];
+    if (clearTree) {
+      this.id = 0;
+      this.CreateTreeViewElements(this.SceneUtilsService.scene);
+      this.CreateMixers(this.SceneUtilsService.model);
+      AnimationModel.GetArrayTimeLine(this.timeLine);
+    }
   }
 }
