@@ -129,7 +129,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.scene.add(this.SceneUtilsService.annotationGroup);
   }
   startRenderingLoop() {
-    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: false, failIfMajorPerformanceCaveat: true });
+    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, failIfMajorPerformanceCaveat: true });
     this.SceneUtilsService.renderer = this.renderer;
     this.renderer.shadowMap.enabled = true;
     // this.renderer.localClippingEnabled = true;

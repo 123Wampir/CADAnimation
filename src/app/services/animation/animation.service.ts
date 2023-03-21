@@ -20,9 +20,6 @@ export class AnimationService {
   actions: THREE.AnimationAction[] = [];
   mixers: THREE.AnimationMixer[] = [];
   timeLine: AnimationModel.TimelineModel = { tracks: [], duration: 30, scale: 50 };
-  dialogShow = false;
-  dialogModal = false;
-  dialogType = "";
 
   async LoadAnimationFile(event: Event) {
     console.log(event);

@@ -74,6 +74,10 @@ export class SceneUtilsService {
   ContextmenuComponent!: ContextmenuComponent;
   ViewcubeComponent!: ViewcubeComponent;
 
+  dialogType = "";
+  dialogShow = false;
+  dialogModal = false;
+
   CTRLPressed: boolean = false;
   SHIFTPressed: boolean = false;
 

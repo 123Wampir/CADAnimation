@@ -141,6 +141,18 @@ input[type="color"] {
     min-width: 50px;
 }
 
+select {
+    margin: 2px 4px;
+    align-self: center;
+    border-radius: 0;
+    background: var(--third-color);
+    color: var(--text-color);
+    border-color: var(--main-color);
+    box-shadow: inset 0px 0px 3px 0px var(--second-color);
+    min-width: 0;
+    border-style: inset;
+}
+
 .button-icon {
     padding: 0;
     aspect-ratio: 1;

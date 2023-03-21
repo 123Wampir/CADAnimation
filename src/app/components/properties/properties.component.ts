@@ -353,8 +353,8 @@ export class PropertiesComponent implements OnInit, OnChanges {
   }
   OnCameraRotation($event: MouseEvent) {
     this.SceneUtilsService.currentCamera.lookAt(this.SceneUtilsService.scene.position);
-    this.AnimationService.dialogType = "CameraRotation";
-    this.AnimationService.dialogShow = true;
+    this.SceneUtilsService.dialogType = "cameraRotation";
+    this.SceneUtilsService.dialogShow = true;
   }
   OnShadowCameraChange(event: Event) {
     this.propertiesObject.shadow.camera.left = -this.shadowWidth / 2;

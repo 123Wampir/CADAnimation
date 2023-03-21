@@ -1,9 +1,8 @@
 .container {
     display: grid;
-    grid-template-rows: 50px auto 30px;
+    grid-template-rows: 50px auto;
     top: 200px;
     left: 200px;
-    /* border: 2px solid black; */
     min-width: min-content;
     min-height: min-content;
     visibility: hidden;
@@ -34,4 +33,10 @@
     display: flex;
     align-items: center;
     margin: 2px 0;
+}
+
+.snapshot {
+    border: 1px solid var(--second-color);
+    box-shadow: 0px 2px 3px 0px var(--second-color);
+    margin: 5px;
 }

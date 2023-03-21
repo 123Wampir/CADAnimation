@@ -26,6 +26,7 @@ This app also support animation import from CAD Kompas3D (but only translation a
 - :floppy_disk: Export your models to GLTF
 - :ice_cube: Navigate with the handy ViewCube
 - :city_sunset: Make your scene look better with background color, grid, ground reflection, orthographic camera, outlines and wireframes
+- :framed_picture: Create snapshot of the size you want
 - :bulb: Add and animate different types of light
 - :speech_balloon: Add and animate annotation
 - :scissors: Create animation with cutting planes
@@ -37,7 +38,7 @@ This app also support animation import from CAD Kompas3D (but only translation a
 
 ## To Do
 - [x] Model explode animation (Select group of objects and them press button for exploded view)
-- [ ] Animation saving/loading
+- [x] Animation saving/loading (Save and Load your animation as a simple JSON file)
 - [ ] Scene record and export to your PC
 - [ ] How to use tutorials
 - [ ] (maybe in the future) Three PathTracing support

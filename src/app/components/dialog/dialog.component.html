@@ -1,12 +1,12 @@
 <div class="container" #container id="container" (mousemove)="OnMouseMove($event)" (mouseup)="OnMouseUp($event)">
     <div class="header" (mousedown)="OnMouseDown($event)">
-        <div class="label">Диалоговое окно</div>
+        <div class="label" style="align-self: center;">Диалоговое окно</div>
         <button class="button-icon" (click)="CloseClick($event)">
             <img src="../../../assets/cancel.png" class="no-filter" alt="button-icon" width="19px" height="19px">
         </button>
     </div>
     <div class="form" [ngSwitch]="type">
-        <div *ngSwitchCase="'CameraRotation'">
+        <div *ngSwitchCase="'cameraRotation'">
             <!--Лучше вывести в отдельный компонент-->
             <div class="line">
                 <div class="param">
@@ -44,7 +44,50 @@
             </div>
             <button (click)="OnCameraRotationCreate($event)">Создать</button>
         </div>
-        <div *ngSwitchCase="'Settings'"></div>
-        <div *ngSwitchCase="'Render'"></div>
+        <div *ngSwitchCase="'snapshot'">
+            <div class="line">
+                <div class="param">
+                    <div class="label">Соотношение сторон</div>
+                    <div class="inputs">
+                        <select name="Aspect ration" (change)="OnAspectRatioChange($event)">
+                            <option [value]="16/9" selected>16:9</option>
+                            <option [value]="4/3">4:3</option>
+                            <option [value]="5/3">5:3</option>
+                            <option [value]="1">1:1</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">Ширина</div>
+                    <div class="inputs">
+                        <input type="number" class="input-number" min="1" max="5000" placeholder="Width"
+                            [(ngModel)]="canvasWidth" (ngModelChange)="SetCanvasWidth()">
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">Высота</div>
+                    <div class="inputs">
+                        <input type="number" class="input-number" min="1" max="5000" placeholder="height"
+                            [(ngModel)]="canvasHeight" (ngModelChange)="SetCanvasHeight()">
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <button class="button-icon" (click)="RenderSnapshot()">
+                    <img src="../../../assets/snapshot.png" alt="button-icon" width="19px" height="19px">
+                </button>
+                <button class="button-icon" (click)="SaveSnapshot()">
+                    <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px">
+                </button>
+            </div>
+            <div style="aspect-ratio: 1;">
+                <canvas class="snapshot" #canvas width="1920" height="1080" [style]="SetCanvasStyle()"></canvas>
+            </div>
+        </div>
+        <div *ngSwitchCase="'settings'"></div>
     </div>
 </div>

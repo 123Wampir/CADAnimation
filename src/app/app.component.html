@@ -1,12 +1,4 @@
 <router-outlet></router-outlet>
-<!-- <div class="btns">
-    <label class="file-label" for="fileUpload">
-        <input class="file" type="file" name="file" id="fileUpload" accept=".step,.stp,.gltf,.brep,.igs"
-            (change)="LoadFile($event)">
-        Загрузить модель
-    </label>
-    <button class="file-label" id="fileSave" (click)="SaveFile($event)">Сохранить модель </button>
-</div> -->
 <app-menubar></app-menubar>
 <app-properties [selected]="SceneUtilsService.selectionChange" [curTime]="AnimationService.currentTime"
     [transformed]="SceneUtilsService.transformChange">
@@ -18,5 +10,5 @@
 <app-timeline [curTime]="AnimationService.currentTime" [selChange]="SceneUtilsService.selectionChange"
     [newFile]="SceneUtilsService.newFileLoading">
 </app-timeline>
-<app-dialog [show]="AnimationService.dialogShow" [modal]="AnimationService.dialogModal"
-    [type]="AnimationService.dialogType"></app-dialog>
+<app-dialog [show]="SceneUtilsService.dialogShow" [modal]="SceneUtilsService.dialogModal"
+    [type]="SceneUtilsService.dialogType"></app-dialog>

@@ -62,7 +62,10 @@ export class MenubarComponent {
       mesh.material.wireframe = this.SceneUtilsService.wireframe;
     })
   }
-
+  CreateSnapshot() {
+    this.SceneUtilsService.dialogType = "snapshot";
+    this.SceneUtilsService.dialogShow = true;
+  }
   SetTheme(type: number) {
     switch (type) {
       case 0:

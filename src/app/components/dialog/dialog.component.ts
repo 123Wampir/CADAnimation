@@ -15,8 +15,12 @@ export class DialogComponent implements OnInit, OnChanges {
     public SceneUtilsService: SceneUtilsService) { }
 
   @ViewChild('container') containerRef!: ElementRef;
+  @ViewChild('canvas') canvasRef!: ElementRef;
   get container(): HTMLCanvasElement {
     return this.containerRef.nativeElement
+  }
+  get canvas(): HTMLCanvasElement {
+    return this.canvasRef.nativeElement
   }
   @Input() show = false;
   @Input() modal = false;
@@ -27,6 +31,10 @@ export class DialogComponent implements OnInit, OnChanges {
   endTime = 5;
   rotAngle = 360;
   rotDirection = true;
+
+  canvasWidth = 1920;
+  canvasHeight = 1080;
+  aspect = 16 / 9;
 
   ngOnInit(): void {
   }
@@ -71,39 +79,67 @@ export class DialogComponent implements OnInit, OnChanges {
       this.AnimationCreatorService.OnCameraChange(this.SceneUtilsService.perspectiveCamera);
     }
   }
-
-
-  RotateOnAxis(id: string) {
-    // let axis = this.SceneUtilsService.axisGroup.find(item => item.id == Number.parseInt(id));
-    // if (axis != undefined) {
-    //   axis.updateWorldMatrix(true, true);
-    //   let axisPos = new THREE.Vector3().setFromMatrixPosition(axis.matrixWorld);
-    //   let direction: THREE.Vector3 = (axis as THREE.Line).userData['direction'];
-    //   let dir = direction.clone();
-    //   let q = new THREE.Quaternion().setFromRotationMatrix(axis.matrixWorld);
-    //   dir.applyQuaternion(q);
-    //   dir.normalize();
-    //   console.log(q, dir);
-    //   let rot = dir.clone().multiplyScalar(this.rotAngle * Math.PI / 180);
-    //   console.log(rot);
-    //   this.SceneUtilsService.selected.forEach(item => {
-    //     item.updateMatrixWorld(true);
-    //     let pos = new THREE.Vector3().setFromMatrixPosition(item.matrixWorld);
-    //     let diff = pos.clone().sub(axisPos!);
-    //     diff.applyAxisAngle(dir, this.rotAngle * Math.PI / 180);
-    //     diff.add(axisPos!);
-    //     item.position.set(diff.x, diff.y, diff.z);
-    //     item.rotateOnWorldAxis(dir, this.rotAngle * Math.PI / 180)
-    //     //how to rotate around axis
-    //   })
-    // }
+  SaveSnapshot() {
+    this.canvas.toBlob(function (blob) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob!);
+      a.download = "snapshot";
+      a.click();
+    });
   }
-
+  RenderSnapshot() {
+    let context = this.canvas.getContext("2d");
+    if (this.SceneUtilsService.currentCamera.type == "PerspectiveCamera") {
+      this.SceneUtilsService.perspectiveCamera.aspect = this.aspect;
+      this.SceneUtilsService.perspectiveCamera.updateProjectionMatrix();
+    }
+    else {
+      this.SceneUtilsService.orthographicCamera.left = -this.SceneUtilsService.frustumSize * this.aspect / 2;
+      this.SceneUtilsService.orthographicCamera.right = this.SceneUtilsService.frustumSize * this.aspect / 2;
+      this.SceneUtilsService.orthographicCamera.top = this.SceneUtilsService.frustumSize / 2;
+      this.SceneUtilsService.orthographicCamera.bottom = -this.SceneUtilsService.frustumSize / 2;
+      this.SceneUtilsService.orthographicCamera.updateProjectionMatrix();
+    }
+    this.SceneUtilsService.renderer.setSize(this.canvasWidth, this.canvasHeight);
+    this.SceneUtilsService.CSSRenderer.setSize(this.canvasWidth, this.canvasHeight);
+    this.SceneUtilsService.renderer.render(this.SceneUtilsService.scene, this.SceneUtilsService.currentCamera);
+    this.SceneUtilsService.CSSRenderer.render(this.SceneUtilsService.scene, this.SceneUtilsService.currentCamera);
+    if (this.SceneUtilsService.outline)
+      if (this.SceneUtilsService.model != undefined)
+        this.SceneUtilsService.AppComponent.effect.renderOutline(this.SceneUtilsService.scene, this.SceneUtilsService.currentCamera);
+    context?.drawImage(this.SceneUtilsService.renderer.domElement, 0, 0, this.canvas.width, this.canvas.height);
+    this.SceneUtilsService.onResize();
+  }
+  SetCanvasWidth() {
+    this.canvas.width = this.canvasWidth;
+    this.canvasHeight = Math.round(this.canvas.width / this.aspect)
+    this.canvas.height = this.canvasHeight;
+    if (this.canvas.width != 0)
+      this.RenderSnapshot()
+  }
+  SetCanvasHeight() {
+    this.canvas.height = this.canvasHeight;
+    this.canvasWidth = Math.round(this.canvas.height * this.aspect)
+    this.canvas.width = this.canvasWidth;
+    if (this.canvas.height != 0)
+      this.RenderSnapshot()
+  }
+  OnAspectRatioChange(event: Event) {
+    this.aspect = Number((event.target as any).value);
+    this.SetCanvasWidth();
+  }
+  SetCanvasStyle() {
+    const width = 300;
+    return {
+      'width': `${width}px`,
+      'height': `${width / this.aspect}px`
+    }
+  }
 
   CloseClick(event: MouseEvent) {
     this.container.style.visibility = "hidden";
     this.show = false;
-    this.AnimationService.dialogShow = false;
+    this.SceneUtilsService.dialogShow = false;
   }
 
   OnMouseUp(event: MouseEvent) {
