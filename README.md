@@ -1,8 +1,8 @@
 # CADAnimation (Name still in work)
 
-This repo is my graduation work. Web application for creating a 3D models animation! Created with Angular and Three.js. Also i use Angular Materials and Quill.
+Get ready to dive into the world of 3D model animation with my graduation work! I've created a web application using Angular and Three.js that lets you bring your models to life. Plus, I've incorporated Angular Materials and Quill for a seamless user experience.
 
-You can already try it by following the [link](https://cad-animation.vercel.app/) (Most of the inscriptions are in Russian and will be translated later).
+You can try out the application right now by following the [link](https://cad-animation.vercel.app/) (please note that some of the inscriptions are currently in Russian and will be translated later). With intuitive controls and a user-friendly interface, you'll be creating stunning 3D animations in no time.
 
 ![Animation](readme/Кран%20анимация%20loosyMax.gif)
 
