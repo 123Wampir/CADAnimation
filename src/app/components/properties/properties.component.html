@@ -31,13 +31,6 @@
         </div>
         <div class="line" *ngIf="annotation">
             <div class="param">
-                <div class="label">Задать через смещение к цели</div>
-                <input type="checkbox" [(ngModel)]="annotationTarget" class="input-checkbox">
-            </div>
-            <button class="button-icon" style="visibility: hidden;"></button>
-        </div>
-        <div class="line" *ngIf="annotationTarget">
-            <div class="param">
                 <div class="label">Цель</div>
                 <div class="inputs">
                     <div class="target-name">{{targetName}}</div>
@@ -52,20 +45,6 @@
             <button *ngIf="targetSelect" class="button-icon" (click)="DiscardTargetSelect()">
                 <img src="../../../assets/cancel.png" class="no-filter" alt="button-icon" width="19px" height="19px">
             </button>
-        </div>
-        <div class="line" *ngIf="annotation && !annotationTarget">
-            <div class="param">
-                <div class="label">Цель</div>
-                <div class="inputs">
-                    <input type="number" class="input-number" placeholder="X" [(ngModel)]="targetVec.x"
-                        (ngModelChange)="OnTargetChange($event)">
-                    <input type="number" class="input-number" placeholder="Y" [(ngModel)]="targetVec.y"
-                        (ngModelChange)="OnTargetChange($event)">
-                    <input type="number" class="input-number" placeholder="Z" [(ngModel)]="targetVec.z"
-                        (ngModelChange)="OnTargetChange($event)">
-                </div>
-            </div>
-            <button class="button-icon" style="visibility: hidden;"></button>
         </div>
         <div class="line" *ngIf="posParam">
             <div class="param">
@@ -213,11 +192,14 @@
             <div class="param">
                 <div class="label">Направление</div>
                 <div class="inputs">
-                    <input type="number" class="input-number" placeholder="X" [(ngModel)]="targetVec.x"
+                    <input type="number" class="input-number" placeholder="X"
+                        [(ngModel)]="propertiesObject.userData['direction'].x"
                         (ngModelChange)="OnDirectionChange($event)">
-                    <input type="number" class="input-number" placeholder="Y" [(ngModel)]="targetVec.y"
+                    <input type="number" class="input-number" placeholder="Y"
+                        [(ngModel)]="propertiesObject.userData['direction'].y"
                         (ngModelChange)="OnDirectionChange($event)">
-                    <input type="number" class="input-number" placeholder="Z" [(ngModel)]="targetVec.z"
+                    <input type="number" class="input-number" placeholder="Z"
+                        [(ngModel)]="propertiesObject.userData['direction'].z"
                         (ngModelChange)="OnDirectionChange($event)">
                 </div>
             </div>

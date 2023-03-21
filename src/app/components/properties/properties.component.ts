@@ -26,10 +26,8 @@ export class PropertiesComponent implements OnInit, OnChanges {
   ambLight = false;
   cutPlane = false;
   annotation = false;
-  annotationTarget = false;
   axisParams = false;
   targetName = "";
-  targetVec = new THREE.Vector3(0);
   targetSelect = false;
   objectsSelect = false;
   targetArray: THREE.Object3D[] = [];
@@ -69,7 +67,6 @@ export class PropertiesComponent implements OnInit, OnChanges {
           this.cutPlane = false;
 
           this.annotation = false;
-          this.annotationTarget = false;
           this.targetName = "None";
 
           this.axisParams = false;
@@ -129,13 +126,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
             this.annotation = true;
             this.rotParam = false;
             this.opacityParam = false;
-            if (!(this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"].isVector3 == true) {
-              this.annotationTarget = true;
-              this.targetName = (this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"].name;
-            }
-            else {
-              this.targetVec = (this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"];
-            }
+            this.targetName = this.SceneUtilsService.selected[0].children[0].userData["target"].name;
           }
         }
         else {
@@ -202,7 +193,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
     this.propertiesObject.name = this.oldName;
     this.rename = false;
   }
-  
+
   InitExplode() {
     this.SceneUtilsService.CalculateCenter(this.SceneUtilsService.selected);
     this.SceneUtilsService.CalculateOffsets(this.SceneUtilsService.selected);
@@ -267,7 +258,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
     if (this.SceneUtilsService.targetArray.length != 0) {
       switch (this.propertiesObject.type) {
         case "Annotation":
-          (this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"] = this.SceneUtilsService.targetArray[0];
+          this.SceneUtilsService.selected[0].children[0].userData["target"] = this.SceneUtilsService.targetArray[0];
           break;
         case "Axis":
           this.SceneUtilsService.targetArray[0].attach(this.propertiesObject);
@@ -306,15 +297,11 @@ export class PropertiesComponent implements OnInit, OnChanges {
   OnAxisAngleChange(event: Event) {
     this.AnimationCreatorService.OnAxisAngleChange(this.propertiesObject);
   }
-  OnTargetChange(event: Event) {
-    (this.SceneUtilsService.selected[0].children[0] as THREE.Line).geometry.userData["target"] = this.targetVec;
-  }
   OnDirectionChange(event: Event) {
+    (this.SceneUtilsService.selected[0] as THREE.Line).userData["direction"].normalize();
     let points = [];
     points.push(new THREE.Vector3(0));
-    let dir = this.targetVec.clone().normalize();
-    (this.SceneUtilsService.selected[0] as THREE.Line).userData["direction"] = dir;
-    points.push(dir.clone().multiplyScalar(500));
+    points.push((this.SceneUtilsService.selected[0] as THREE.Line).userData["direction"].clone().multiplyScalar(500));
     (this.SceneUtilsService.selected[0] as THREE.Line).geometry.setFromPoints(points);
     (this.SceneUtilsService.selected[0] as THREE.Line).geometry.attributes['position'].needsUpdate = true;
   }

@@ -13,9 +13,9 @@ export class SceneManagerService {
   constructor(public SceneUtilsService: SceneUtilsService) { }
 
 
-  AddDirectionalLight(): THREE.DirectionalLight {
+  AddDirectionalLight(name?: string): THREE.DirectionalLight {
     let light = new THREE.DirectionalLight(0xffffff, 2.2);
-    light.name = light.type + `_${++this.id}`;
+    name != undefined ? light.name = name : light.name = light.type + `_${++this.id}`;
     let lightHelper = new THREE.DirectionalLightHelper(light, 10, light.color);
     lightHelper.matrixWorld = light.matrixWorld;
     light.add(lightHelper);
@@ -29,9 +29,9 @@ export class SceneManagerService {
     AnimationModel.GetArrayTimeLine(this.SceneUtilsService.AnimationService.timeLine);
     return light;
   }
-  AddPointLight(): THREE.PointLight {
+  AddPointLight(name?: string): THREE.PointLight {
     let light = new THREE.PointLight(0xffffff, 2.2, 10000);
-    light.name = light.type + `_${++this.id}`;
+    name != undefined ? light.name = name : light.name = light.type + `_${++this.id}`;
     let lightHelper = new THREE.PointLightHelper(light, 5, light.color);
     lightHelper.matrixWorld = light.matrixWorld;
     light.add(lightHelper);
@@ -44,13 +44,13 @@ export class SceneManagerService {
     return light;
   }
 
-  AddAnnotation(): CSS2DObject {
+  AddAnnotation(name?: string): CSS2DObject {
     let annDiv = this.SceneUtilsService.angRenderer.createElement('div');
     this.SceneUtilsService.angRenderer.addClass(annDiv, "annotation-container");
     annDiv.innerText = "Text";
     let annotation = new CSS2DObject(annDiv);
     annotation.type = "Annotation";
-    annotation.name = `Annotation_${++this.id}`;
+    name != undefined ? annotation.name = name : annotation.name = `Annotation_${++this.id}`;
     this.SceneUtilsService.annotationGroup.add(annotation);
     annotation.position.set(10, -10, 30);
     let pts = [];
@@ -58,25 +58,20 @@ export class SceneManagerService {
     pts.push(annotation.worldToLocal(new THREE.Vector3(0)));
     pts.push(new THREE.Vector3(0));
     let geom = new THREE.BufferGeometry().setFromPoints(pts);
-    geom.userData = { target: new THREE.Vector3(0) };
     let mat = new THREE.LineBasicMaterial({ color: 0x000000 });
     let line = new THREE.Line(geom, mat);
+    line.userData = { target: line };
     line.type = "Ignore";
-    line.onAfterRender = function (renderer, scene, camera, geometry) {
+    line.onAfterRender = function () {
       this.updateMatrixWorld(true);
       let vec!: THREE.Vector3;
-      if ((geometry.userData['target'].isVector3 == true)) {
-        vec = this.worldToLocal(geometry.userData['target'].clone());
-      }
-      else {
-        let pos = new THREE.Vector3().setFromMatrixPosition(geometry.userData['target'].matrixWorld);
-        vec = this.worldToLocal(pos);
-      }
+      let pos = new THREE.Vector3().setFromMatrixPosition(this.userData['target'].matrixWorld);
+      vec = this.worldToLocal(pos);
       let points = [];
       points.push(vec);
       points.push(new THREE.Vector3(0));
-      geometry.setFromPoints(points);
-      geometry.attributes['position'].needsUpdate = true;
+      this.geometry.setFromPoints(points);
+      this.geometry.attributes['position'].needsUpdate = true;
     }
     annotation.add(line);
     this.SceneUtilsService.Select(this.SceneUtilsService.targetArray, annotation, false);
@@ -86,22 +81,17 @@ export class SceneManagerService {
     return annotation;
   }
 
-  AddAxis(): THREE.Line {
+  AddAxis(name?: string): THREE.Line {
     let pt = [new THREE.Vector3(0), new THREE.Vector3(0, 0, 10)];
     let geom = new THREE.BufferGeometry().setFromPoints(pt);
     let mat = new THREE.LineBasicMaterial({ color: 0x0000FF });
     let line = new THREE.Line(geom, mat);
     this.SceneUtilsService.scene.add(line);
-    console.log(line);
-
     this.SceneUtilsService.axisArray.push(line);
-    line.name = `Axis_${++this.id}`;
+    name != undefined ? line.name = name : line.name = `Axis_${++this.id}`;
     line.type = "Axis";
     line.userData['direction'] = new THREE.Vector3(0);
     line.userData['objects'] = new Array<THREE.Object3D>(0);
-    // let arr: any[] = [];
-    // this.SceneUtilsService.FindMeshes(this.SceneUtilsService.model, arr);
-    // line.userData['objects'] = arr;
     line.userData['angle'] = 0;
     line.userData['oldAngle'] = 0;
     line.onAfterRender = function (renderer, scene, camera, geometry) {

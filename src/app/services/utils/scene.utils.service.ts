@@ -361,24 +361,6 @@ export class SceneUtilsService {
   }
   Select(target: THREE.Object3D[], obj: any, CTRLPressed: boolean) {
     let transform = false;
-    // if (this.selectReturn) {
-    //   switch (this.selectTarget) {
-    //     case "Annotation":
-    //       (this.selected[0].children[0] as THREE.Line).geometry.userData["target"] = obj;
-    //       break;
-    //     case "Axis":
-    //       obj.attach(this.selected[0]);
-    //       break;
-    //     default:
-    //       this.ClearSelection(target);
-    //       this.selected.push(obj);
-    //       this.selectionChange = !this.selectionChange;
-    //       break;
-    //   }
-    //   this.selectionChange = !this.selectionChange;
-    //   this.selectReturn = false;
-    //   return obj;
-    // }
     if (!CTRLPressed) {
       this.selectionChange = !this.selectionChange;
       this.ClearSelection(target);
@@ -447,8 +429,6 @@ export class SceneUtilsService {
         })
       }
     }
-    console.log(this.selected);
-    console.log(this.targetArray);
     if (this.attachTransform)
       this.selectionChange = !this.selectionChange;
   }

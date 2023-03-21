@@ -428,40 +428,58 @@ export class AnimationService {
     let response = await fetch(url);
     let buffer = await response.text();
     let json = JSON.parse(buffer);
+    console.log(json);
     (json as Array<any>).forEach(item => {
-      switch (item["type"]) {
-        case "Mesh":
-          let clip: THREE.AnimationClip = THREE.AnimationClip.parse(item);
-          let mixer!: THREE.AnimationMixer;
-          mixer = this.mixers.find(mixer => (mixer.getRoot() as THREE.Object3D).name == item.name)!;
-          if (mixer == undefined) {
-            let arr: any[] = [];
-            this.SceneUtilsService.FindMeshes(this.SceneUtilsService.model, arr);
-            let object = arr.find(mesh => mesh.name == item.name);
-            if (object != undefined) {
-              mixer = new THREE.AnimationMixer(object);
-              this.mixers.push(mixer);
-            }
-          }
-          let animTrack = this.timeLine.tracks.find(track => track.object == mixer.getRoot());
-          clip.tracks.forEach(track => {
-            let action = this.CreateAction(animTrack!, track.name);
-            let n = track.getValueSize();
-            track.times.forEach((time, i) => {
-              let values: any[] = [];
-              for (let j = 0; j < n; j++) {
-                values.push(track.values[i * n + j]);
-              }
-              this.CreateKeyframe(action, track.name, time, values);
-            })
-          })
-          // if (mixer == undefined) {
-          //   mixer = new THREE.AnimationMixer(keyframe.action.trackDOM.object);
-          //   this.mixers.push(mixer);
-          // }
-          break;
+      let clip: THREE.AnimationClip = THREE.AnimationClip.parse(item);
+      let animTrack = this.timeLine.tracks.find(track => track.name == item.name);
+      if (item.type == "PlaneHelper") {
+        if (item.normal != undefined)
+          (animTrack?.object as THREE.PlaneHelper).plane.normal.set(item.normal.x, item.normal.y, item.normal.z);
       }
-
+      if (animTrack == undefined) {
+        if ((item.type as string).includes("Light")) {
+          switch (item.type) {
+            case "DirectionalLight":
+              this.SceneUtilsService.SceneManagerService.AddDirectionalLight(item.name);
+              break;
+            case "PointLight":
+              this.SceneUtilsService.SceneManagerService.AddPointLight(item.name);
+              break;
+          }
+        }
+        else if (item.type == "Annotation") {
+          this.SceneUtilsService.SceneManagerService.AddAnnotation(item.name);
+        }
+        else if (item.type == "Axis") {
+          let axis = this.SceneUtilsService.SceneManagerService.AddAxis(item.name);
+          if (item.parent != "") {
+            let track = this.timeLine.tracks.find(track => track.name == item.parent);
+            if (track != undefined)
+              track.object.attach(axis);
+          }
+          axis.position.set(item.position.x, item.position.y, item.position.z);
+          axis.userData["direction"] = new THREE.Vector3(item.direction.x, item.direction.y, item.direction.z);
+          let objects: THREE.Object3D[] = [];
+          (item.objects as Array<any>).forEach(objName => {
+            let track = this.timeLine.tracks.find(track => track.name == objName);
+            if (track != undefined)
+              objects.push(track.object);
+          });
+          axis.userData["objects"] = objects.slice(0);
+        }
+        animTrack = this.timeLine.tracks.find(track => track.name == item.name);
+      }
+      clip.tracks.forEach(track => {
+        let action = this.CreateAction(animTrack!, track.name);
+        let n = track.getValueSize();
+        track.times.forEach((time, i) => {
+          let values: any[] = [];
+          for (let j = 0; j < n; j++) {
+            values.push(track.values[i * n + j]);
+          }
+          this.CreateKeyframe(action, track.name, time, values);
+        })
+      })
     })
   }
 
@@ -615,7 +633,24 @@ export class AnimationService {
     this.actions.forEach(action => {
       let clip = action.getClip();
       let json = THREE.AnimationClip.toJSON(clip);
-      json.type = action.getRoot().type;
+      let obj = action.getRoot();
+      json.type = obj.type;
+      if (obj.type == "PlaneHelper") {
+        json.normal = (obj as THREE.PlaneHelper).plane.normal;
+      }
+      else if (obj.type == "Annotation") {
+        json.target = obj.children[0].userData["target"].name;
+      }
+      else if (obj.type == "Axis") {
+        let nameArr: string[] = [];
+        (obj.userData["objects"] as Array<THREE.Object3D>).forEach(item => {
+          nameArr.push(item.name);
+        })
+        json.position = obj.position;
+        json.parent = obj.parent?.name;
+        json.direction = obj.userData["direction"];
+        json.objects = nameArr;
+      }
       arr.push(JSON.stringify(json));
       console.log(JSON.stringify(json));
     })
