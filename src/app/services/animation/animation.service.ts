@@ -445,6 +445,9 @@ export class AnimationService {
             case "PointLight":
               this.SceneUtilsService.SceneManagerService.AddPointLight(item.name);
               break;
+            case "SpotLight":
+              this.SceneUtilsService.SceneManagerService.AddSpotLight(item.name);
+              break;
           }
         }
         else if (item.type == "Annotation") {
