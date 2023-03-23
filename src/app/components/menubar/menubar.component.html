@@ -97,7 +97,8 @@
                                             Direction Light</div>
                                         <div class="basic-line" (click)="SceneManagerService.AddPointLight()">Point
                                             Light</div>
-                                        <div class="basic-line">Spot Light</div>
+                                        <div class="basic-line" (click)="SceneManagerService.AddSpotLight()">Spot Light
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="basic-line">Удалить</div>
@@ -169,6 +170,14 @@
     <div class="toolbar-container">
         <div class="toolbar-tool">
             <input type="color" (change)="OnSceneColorChange($event)" id="scene-color">
+        </div>
+        <div class="toolbar-tool">
+            <input type="color" (change)="OnGroundColorChange($event)" id="ground-color">
+        </div>
+        <div class="vert-separator"></div>
+        <div class="toolbar-tool">
+            <input class="input-number" min="0" max="1000" value="2" step="1" (change)="SetSceneFog($event)"
+                type="number" id="fog">
         </div>
         <div class="vert-separator"></div>
         <div class="toolbar-tool">

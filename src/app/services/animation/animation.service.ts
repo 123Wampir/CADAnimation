@@ -224,6 +224,9 @@ export class AnimationService {
       case ".intensity":
         newTrack = new THREE.NumberKeyframeTrack(type, times, values);
         break;
+      case ".angle":
+        newTrack = new THREE.NumberKeyframeTrack(type, times, values);
+        break;
       case ".plane.constant":
         newTrack = new THREE.NumberKeyframeTrack(type, times, values);
         break;

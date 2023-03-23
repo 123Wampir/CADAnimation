@@ -24,6 +24,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
   light = false;
   dirLight = false;
   ambLight = false;
+  spotLight = false;
   cutPlane = false;
   annotation = false;
   axisParams = false;
@@ -63,6 +64,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
           this.light = false;
           this.dirLight = false;
           this.ambLight = false;
+          this.spotLight = false;
 
           this.cutPlane = false;
 
@@ -105,7 +107,10 @@ export class PropertiesComponent implements OnInit, OnChanges {
               this.ambLight = true;
               this.posParam = false;
               this.rotParam = false;
-              this.opacityParam = false;
+            }
+            else if (this.propertiesObject.type == "SpotLight") {
+              this.spotLight = true;
+              this.rotParam = false;
             }
           }
           else if (this.propertiesObject.type == "PlaneHelper") {
@@ -154,7 +159,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
     }
     if (changes["transformed"] != undefined) {
       if (!this.axisParams)
-        this.OnPositionChange(new Event(""));
+        this.AnimationCreatorService.OnPositionChange(this.propertiesObject);
     }
     if (changes["curTime"] != undefined) {
       if (this.propertiesObject != undefined) {
@@ -239,9 +244,6 @@ export class PropertiesComponent implements OnInit, OnChanges {
   OnTextChange(event: any) {
     (this.SceneUtilsService.selected[0] as any).element.innerHTML = event.html;
   }
-  OnTextSave(event: Event) {
-    this.AnimationCreatorService.OnTextChange(this.propertiesObject);
-  }
   SelectTarget() {
     this.SceneUtilsService.targetArray = this.targetArray;
     this.SceneUtilsService.attachTransform = false;
@@ -294,9 +296,6 @@ export class PropertiesComponent implements OnInit, OnChanges {
     this.SceneUtilsService.targetArray = this.SceneUtilsService.selected;
     this.SceneUtilsService.selectionChange = !this.SceneUtilsService.selectionChange;
   }
-  OnAxisAngleChange(event: Event) {
-    this.AnimationCreatorService.OnAxisAngleChange(this.propertiesObject);
-  }
   OnDirectionChange(event: Event) {
     (this.SceneUtilsService.selected[0] as THREE.Line).userData["direction"].normalize();
     let points = [];
@@ -305,34 +304,9 @@ export class PropertiesComponent implements OnInit, OnChanges {
     (this.SceneUtilsService.selected[0] as THREE.Line).geometry.setFromPoints(points);
     (this.SceneUtilsService.selected[0] as THREE.Line).geometry.attributes['position'].needsUpdate = true;
   }
-  OnPositionChange(event: Event) {
-    this.AnimationCreatorService.OnPositionChange(this.propertiesObject);
-  }
+
   OnRotationChange(event: Event) {
     this.AnimationCreatorService.OnRotationChange(this.propertiesObject);
-  }
-  SetTransparancy(event: Event) {
-    this.SceneUtilsService.selected.forEach(item => {
-      if (item.type == "Mesh") {
-        (item as any).material.transparent = this.propertiesObject.material.transparent;
-        (item as any).material.needsUpdate = true;
-      }
-    })
-  }
-  OnOpacityChange(event: Event) {
-    this.AnimationCreatorService.OnOpacityChange(this.propertiesObject);
-  }
-  OnVisibleChange(event: Event) {
-    this.AnimationCreatorService.OnVisibleChange(this.propertiesObject);
-  }
-  OnColorChange(event: Event) {
-    this.AnimationCreatorService.OnColorChange(this.propertiesObject, this.hex);
-  }
-  OnIntensityChange(event: Event) {
-    this.AnimationCreatorService.OnIntencityChange(this.propertiesObject);
-  }
-  OnConstantChange(event: Event) {
-    this.AnimationCreatorService.OnConstantChange(this.propertiesObject);
   }
 
   DeleteKeyframe(event: MouseEvent) {
@@ -348,9 +322,6 @@ export class PropertiesComponent implements OnInit, OnChanges {
     this.AnimationService.selAction = [];
   }
 
-  OnCameraChange($event: MouseEvent) {
-    this.AnimationCreatorService.OnCameraChange(this.SceneUtilsService.perspectiveCamera);
-  }
   OnCameraRotation($event: MouseEvent) {
     this.SceneUtilsService.currentCamera.lookAt(this.SceneUtilsService.scene.position);
     this.SceneUtilsService.dialogType = "cameraRotation";

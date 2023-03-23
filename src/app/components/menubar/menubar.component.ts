@@ -37,7 +37,16 @@ export class MenubarComponent {
     color.getHSL(target);
     let l = Math.abs(Math.round(target.l) - 1);
     this.SceneUtilsService.renderer.setClearColor(color);
+    this.SceneUtilsService.scene.fog!.color = color;
     (this.SceneUtilsService.selectBox.material as THREE.LineBasicMaterial).color.setHSL(0, 0, l);
+  }
+  OnGroundColorChange(event: Event) {
+    let color: THREE.Color = new THREE.Color((event as any).target.value);
+    (this.SceneUtilsService.zeroPlane.material as THREE.MeshBasicMaterial).color = color;
+  }
+  SetSceneFog(event: Event) {
+    let n = (event as any).target.value / 10000;
+    (this.SceneUtilsService.scene.fog as THREE.FogExp2).density = n;
   }
   SetClipping(event: Event) {
     let e = event?.target as any;

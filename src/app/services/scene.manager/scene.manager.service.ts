@@ -17,11 +17,14 @@ export class SceneManagerService {
     let light = new THREE.DirectionalLight(0xffffff, 2.2);
     name != undefined ? light.name = name : light.name = light.type + `_${++this.id}`;
     let lightHelper = new THREE.DirectionalLightHelper(light, 10, light.color);
-    lightHelper.matrixWorld = light.matrixWorld;
     light.add(lightHelper);
+    lightHelper.matrixWorld = light.matrixWorld;
+    lightHelper.children[0].onBeforeRender = function () {
+      lightHelper.update();
+    }
     let cameraHelper = new THREE.CameraHelper(light.shadow.camera);
+    cameraHelper.visible = false;
     light.add(cameraHelper);
-    cameraHelper.matrixWorld = light.shadow.camera.matrixWorld;
     this.SceneUtilsService.lightGroup.add(light);
     this.SceneUtilsService.Select(this.SceneUtilsService.targetArray, light, false);
     let track = AnimationModel.FindKeyframeTrack(this.SceneUtilsService.AnimationService.timeLine, this.SceneUtilsService.lightGroup.name);
@@ -35,7 +38,22 @@ export class SceneManagerService {
     let lightHelper = new THREE.PointLightHelper(light, 5, light.color);
     lightHelper.matrixWorld = light.matrixWorld;
     light.add(lightHelper);
-    light.shadow.bias = - 0.005;
+    this.SceneUtilsService.lightGroup.add(light);
+    this.SceneUtilsService.Select(this.SceneUtilsService.targetArray, light, false);
+    let track = AnimationModel.FindKeyframeTrack(this.SceneUtilsService.AnimationService.timeLine, this.SceneUtilsService.lightGroup.name);
+    this.SceneUtilsService.AnimationService.CreateTreeViewElement(light, track);
+    AnimationModel.GetArrayTimeLine(this.SceneUtilsService.AnimationService.timeLine);
+    return light;
+  }
+  AddSpotLight(name?: string): THREE.SpotLight {
+    let light = new THREE.SpotLight(0xffffff, 2.2, 0, 0.5, 1);
+    name != undefined ? light.name = name : light.name = light.type + `_${++this.id}`;
+    let lightHelper = new THREE.SpotLightHelper(light, light.color);
+    lightHelper.matrixWorld = light.matrixWorld;
+    lightHelper.children[0].onBeforeRender = function () {
+      lightHelper.update();
+    }
+    light.add(lightHelper);
     this.SceneUtilsService.lightGroup.add(light);
     this.SceneUtilsService.Select(this.SceneUtilsService.targetArray, light, false);
     let track = AnimationModel.FindKeyframeTrack(this.SceneUtilsService.AnimationService.timeLine, this.SceneUtilsService.lightGroup.name);

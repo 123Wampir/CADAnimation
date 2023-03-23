@@ -49,6 +49,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   CreateScene() {
     this.scene = new THREE.Scene();
+    this.scene.fog = new THREE.FogExp2(0xffffff, 0.0002);
     this.SceneUtilsService.scene = this.scene;
     // Добавление и настройка камеры
     this.SceneUtilsService.perspectiveCamera = new THREE.PerspectiveCamera(45, this.getAspectRatio(), 1.0, 50000.0);
@@ -100,12 +101,12 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.raycaster = new THREE.Raycaster();
     this.pointer = new THREE.Vector2();
 
-    const planeGeometry = new THREE.PlaneGeometry(10000, 10000, 32, 32);
-    const planeMaterial = new THREE.ShadowMaterial({ color: 0x000000, side: THREE.DoubleSide, alphaToCoverage: true })
+    const planeGeometry = new THREE.CircleGeometry(10000);
+    const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, metalness: 0 });
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.name = "Zero Plane";
     plane.type = "Ignore";
-    const planeHelper = new THREE.GridHelper(1000, 100, 0x000000, 0xaaaaaa);
+    const planeHelper = new THREE.GridHelper(2000, 200, 0x000000, 0xaaaaaa);
     plane.add(planeHelper.rotateX(degToRad(90)));
     planeHelper.visible = false;
     plane.receiveShadow = true;
@@ -115,7 +116,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       textureHeight: window.innerHeight * window.devicePixelRatio,
       color: 0xb5b5b5
     });
-    mirror.position.z = -0.05;
+    mirror.position.z = 0.05;
     mirror.camera.layers.set(0);
     plane.add(mirror);
     this.scene.add(plane);

@@ -111,7 +111,6 @@ export class AnimationCreatorService {
     }
   }
   OnIntencityChange(obj: any) {
-    console.log(obj);
     if (obj != undefined) {
       let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
       let action = AnimationModel.FindActionByType(track, ".intensity");
@@ -125,6 +124,23 @@ export class AnimationCreatorService {
       }
       else {
         this.AnimationService.CreateKeyframe(action, ".intensity", this.AnimationService.currentTime, [obj.intensity]);
+      }
+    }
+  }
+  OnLightAngleChange(obj: any) {
+    if (obj != undefined) {
+      let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
+      let action = AnimationModel.FindActionByType(track, ".angle");
+      if (action == undefined) {
+        action = this.AnimationService.CreateAction(track, ".angle");
+      }
+      let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
+      if (keyframe != undefined) {
+        keyframe.value = [obj.angle];
+        this.AnimationService.ChangeKeyframe(keyframe);
+      }
+      else {
+        this.AnimationService.CreateKeyframe(action, ".angle", this.AnimationService.currentTime, [obj.angle]);
       }
     }
   }
