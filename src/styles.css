@@ -91,6 +91,10 @@ img {
     margin: 2px 10px;
 }
 
+.arrow-right {
+    padding-left: 20px;
+}
+
 .param {
     display: grid;
     width: 100%;

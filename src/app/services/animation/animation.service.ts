@@ -21,6 +21,56 @@ export class AnimationService {
   mixers: THREE.AnimationMixer[] = [];
   timeLine: AnimationModel.TimelineModel = { tracks: [], duration: 30, scale: 50 };
 
+
+  OnStartRecord(event: Event) {
+    this.startRecording(this.SceneUtilsService.renderer.domElement.captureStream(), 10000)
+      .then((recordedChunks) => {
+        let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(recordedBlob);
+        a.download = "Animation";
+        a.click();
+        console.log(
+          `Successfully recorded ${recordedBlob.size} bytes of ${recordedBlob.type} media.`
+        );
+      })
+      .catch((error) => {
+        if (error.name === "NotFoundError") {
+          console.log("Camera or microphone not found. Can't record.");
+        } else {
+          console.log(error);
+        }
+      });
+  }
+
+  wait(delayInMS: number) {
+    return new Promise((resolve) => setTimeout(resolve, delayInMS));
+  }
+
+  async startRecording(stream: MediaStream, lengthInMS: number) {
+    let recorder = new MediaRecorder(stream);
+    let data: any[] = [];
+
+    recorder.ondataavailable = (event) => data.push(event.data);
+    recorder.start();
+    console.log(`${recorder.state} for ${lengthInMS / 1000} seconds…`);
+
+    let stopped = new Promise((resolve, reject) => {
+      recorder.onstop = resolve;
+      recorder.onerror = (event: any) => reject(event.name);
+    });
+
+    let recorded = this.wait(lengthInMS).then(() => {
+      if (recorder.state === "recording") {
+        recorder.stop();
+      }
+    });
+
+    return Promise.all([stopped, recorded]).then(() => data);
+  }
+
+
+
   async LoadAnimationFile(event: Event) {
     console.log(event);
     let f = event.target as any;
@@ -411,7 +461,7 @@ export class AnimationService {
   }
 
   async LoadAnimation(url: string, fileName: string): Promise<boolean> {
-    if (/(.(xml|xmla)$)/.test(fileName!)) {
+    if (/ (.(xml | xmla)$) /.test(fileName!)) {
       console.log(/(.(xml|xmla)$)/.exec(fileName!)![2]);
       await this.LoadAnimationFromKompasXML(url);
       return true;
