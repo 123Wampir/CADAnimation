@@ -77,7 +77,7 @@
                 </div>
             </div>
             <div class="line">
-                <button class="button-icon" (click)="RenderSnapshot()">
+                <button class="button-icon" (click)="RenderFrame(canvasPreviewWidth,canvasPreviewHeight)">
                     <img src="../../../assets/snapshot.png" alt="button-icon" width="19px" height="19px">
                 </button>
                 <button class="button-icon" (click)="SaveSnapshot()">
@@ -86,6 +86,75 @@
             </div>
             <div style="aspect-ratio: 1;">
                 <canvas class="snapshot" #canvas width="1920" height="1080" [style]="SetCanvasStyle()"></canvas>
+            </div>
+        </div>
+        <div *ngSwitchCase="'record'">
+            <div class="line">
+                <div class="param">
+                    <div class="label">Соотношение сторон</div>
+                    <div class="inputs">
+                        <select name="Aspect ration" (change)="OnAspectRatioChange($event)">
+                            <option [value]="16/9" selected>16:9</option>
+                            <option [value]="4/3">4:3</option>
+                            <option [value]="5/3">5:3</option>
+                            <option [value]="1">1:1</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">Ширина</div>
+                    <div class="inputs">
+                        <input type="number" class="input-number" min="1" max="5000" placeholder="Width"
+                            [(ngModel)]="canvasWidth" (ngModelChange)="SetCanvasWidth()">
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">Высота</div>
+                    <div class="inputs">
+                        <input type="number" class="input-number" min="1" max="5000" placeholder="height"
+                            [(ngModel)]="canvasHeight" (ngModelChange)="SetCanvasHeight()">
+                    </div>
+                </div>
+            </div>
+            <div class="label">Отрезок</div>
+            <div class="line">
+                <div class="param">
+                    <div class="inputs">
+                        <input type="number" #start class="input-number" min="0" value="0" [max]="end.value"
+                            placeholder="start" [(ngModel)]="recordStart">
+                        <input type="number" #end class="input-number" [min]="start.value"
+                            [max]="AnimationService.timeLine.duration" placeholder="start" [(ngModel)]="recordEnd">
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">Частота кадров</div>
+                    <div class="inputs">
+                        <input type="range" min="5" max="60" placeholder="framerate" [(ngModel)]="framerate">
+                        <input type="number" #start class="input-number" min="5" max="60" placeholder="start"
+                            [(ngModel)]="framerate">
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="range-slider" #rangeSlider>
+                <input type="range" #start class="range-start" sty value="300">
+                <input type="range" #end class="range-end" value="400">
+            </div> -->
+            <div class="line">
+                <button class="button-icon" (click)="OnStartRecord()">
+                    <img src="../../../assets/snapshot.png" alt="button-icon" width="19px" height="19px">
+                </button>
+                <!-- <button class="button-icon" (click)="SaveSnapshot()">
+                    <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px">
+                </button> -->
+            </div>
+            <div style="aspect-ratio: 1;">
+                <canvas class="snapshot" #canvas width="300" height="300" [style]="SetCanvasStyle()"></canvas>
             </div>
         </div>
         <div *ngSwitchCase="'settings'"></div>

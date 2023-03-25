@@ -131,6 +131,18 @@ input[type="range"] {
     overflow: hidden;
 }
 
+.range-slider {}
+
+.range-start {
+    transform: rotate(180deg);
+    margin-right: 0;
+}
+
+.range-end {
+    margin-left: 0;
+}
+
+
 input[type="number"] {
     border-radius: 0;
     background: var(--third-color);

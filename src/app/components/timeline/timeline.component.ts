@@ -73,53 +73,9 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     }
   }
 
-  OnExplode(event: Event) {
-    let arr: any[] = [];
-    // console.log(this.center);
-    if (this.SceneUtilsService.startPos.length == 0) {
-      this.offsets = [];
-      (this.center as any) = undefined;
-    }
-    this.SceneUtilsService.FindMeshes(this.SceneUtilsService.scene, arr);
-    if (this.center == undefined) {
-      // this.AnimationService.boundingBox.getCenter(this.center);
-      if (this.SceneUtilsService.boundingSphere == null) {
-        //console.log(this.AnimationService.boundingSphere);
-        return;
-      }
-      this.center = new THREE.Vector3();
-      this.center = this.SceneUtilsService.boundingSphere.center.clone();
-      console.log(this.SceneUtilsService.boundingSphere);
-      let geom = new THREE.SphereGeometry(this.SceneUtilsService.boundingSphere.radius);
-      let mat = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.7, alphaToCoverage: true });
-      this.point = new THREE.Mesh(geom, mat);
-      this.point.type = "point";
-      this.point.position.add(this.center)
-      //this.scene.add(this.point)
-      //console.log(this.point);
-    }
-
-    arr.forEach((item, index) => {
-      if (this.SceneUtilsService.startPos.length != arr.length) {
-        this.SceneUtilsService.startPos.push(item.position.clone());
-        let pts: any[] = [];
-        item.updateWorldMatrix(true, true);
-        pts.push(this.center.clone());
-        let wPos = new THREE.Vector3();
-        item.getWorldPosition(wPos);
-        let offset = wPos.clone().sub(this.center).normalize();
-        pts.push(item.getWorldPosition(new THREE.Vector3()));
-        let geom = new THREE.BufferGeometry().setFromPoints(pts);
-        let mat = new THREE.LineBasicMaterial({ color: 0xff0000 });
-        let line = new THREE.Line(geom, mat);
-        //this.scene.add(line);
-        this.offsets.push(offset);
-      }
-      let ps = new THREE.Vector3();
-      item.getWorldPosition(ps);
-      let pos = item.worldToLocal(ps.clone().add(this.offsets[index].clone().multiplyScalar((event.target as any).value))).add(this.SceneUtilsService.startPos[index])
-      item.position.set(pos.x, pos.y, pos.z);
-    })
+  PrepareForRecord() {
+    this.SceneUtilsService.dialogType = "record";
+    this.SceneUtilsService.dialogShow = true;
   }
 
   TrackByFunction(index: number) {
