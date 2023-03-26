@@ -177,7 +177,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     let component = this;
     (function animate() {
       if (component.mainObject != undefined) {
-        component.FindIntersection();
+        if (!component.AnimationService.recorder.isRecording())
+          component.FindIntersection();
         // if (component.SceneUtilsService.stencilNeedUpdate && component.renderer.localClippingEnabled)
         //   if (component.meshArr.length != 0) {
         //     for (let i = 0; i < component.SceneUtilsService.stencilGroups.children.length; i++) {
@@ -227,14 +228,29 @@ export class AppComponent implements OnInit, AfterViewInit {
         component.SceneUtilsService.stencilNeedUpdate = true;
         component.counter = 0;
       }
-      component.SceneUtilsService.CopyCameraPlacement();
-      component.renderer.render(component.scene, component.SceneUtilsService.currentCamera);
-      component.SceneUtilsService.CSSRenderer.render(component.scene, component.SceneUtilsService.currentCamera);
-
-      //effects
-      if (component.SceneUtilsService.outline)
-        if (component.SceneUtilsService.model != undefined)
-          component.effect.renderOutline(component.SceneUtilsService.model as any, component.SceneUtilsService.currentCamera);
+      if (component.AnimationService.recorder.isRecording()) {
+        component.AnimationService.RenderFrame(component.AnimationService.targetCanvas, component.AnimationService.targetCanvas.width, component.AnimationService.targetCanvas.height, false);
+        if (component.AnimationService.currentFrame < component.AnimationService.duration * component.AnimationService.framerate) {
+          component.AnimationService.recorder.recordFrame();
+          component.AnimationService.currentFrame++;
+          component.AnimationService.currentTime = component.AnimationService.recordStart + component.AnimationService.currentFrame / component.AnimationService.framerate;
+          component.AnimationService.currentTimeChange = !component.AnimationService.currentTimeChange;
+        }
+        else {
+          component.AnimationService.recorder.stopRecord();
+          console.log("capture finished!");
+          requestAnimationFrame(animate);
+        }
+      }
+      else {
+        component.SceneUtilsService.CopyCameraPlacement();
+        component.renderer.render(component.scene, component.SceneUtilsService.currentCamera);
+        component.SceneUtilsService.CSSRenderer.render(component.scene, component.SceneUtilsService.currentCamera);
+        //effects
+        if (component.SceneUtilsService.outline)
+          if (component.SceneUtilsService.model != undefined)
+            component.effect.renderOutline(component.SceneUtilsService.model as any, component.SceneUtilsService.currentCamera);
+      }
     }());
   }
   ngOnInit() {

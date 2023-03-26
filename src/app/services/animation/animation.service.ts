@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import THREE = require('three');
 import * as AnimationModel from 'src/app/shared/animation.model';
 import { SceneUtilsService } from '../utils/scene.utils.service';
+import { CanvasCapture } from "canvas-capture"
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,14 @@ export class AnimationService {
   actions: THREE.AnimationAction[] = [];
   mixers: THREE.AnimationMixer[] = [];
   timeLine: AnimationModel.TimelineModel = { tracks: [], duration: 30, scale: 50 };
+  recorder = CanvasCapture;
+  recording = false;
+  recordStart = 0;
+  recordEnd = this.timeLine.duration;
+  framerate = 60;
+  currentFrame = 0;
+  duration = this.recordEnd - this.recordStart;
+  targetCanvas!: HTMLCanvasElement;
 
   async LoadAnimationFile(event: Event) {
     console.log(event);
@@ -47,6 +56,35 @@ export class AnimationService {
         }
       }
     }
+  }
+
+  RenderFrame(canvas: HTMLCanvasElement, width: number, height: number, resize = true) {
+    canvas.width = width;
+    canvas.height = height
+    const aspect = width / height;
+    // console.log(this.canvas.width, this.canvas.height);
+    let context = canvas.getContext("2d");
+    if (this.SceneUtilsService.currentCamera.type == "PerspectiveCamera") {
+      this.SceneUtilsService.perspectiveCamera.aspect = aspect;
+      this.SceneUtilsService.perspectiveCamera.updateProjectionMatrix();
+    }
+    else {
+      this.SceneUtilsService.orthographicCamera.left = -this.SceneUtilsService.frustumSize * aspect / 2;
+      this.SceneUtilsService.orthographicCamera.right = this.SceneUtilsService.frustumSize * aspect / 2;
+      this.SceneUtilsService.orthographicCamera.top = this.SceneUtilsService.frustumSize / 2;
+      this.SceneUtilsService.orthographicCamera.bottom = -this.SceneUtilsService.frustumSize / 2;
+      this.SceneUtilsService.orthographicCamera.updateProjectionMatrix();
+    }
+    this.SceneUtilsService.renderer.setSize(width, height);
+    this.SceneUtilsService.CSSRenderer.setSize(width, height);
+    this.SceneUtilsService.renderer.render(this.SceneUtilsService.scene, this.SceneUtilsService.currentCamera);
+    this.SceneUtilsService.CSSRenderer.render(this.SceneUtilsService.scene, this.SceneUtilsService.currentCamera);
+    if (this.SceneUtilsService.outline)
+      if (this.SceneUtilsService.model != undefined)
+        this.SceneUtilsService.AppComponent.effect.renderOutline(this.SceneUtilsService.scene, this.SceneUtilsService.currentCamera);
+    context?.drawImage(this.SceneUtilsService.renderer.domElement, 0, 0, width, height);
+    if (resize)
+      this.SceneUtilsService.onResize();
   }
 
   CreateTreeViewElements(obj: THREE.Object3D, tabIndex: number = 0, parent?: AnimationModel.KeyframeTrackModel) {

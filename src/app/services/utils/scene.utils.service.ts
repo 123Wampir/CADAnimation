@@ -490,22 +490,24 @@ export class SceneUtilsService {
   }
 
   onResize(event?: any) {
-    let aspect = window.innerWidth / window.innerHeight;
-    let width = window.innerWidth * 0.99;
-    let height = window.innerHeight * 0.99;
-    if (this.currentCamera.type == "PerspectiveCamera") {
-      this.perspectiveCamera.aspect = aspect;
-      this.perspectiveCamera.updateProjectionMatrix();
+    if (!this.AnimationService.recorder.isRecording()) {
+      let aspect = window.innerWidth / window.innerHeight;
+      let width = window.innerWidth * 0.99;
+      let height = window.innerHeight * 0.99;
+      if (this.currentCamera.type == "PerspectiveCamera") {
+        this.perspectiveCamera.aspect = aspect;
+        this.perspectiveCamera.updateProjectionMatrix();
+      }
+      else {
+        this.orthographicCamera.left = -this.frustumSize * aspect / 2;
+        this.orthographicCamera.right = this.frustumSize * aspect / 2;
+        this.orthographicCamera.top = this.frustumSize / 2;
+        this.orthographicCamera.bottom = -this.frustumSize / 2;
+        this.orthographicCamera.updateProjectionMatrix();
+      }
+      this.renderer.setSize(width, height);
+      this.CSSRenderer.setSize(width, height);
+      this.renderer.setPixelRatio(window.devicePixelRatio * this.renderScale);
     }
-    else {
-      this.orthographicCamera.left = -this.frustumSize * aspect / 2;
-      this.orthographicCamera.right = this.frustumSize * aspect / 2;
-      this.orthographicCamera.top = this.frustumSize / 2;
-      this.orthographicCamera.bottom = -this.frustumSize / 2;
-      this.orthographicCamera.updateProjectionMatrix();
-    }
-    this.renderer.setSize(width, height);
-    this.CSSRenderer.setSize(width, height);
-    this.renderer.setPixelRatio(window.devicePixelRatio * this.renderScale);
   }
 }

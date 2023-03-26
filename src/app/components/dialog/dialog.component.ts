@@ -86,7 +86,7 @@ export class DialogComponent implements OnInit, OnChanges {
     }
   }
   SaveSnapshot() {
-    this.RenderFrame(this.canvasWidth, this.canvasHeight);
+    this.AnimationService.RenderFrame(this.canvas, this.canvasWidth, this.canvasHeight, false);
     this.canvas.toBlob(function (blob) {
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob!);
@@ -94,45 +94,19 @@ export class DialogComponent implements OnInit, OnChanges {
       a.click();
     });
   }
-  RenderFrame(width: number, height: number) {
-    this.canvas.width = width;
-    this.canvas.height = height
-    console.log(this.canvas.width, this.canvas.height);
-    let context = this.canvas.getContext("2d");
-    if (this.SceneUtilsService.currentCamera.type == "PerspectiveCamera") {
-      this.SceneUtilsService.perspectiveCamera.aspect = this.aspect;
-      this.SceneUtilsService.perspectiveCamera.updateProjectionMatrix();
-    }
-    else {
-      this.SceneUtilsService.orthographicCamera.left = -this.SceneUtilsService.frustumSize * this.aspect / 2;
-      this.SceneUtilsService.orthographicCamera.right = this.SceneUtilsService.frustumSize * this.aspect / 2;
-      this.SceneUtilsService.orthographicCamera.top = this.SceneUtilsService.frustumSize / 2;
-      this.SceneUtilsService.orthographicCamera.bottom = -this.SceneUtilsService.frustumSize / 2;
-      this.SceneUtilsService.orthographicCamera.updateProjectionMatrix();
-    }
-    this.SceneUtilsService.renderer.setSize(width, height);
-    this.SceneUtilsService.CSSRenderer.setSize(width, height);
-    this.SceneUtilsService.renderer.render(this.SceneUtilsService.scene, this.SceneUtilsService.currentCamera);
-    this.SceneUtilsService.CSSRenderer.render(this.SceneUtilsService.scene, this.SceneUtilsService.currentCamera);
-    if (this.SceneUtilsService.outline)
-      if (this.SceneUtilsService.model != undefined)
-        this.SceneUtilsService.AppComponent.effect.renderOutline(this.SceneUtilsService.scene, this.SceneUtilsService.currentCamera);
-    context?.drawImage(this.SceneUtilsService.renderer.domElement, 0, 0, width, height);
-    this.SceneUtilsService.onResize();
-  }
   SetCanvasWidth() {
     // this.canvas.width = this.canvasWidth;
     this.canvasHeight = Math.round(this.canvasWidth / this.aspect);
     // this.canvas.height = this.canvasHeight;
     if (this.canvasWidth != 0)
-      this.RenderFrame(this.canvasPreviewWidth, this.canvasPreviewHeight);
+      this.AnimationService.RenderFrame(this.canvas, this.canvasPreviewWidth, this.canvasPreviewHeight);
   }
   SetCanvasHeight() {
     // this.canvas.height = this.canvasHeight;
     this.canvasWidth = Math.round(this.canvasHeight * this.aspect);
     // this.canvas.width = this.canvasWidth;
     if (this.canvasHeight != 0)
-      this.RenderFrame(this.canvasPreviewWidth, this.canvasPreviewHeight);
+      this.AnimationService.RenderFrame(this.canvas, this.canvasPreviewWidth, this.canvasPreviewHeight);
   }
   OnAspectRatioChange(event: Event) {
     this.aspect = Number((event.target as any).value);
@@ -148,52 +122,20 @@ export class DialogComponent implements OnInit, OnChanges {
   }
 
   OnStartRecord() {
-    this.AnimationService.currentTime = this.recordStart;
-    this.AnimationService.currentTimeChange = !this.AnimationService.currentTimeChange;
-    this.AnimationService.play = true;
-    let stream = this.SceneUtilsService.renderer.domElement.captureStream(this.framerate);
-    // let track = stream.getVideoTracks()[0];
-    this.startRecording(stream, this.recordStart, this.recordEnd)
-      .then((recordedChunks) => {
-        this.AnimationService.play = false;
-        let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(recordedBlob);
-        a.download = "Animation";
-        a.click();
-        console.log(
-          `Successfully recorded ${recordedBlob.size} bytes of ${recordedBlob.type} media.`
-        );
-      })
-      .catch((error) => {
-        if (error.name === "NotFoundError") {
-          console.log("Camera or microphone not found. Can't record.");
-        } else {
-          console.log(error);
-        }
-      });
-  }
-
-  async startRecording(stream: MediaStream, start: number, end: number) {
-    console.log(start, end);
-    let recorder = new MediaRecorder(stream);
-    let data: any[] = [];
-    recorder.ondataavailable = (event) => {
-      data.push(event.data);
-      if (this.AnimationService.currentTime >= end)
-        if (recorder.state === "recording") {
-          console.log(this.AnimationService.currentTime);
-          recorder.stop();
-        }
-    }
-    recorder.start(1 / this.framerate);
-    let duration = end - start;
-    console.log(`${recorder.state} for ${duration} seconds…`);
-    let stopped = new Promise((resolve, reject) => {
-      recorder.onstop = resolve;
-      recorder.onerror = (event: any) => reject(event.name);
+    this.AnimationService.targetCanvas = this.canvas;
+    this.AnimationService.recorder.init(this.canvas, { verbose: false });
+    this.AnimationService.recordEnd = this.recordEnd;
+    this.AnimationService.recordStart = this.recordStart;
+    this.AnimationService.framerate = this.framerate;
+    let duration = this.recordEnd - this.recordStart;
+    this.AnimationService.duration = duration;
+    this.AnimationService.RenderFrame(this.canvas, this.canvasWidth, this.canvasHeight, false);
+    this.AnimationService.recorder.beginVideoRecord({
+      format: "webm",
+      fps: this.framerate
     });
-    return Promise.all([stopped]).then(() => data);
+    let frames = duration * this.framerate;
+    console.log(duration, frames);
   }
 
   CloseClick(event: MouseEvent) {

@@ -77,7 +77,8 @@
                 </div>
             </div>
             <div class="line">
-                <button class="button-icon" (click)="RenderFrame(canvasPreviewWidth,canvasPreviewHeight)">
+                <button class="button-icon"
+                    (click)="AnimationService.RenderFrame(canvas,canvasPreviewWidth,canvasPreviewHeight)">
                     <img src="../../../assets/snapshot.png" alt="button-icon" width="19px" height="19px">
                 </button>
                 <button class="button-icon" (click)="SaveSnapshot()">
