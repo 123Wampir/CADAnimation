@@ -238,6 +238,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
         else {
           component.AnimationService.recorder.stopRecord();
+          component.AnimationService.currentFrame = 0;
           console.log("capture finished!");
           requestAnimationFrame(animate);
         }
