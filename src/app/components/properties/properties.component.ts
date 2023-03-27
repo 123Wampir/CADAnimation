@@ -51,6 +51,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes["selected"] != undefined) {
       if (this.SceneUtilsService.selected.length != 0) {
+        this.OnExpandClick(false);
         if (this.SceneUtilsService.selected.length == 1) {
           this.rename = false;
 
@@ -148,6 +149,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
         }
       }
       else {
+        this.OnExpandClick(true);
         this.propertiesObject = undefined;
         this.light = false;
         this.camera = false;
@@ -342,7 +344,9 @@ export class PropertiesComponent implements OnInit, OnChanges {
   OnFOVChange($event: Event) {
     this.propertiesObject.updateProjectionMatrix();
   }
-  OnExpandClick(event: MouseEvent) {
+  OnExpandClick(expand?: boolean) {
+    if (expand != undefined)
+      this.expanded = expand;
     let container = document.getElementById("properties-container")!;
     if (container != undefined) {
       if (this.expanded) {

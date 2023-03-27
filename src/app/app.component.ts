@@ -228,6 +228,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         component.SceneUtilsService.stencilNeedUpdate = true;
         component.counter = 0;
       }
+      component.SceneUtilsService.CopyCameraPlacement();
       if (component.AnimationService.recorder.isRecording()) {
         component.AnimationService.RenderFrame(component.AnimationService.targetCanvas, component.AnimationService.targetCanvas.width, component.AnimationService.targetCanvas.height, false);
         if (component.AnimationService.currentFrame < component.AnimationService.duration * component.AnimationService.framerate) {
@@ -240,11 +241,11 @@ export class AppComponent implements OnInit, AfterViewInit {
           component.AnimationService.recorder.stopRecord();
           component.AnimationService.currentFrame = 0;
           console.log("capture finished!");
+          component.SceneUtilsService.onResize();
           requestAnimationFrame(animate);
         }
       }
       else {
-        component.SceneUtilsService.CopyCameraPlacement();
         component.renderer.render(component.scene, component.SceneUtilsService.currentCamera);
         component.SceneUtilsService.CSSRenderer.render(component.scene, component.SceneUtilsService.currentCamera);
         //effects

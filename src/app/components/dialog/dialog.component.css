@@ -40,3 +40,25 @@
     box-shadow: 0px 2px 3px 0px var(--second-color);
     margin: 5px;
 }
+
+.progress-line {
+    margin: 0px 5px;
+    margin-top: 2px;
+}
+
+.progress {
+    background-color: var(--second-color);
+}
+
+.progress-bar {
+    background-color: dodgerblue;
+    height: 5px;
+}
+
+.progress-labels {
+    display: flex;
+}
+
+.progress-label {
+    position: absolute;
+}

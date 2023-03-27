@@ -95,16 +95,12 @@ export class DialogComponent implements OnInit, OnChanges {
     });
   }
   SetCanvasWidth() {
-    // this.canvas.width = this.canvasWidth;
     this.canvasHeight = Math.round(this.canvasWidth / this.aspect);
-    // this.canvas.height = this.canvasHeight;
     if (this.canvasWidth != 0)
       this.AnimationService.RenderFrame(this.canvas, this.canvasPreviewWidth, this.canvasPreviewHeight);
   }
   SetCanvasHeight() {
-    // this.canvas.height = this.canvasHeight;
     this.canvasWidth = Math.round(this.canvasHeight * this.aspect);
-    // this.canvas.width = this.canvasWidth;
     if (this.canvasHeight != 0)
       this.AnimationService.RenderFrame(this.canvas, this.canvasPreviewWidth, this.canvasPreviewHeight);
   }
@@ -118,6 +114,18 @@ export class DialogComponent implements OnInit, OnChanges {
     return {
       'width': `${width}px`,
       'height': `${width / this.aspect}px`
+    }
+  }
+  SetProgressBarStyle() {
+    return {
+      'width': `${100 * this.AnimationService.currentFrame / (this.framerate * this.AnimationService.duration)}%`
+    }
+  }
+  SetProgressBarLabelStyle() {
+    return {
+      'width': `${100 * this.AnimationService.currentFrame / (this.framerate * this.AnimationService.duration)}%`,
+      'text-align': `end`,
+      'position': 'relative'
     }
   }
 

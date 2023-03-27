@@ -121,6 +121,16 @@
                     </div>
                 </div>
             </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">Частота кадров</div>
+                    <div class="inputs">
+                        <input type="range" min="5" max="60" placeholder="framerate" [(ngModel)]="framerate">
+                        <input type="number" #start class="input-number" min="5" max="60" placeholder="start"
+                            [(ngModel)]="framerate">
+                    </div>
+                </div>
+            </div>
             <div class="label">Отрезок</div>
             <div class="line">
                 <div class="param">
@@ -133,26 +143,23 @@
                 </div>
             </div>
             <div class="line">
-                <div class="param">
-                    <div class="label">Частота кадров</div>
-                    <div class="inputs">
-                        <input type="range" min="5" max="60" placeholder="framerate" [(ngModel)]="framerate">
-                        <input type="number" #start class="input-number" min="5" max="60" placeholder="start"
-                            [(ngModel)]="framerate">
-                    </div>
-                </div>
-            </div>
-            <!-- <div class="range-slider" #rangeSlider>
-                <input type="range" #start class="range-start" sty value="300">
-                <input type="range" #end class="range-end" value="400">
-            </div> -->
-            <div class="line">
                 <button class="button-icon" (click)="OnStartRecord()">
                     <img src="../../../assets/snapshot.png" alt="button-icon" width="19px" height="19px">
                 </button>
-                <!-- <button class="button-icon" (click)="SaveSnapshot()">
-                    <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px">
-                </button> -->
+            </div>
+            <div class="progress-line">
+                <div class="progress-labels" style="height: 20px;">
+                    <div class="progress-label">0</div>
+                    <div class="progress-label" style="right: 5px;">
+                        {{AnimationService.duration*AnimationService.framerate}}</div>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar" [style]="SetProgressBarStyle()"></div>
+                </div>
+                <div class="progress-labels">
+                    <div class="progress-label" [style]="SetProgressBarLabelStyle()">{{AnimationService.currentFrame}}
+                    </div>
+                </div>
             </div>
             <div style="aspect-ratio: 1;">
                 <canvas class="snapshot" #canvas width="300" height="300" [style]="SetCanvasStyle()"></canvas>

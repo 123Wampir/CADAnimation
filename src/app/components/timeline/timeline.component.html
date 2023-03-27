@@ -2,11 +2,6 @@
     <div class="header">
         <div class="label">CADAnimation</div>
         <div class="controls-panel">
-            <div class="keyframe-controls">
-                <div class="label">Разрешение</div>
-                <input type="range" min="0.1" max="1" step="0.05" [(ngModel)]="SceneUtilsService.renderScale"
-                    (change)="SceneUtilsService.onResize($event)">
-            </div>
             <div class="playback-controls">
                 <button class="button-icon" (click)="OnPlayClick($event)">
                     <img src="../../../assets/play.png" alt="play/pause button" width="19px" height="19px">
@@ -21,7 +16,6 @@
                 <input type="number" class="input-number" min="1" max="3600" step="0.5" placeholder="Длительность"
                     [(ngModel)]="AnimationService.timeLine.duration">
                 <input type="range" min="1" max="300" step="0.5" [(ngModel)]="AnimationService.timeLine.scale">
-                <!-- <input type="range" value="0" min="0" max="300" step="0.5" (mousemove)="OnExplode($event)"> -->
                 <button class="button-icon">
                     <label class="file-label" for="load">
                         <input class="file" type="file" name="load" id="load" accept=".xml,.json"
@@ -36,7 +30,8 @@
                     </label>
                 </button>
                 <button class="button-icon" (click)="PrepareForRecord()">
-                    <img src="../../../assets/record.png" alt="stop button" width="19px" height="19px">
+                    <img src="../../../assets/record.png" class="no-filter" alt="stop button" width="19px"
+                        height="19px">
                 </button>
                 <button class="expand-first" (click)="OnTimelineExpand($event)">▼</button>
             </div>
