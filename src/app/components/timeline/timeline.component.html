@@ -1,40 +1,37 @@
 <div class="container" id="timeline-container">
     <div class="header">
         <div class="label">CADAnimation</div>
-        <div class="controls-panel">
-            <div class="playback-controls">
-                <button class="button-icon" (click)="OnPlayClick($event)">
-                    <img src="../../../assets/play.png" alt="play/pause button" width="19px" height="19px">
-                </button>
-                <button class="button-icon" (click)="OnStopClick($event)">
-                    <img src="../../../assets/stop.png" alt="stop button" width="19px" height="19px">
-                </button>
-                <div class="timer">{{curTime.toPrecision(3)}}</div>
-            </div>
-            <div class="window-controls">
-                <div class="label">Длительность</div>
-                <input type="number" class="input-number" min="1" max="3600" step="0.5" placeholder="Длительность"
-                    [(ngModel)]="AnimationService.timeLine.duration">
-                <input type="range" min="1" max="300" step="0.5" [(ngModel)]="AnimationService.timeLine.scale">
-                <button class="button-icon">
-                    <label class="file-label" for="load">
-                        <input class="file" type="file" name="load" id="load" accept=".xml,.json"
-                            (change)="AnimationService.LoadAnimationFile($event)">
-                        <img src="../../../assets/upload.png" alt="stop button" width="19px" height="19px">
-                    </label>
-                </button>
-                <button class="button-icon" (click)="AnimationService.SaveAnimationAsJSON()">
-                    <label class="file-label" for="save">
-                        <!-- <input class="file" type="file" name="save" id="save" accept=".xml"> -->
-                        <img src="../../../assets/save.png" alt="stop button" width="19px" height="19px">
-                    </label>
-                </button>
-                <button class="button-icon" (click)="PrepareForRecord()">
-                    <img src="../../../assets/record.png" class="no-filter" alt="stop button" width="19px"
-                        height="19px">
-                </button>
-                <button class="expand-first" (click)="OnTimelineExpand($event)">▼</button>
-            </div>
+        <div class="playback-controls">
+            <button class="button-icon" (click)="OnPlayClick($event)">
+                <img src="../../../assets/play.png" alt="play/pause button" width="19px" height="19px">
+            </button>
+            <button class="button-icon" (click)="OnStopClick($event)">
+                <img src="../../../assets/stop.png" alt="stop button" width="19px" height="19px">
+            </button>
+            <div class="timer">{{curTime.toPrecision(3)}}</div>
+        </div>
+        <div class="window-controls">
+            <div class="label">Длительность</div>
+            <input type="number" class="input-number" min="1" max="3600" step="0.5" placeholder="Длительность"
+                [(ngModel)]="AnimationService.timeLine.duration">
+            <input type="range" min="1" max="300" step="0.5" [(ngModel)]="AnimationService.timeLine.scale">
+            <button class="button-icon">
+                <label class="file-label" for="load">
+                    <input class="file" type="file" name="load" id="load" accept=".xml,.json"
+                        (change)="AnimationService.LoadAnimationFile($event)">
+                    <img src="../../../assets/upload.png" alt="stop button" width="19px" height="19px">
+                </label>
+            </button>
+            <button class="button-icon" (click)="AnimationService.SaveAnimationAsJSON()">
+                <label class="file-label" for="save">
+                    <!-- <input class="file" type="file" name="save" id="save" accept=".xml"> -->
+                    <img src="../../../assets/save.png" alt="stop button" width="19px" height="19px">
+                </label>
+            </button>
+            <button class="button-icon" (click)="PrepareForRecord()">
+                <img src="../../../assets/record.png" class="no-filter" alt="stop button" width="19px" height="19px">
+            </button>
+            <button class="expand-first" (click)="OnTimelineExpand($event)">▼</button>
         </div>
     </div>
     <cdk-virtual-scroll-viewport #cdkScrollable [itemSize]="itemSize" class="timeline" id="timeline">

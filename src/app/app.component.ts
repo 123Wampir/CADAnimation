@@ -81,22 +81,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     const ambientLight = new THREE.AmbientLight(0xffffff);
     ambientLight.name = ambientLight.type;
     this.SceneUtilsService.lightGroup.add(ambientLight);
-    // Добавление направленного света
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 2.2);
-    directionalLight.name = directionalLight.type;
-    var lightHelper = new THREE.DirectionalLightHelper(directionalLight, 10, directionalLight.color);
-    lightHelper.matrixWorld = directionalLight.matrixWorld;
-    directionalLight.add(lightHelper);
-    directionalLight.position.add(this.SceneUtilsService.perspectiveCamera.position);
-    let cameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
-    directionalLight.add(cameraHelper);
-    cameraHelper.matrixWorld = directionalLight.shadow.camera.matrixWorld;
-    this.SceneUtilsService.lightGroup.add(directionalLight);
 
     this.SceneUtilsService.axisGroup = new THREE.Group();
     this.SceneUtilsService.axisGroup.name = "Axis";
     this.scene.add(this.SceneUtilsService.axisGroup);
-
 
     this.raycaster = new THREE.Raycaster();
     this.pointer = new THREE.Vector2();
@@ -230,7 +218,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
       component.SceneUtilsService.CopyCameraPlacement();
       if (component.AnimationService.recorder.isRecording()) {
-        component.AnimationService.RenderFrame(component.AnimationService.targetCanvas, component.AnimationService.targetCanvas.width, component.AnimationService.targetCanvas.height, false);
+        component.AnimationService.RenderFrame(component.AnimationService.targetCanvas, component.AnimationService.targetCanvas.width, component.AnimationService.targetCanvas.height);
         if (component.AnimationService.currentFrame < component.AnimationService.duration * component.AnimationService.framerate) {
           component.AnimationService.recorder.recordFrame();
           component.AnimationService.currentFrame++;
@@ -336,11 +324,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     obj.children.forEach(part => {
       let arr: any[] = [];
       this.SceneUtilsService.FindMeshes(part, arr);
-      let vec = new THREE.Vector3(0, 0, 0);
       arr.forEach(mesh => {
         let geom = mesh as THREE.Mesh;
         let pos = geom.position.clone();
-        let vec = new THREE.Vector3(0, 0, 0);
         var geometry = geom.geometry;
         geometry.computeBoundingBox();
         var center = new THREE.Vector3();
@@ -349,6 +335,22 @@ export class AppComponent implements OnInit, AfterViewInit {
         geometry.center()
         geom.position.set(center.x, center.y, center.z);
         geom.position.add(pos);
+      })
+    })
+    this.SceneUtilsService.CalculateBounding(obj);
+    let modelCenter = this.SceneUtilsService.boundingSphere.center.clone().negate();
+    obj.children.forEach(part => {
+      let arr: any[] = [];
+      this.SceneUtilsService.FindMeshes(part, arr);
+      arr.forEach(mesh => {
+        let geom = mesh as THREE.Mesh;
+        let pos = new THREE.Vector3();
+        geom.getWorldPosition(pos);
+        let q = new THREE.Quaternion();
+        geom.getWorldQuaternion(q);
+        let vec = modelCenter.clone().applyQuaternion(q.invert()).add(geom.position);
+        geom.updateWorldMatrix(true, true)
+        geom.position.set(vec.x, vec.y, vec.z);
       })
     })
   }

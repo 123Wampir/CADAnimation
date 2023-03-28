@@ -86,7 +86,7 @@ export class DialogComponent implements OnInit, OnChanges {
     }
   }
   SaveSnapshot() {
-    this.AnimationService.RenderFrame(this.canvas, this.canvasWidth, this.canvasHeight, false);
+    this.AnimationService.RenderFrame(this.canvas, this.canvasWidth, this.canvasHeight);
     this.canvas.toBlob(function (blob) {
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob!);
@@ -96,11 +96,13 @@ export class DialogComponent implements OnInit, OnChanges {
   }
   SetCanvasWidth() {
     this.canvasHeight = Math.round(this.canvasWidth / this.aspect);
+    this.canvasPreviewHeight = Math.round(this.canvasPreviewWidth / this.aspect);
     if (this.canvasWidth != 0)
       this.AnimationService.RenderFrame(this.canvas, this.canvasPreviewWidth, this.canvasPreviewHeight);
   }
   SetCanvasHeight() {
     this.canvasWidth = Math.round(this.canvasHeight * this.aspect);
+    this.canvasPreviewHeight = Math.round(this.canvasPreviewWidth / this.aspect);
     if (this.canvasHeight != 0)
       this.AnimationService.RenderFrame(this.canvas, this.canvasPreviewWidth, this.canvasPreviewHeight);
   }

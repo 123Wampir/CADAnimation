@@ -19,7 +19,15 @@ export class AnimationCreatorService {
           action = this.AnimationService.CreateAction(track, ".position");
         }
         let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
-        let position = item.position;
+        let position!: THREE.Vector3;
+        if (obj.type != "Group") {
+          position = obj.position;
+        }
+        else {
+          let q = new THREE.Quaternion();
+          item.getWorldQuaternion(q);
+          position = obj.position.clone().applyQuaternion(q.invert()).add(this.SceneUtilsService.startPos[index]);
+        }
         if (keyframe != undefined) {
           keyframe.value = position.toArray();
           this.AnimationService.ChangeKeyframe(keyframe);

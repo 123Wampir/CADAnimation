@@ -449,7 +449,9 @@ export class AnimationService {
   }
 
   async LoadAnimation(url: string, fileName: string): Promise<boolean> {
-    if (/ (.(xml | xmla)$) /.test(fileName!)) {
+    console.log(fileName);
+
+    if (/(.(xml|xmla)$)/.test(fileName!)) {
       console.log(/(.(xml|xmla)$)/.exec(fileName!)![2]);
       await this.LoadAnimationFromKompasXML(url);
       return true;

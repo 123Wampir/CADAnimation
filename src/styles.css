@@ -54,6 +54,7 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 }
 
 button:hover {
@@ -85,6 +86,7 @@ img {
 
 .file-label {
     display: flex;
+    cursor: pointer;
 }
 
 .label {
@@ -130,18 +132,6 @@ input[type="range"] {
     background: var(--third-color);
     overflow: hidden;
 }
-
-.range-slider {}
-
-.range-start {
-    transform: rotate(180deg);
-    margin-right: 0;
-}
-
-.range-end {
-    margin-left: 0;
-}
-
 
 input[type="number"] {
     border-radius: 0;

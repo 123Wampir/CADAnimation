@@ -6,7 +6,7 @@
             <div class="menu">
                 <div class="menu-line">
                     <label class="first-menu-label">
-                        <div class="menu-name">File</div>
+                        <div class="menu-name">Файл</div>
                     </label>
                     <div class="container menu-items">
                         <div class="basic-line" (click)="NewProject()">Новый</div>
@@ -22,7 +22,7 @@
                 </div>
                 <div class="menu-line">
                     <label class="first-menu-label">
-                        <div class="menu-name">Edit</div>
+                        <div class="menu-name">Правка</div>
                     </label>
                     <div class="container menu-items">
                         <div class="basic-line">Отменить</div>
@@ -33,7 +33,7 @@
                 </div>
                 <div class="menu-line">
                     <label class="first-menu-label">
-                        <div class="menu-name">View</div>
+                        <div class="menu-name">Вид</div>
                     </label>
                     <div class="container menu-items">
                         <div class="basic-line" (click)="SceneUtilsService.ViewcubeComponent.setView(0,1,0)">Вид спереди
@@ -78,7 +78,7 @@
                 </div>
                 <div class="menu-line">
                     <label class="first-menu-label">
-                        <div class="menu-name">Scene</div>
+                        <div class="menu-name">Сцена</div>
                     </label>
                     <div class="container menu-items">
                         <div class="menu-line">
@@ -102,12 +102,6 @@
                                     </div>
                                 </div>
                                 <div class="basic-line">Удалить</div>
-                                <div class="hor-separator"></div>
-                                <div class="basic-line">Включить все</div>
-                                <div class="checkbox-line">
-                                    <label class="basic-line" for="checkbox">Тени</label>
-                                    <input type="checkbox" id="checkbox">
-                                </div>
                             </div>
                         </div>
                         <div class="menu-line">
@@ -135,7 +129,7 @@
                 </div>
                 <div class="menu-line">
                     <label class="first-menu-label">
-                        <div class="menu-name">Animation</div>
+                        <div class="menu-name">Анимация</div>
                     </label>
                     <div class="container menu-items">
                         <div class="basic-line" (click)="AnimationService.ClearAnimation(true)">Очистить</div>
@@ -147,7 +141,7 @@
                         </label>
                         <div class="basic-line"
                             [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.model!=undefined && SceneUtilsService.model.children.length!=0)"
-                            (click)="SceneUtilsService.SaveModelAsGLTF($event)">Сохранить</div>
+                            (click)="AnimationService.SaveAnimationAsJSON()">Сохранить</div>
                     </div>
                 </div>
                 <!-- <div class="menu-line">
@@ -185,7 +179,7 @@
             <label for="ground"><img src="../../../assets/grid.png" width="19px" height="19px"></label>
         </div>
         <div class="toolbar-tool">
-            <input class="checkbox" (change)="SetReflection($event)" type="checkbox" id="reflection">
+            <input class="checkbox" (change)="SetReflection($event)" checked type="checkbox" id="reflection">
             <label for="reflection"><img src="../../../assets/reflection.png" width="19px" height="19px"></label>
         </div>
         <div class="vert-separator"></div>
