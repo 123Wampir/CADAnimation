@@ -453,34 +453,58 @@ export class SceneUtilsService {
     }
   }
 
+  DisposeObject(obj: any) {
+    if (obj.geometry != undefined) {
+      obj.geometry.dispose();
+      obj.material.dispose();
+    }
+    if (obj.material != undefined) {
+      obj.material.dispose();
+    }
+    if (obj.dispose != undefined) {
+      obj.dispose();
+    }
+  }
+
   ClearScene() {
     if (this.model != undefined) {
+      this.transform.detach();
       console.log(this.scene);
-      this.model.traverse(item => {
-        if (item.type == "Mesh" || item.type == "LineSegments") {
-          // console.log(item);
-          (item as any).geometry.dispose();
-          (item as any).material.dispose();
-        }
+      this.scene.traverse(obj => {
+        if (obj != this.transform)
+          this.DisposeObject(obj);
       })
       this.model.clear();
+
       this.fileName = "";
       this.startPos = [];
       this.AnimationService.ClearAnimation();
+
       this.planeHelpers.traverse(obj => {
-        if (obj.type == "Mesh" || obj.type == "PlaneHelper" || obj.type == "Stencil") {
-          (obj as any).geometry.dispose();
-          (obj as any).material.dispose();
-        }
-      })
+        this.DisposeObject(obj);
+      });
       this.planeHelpers.clear();
-      this.stencilGroups.traverse(obj => {
-        if (obj.type == "Mesh" || obj.type == "LineSegments") {
-          (obj as any).geometry.dispose();
-          (obj as any).material.dispose();
-        }
+      
+      this.annotationGroup.traverse(obj => {
+        this.DisposeObject(obj);
+      });
+      this.annotationGroup.clear();
+      
+      // this.stencilGroups.traverse(obj => {
+      //   this.DisposeObject(obj);
+      // });
+      // this.stencilGroups.clear();
+      // this.lightGroup.traverse(obj => {
+      //   this.DisposeObject(obj);
+      // });
+      // this.lightGroup.clear();
+
+      this.axisArray.forEach(obj => {
+        this.DisposeObject(obj);
+        obj.removeFromParent();
       })
-      this.stencilGroups.clear();
+      this.axisArray = [];
+
       this.renderer.renderLists.dispose();
       this.renderer.getRenderTarget()?.dispose();
       this.renderer.clear();
