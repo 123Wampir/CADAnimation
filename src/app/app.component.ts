@@ -435,32 +435,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
     }
   }
-  async CreateEdgesForMeshes(obj: any, threshold: number) {
-    if (obj.children.length != 0) {
-      for (let item of obj.children) {
-        if (item.type == "Object3D") {
-          this.CreateEdgesForMeshes(item, threshold);
-        }
-        else if (item.type == "Mesh") {
-
-          let edges = new THREE.EdgesGeometry(item.geometry, threshold);
-          let line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 1/*, depthTest: false */ }));
-          item.add(line)
-        }
-      }
-    }
-  }
-  async CreateEdges(obj: THREE.Object3D, show: boolean, threshold: number) {
-    if (show) {
-      if (obj.children.length != 0) {
-        for (let item of obj.children) {
-          if (item.type == "Object3D") {
-            await this.CreateEdgesForMeshes(item, threshold);
-          }
-        }
-      }
-    }
-  }
   onClick(event: MouseEvent) {
     if (this.SceneUtilsService.ContextmenuComponent != undefined)
       this.SceneUtilsService.ContextmenuComponent.component.contextMenu = false;
@@ -486,7 +460,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (event.key == "Shift") {
       this.SceneUtilsService.SHIFTPressed = true;
     }
-
   }
   onKeyUp(event: KeyboardEvent) {
     if (event.key == "Control") {

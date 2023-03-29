@@ -10,6 +10,7 @@ export interface KeyframeModel {
 export interface KeyframeActionModel {
     keyframes: KeyframeModel[];
     type: string;
+    valueTypeName: string;
     track?: THREE.KeyframeTrack;
     start: number;
     length: number;

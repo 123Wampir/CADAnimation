@@ -16,7 +16,7 @@ export class AnimationCreatorService {
         let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, item.name);
         let action = AnimationModel.FindActionByType(track, ".position");
         if (action == undefined) {
-          action = this.AnimationService.CreateAction(track, ".position");
+          action = this.AnimationService.CreateAction(track, '.position', 'vector');
         }
         let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
         let position!: THREE.Vector3;
@@ -48,7 +48,7 @@ export class AnimationCreatorService {
         let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
         let action = AnimationModel.FindActionByType(track, ".quaternion");
         if (action == undefined) {
-          action = this.AnimationService.CreateAction(track, ".quaternion");
+          action = this.AnimationService.CreateAction(track, '.quaternion', 'quaternion');
         }
         let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
         if (keyframe != undefined) {
@@ -67,7 +67,7 @@ export class AnimationCreatorService {
         let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, item.name);
         let action = AnimationModel.FindActionByType(track, ".material.opacity");
         if (action == undefined) {
-          action = this.AnimationService.CreateAction(track, ".material.opacity");
+          action = this.AnimationService.CreateAction(track, '.material.opacity', 'number');
         }
         let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
         if (keyframe != undefined) {
@@ -86,7 +86,7 @@ export class AnimationCreatorService {
         let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, item.name);
         let action = AnimationModel.FindActionByType(track, ".visible");
         if (action == undefined) {
-          action = this.AnimationService.CreateAction(track, ".visible");
+          action = this.AnimationService.CreateAction(track, '.visible', 'bool');
         }
         let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
         // console.log(keyframe);
@@ -107,7 +107,7 @@ export class AnimationCreatorService {
     let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
     let action = AnimationModel.FindActionByType(track, ".color");
     if (action == undefined) {
-      action = this.AnimationService.CreateAction(track, ".color");
+      action = this.AnimationService.CreateAction(track, '.color', 'color');
     }
     let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
     if (keyframe != undefined) {
@@ -123,7 +123,7 @@ export class AnimationCreatorService {
       let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
       let action = AnimationModel.FindActionByType(track, ".intensity");
       if (action == undefined) {
-        action = this.AnimationService.CreateAction(track, ".intensity");
+        action = this.AnimationService.CreateAction(track, '.intensity', 'number');
       }
       let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
       if (keyframe != undefined) {
@@ -140,7 +140,7 @@ export class AnimationCreatorService {
       let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
       let action = AnimationModel.FindActionByType(track, ".angle");
       if (action == undefined) {
-        action = this.AnimationService.CreateAction(track, ".angle");
+        action = this.AnimationService.CreateAction(track, '.angle', 'number');
       }
       let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
       if (keyframe != undefined) {
@@ -157,7 +157,7 @@ export class AnimationCreatorService {
       let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
       let action = AnimationModel.FindActionByType(track, ".plane.constant");
       if (action == undefined) {
-        action = this.AnimationService.CreateAction(track, ".plane.constant");
+        action = this.AnimationService.CreateAction(track, '.plane.constant', 'number');
       }
       let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
       if (keyframe != undefined) {
@@ -174,7 +174,7 @@ export class AnimationCreatorService {
       let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
       let action = AnimationModel.FindActionByType(track, ".element.innerHTML");
       if (action == undefined) {
-        action = this.AnimationService.CreateAction(track, ".element.innerHTML");
+        action = this.AnimationService.CreateAction(track, '.element.innerHTML', 'string');
       }
       let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
       if (keyframe != undefined) {
@@ -191,7 +191,7 @@ export class AnimationCreatorService {
       let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
       let action = AnimationModel.FindActionByType(track, ".userData.angle");
       if (action == undefined) {
-        action = this.AnimationService.CreateAction(track, ".userData.angle");
+        action = this.AnimationService.CreateAction(track, '.userData.angle', 'number');
       }
       let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
       if (keyframe != undefined) {
@@ -202,19 +202,6 @@ export class AnimationCreatorService {
         this.AnimationService.CreateKeyframe(action, ".userData.angle", this.AnimationService.currentTime, [obj.userData.angle]);
       }
     }
-  }
-  DeleteKeyframe(obj: THREE.Object3D) {
-    // if (obj != undefined) {
-    //   if (this.AnimationService.selected.length == 1) {
-    //     let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, obj.name);
-    //     track.keyframes.find((key, index) => {
-    //       if (key == this.AnimationService.selectedKeyframe) {
-    //         track.keyframes.splice(index, 1);
-    //       }
-    //     })
-    //     this.AnimationService.DeleteKeyframe(this.AnimationService.selectedKeyframe)
-    //   }
-    // }
   }
   OnCameraChange(obj: THREE.Object3D) {
     let pos = obj.position.clone();

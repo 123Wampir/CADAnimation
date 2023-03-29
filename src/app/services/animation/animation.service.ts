@@ -163,13 +163,13 @@ export class AnimationService {
     }
   }
 
-  CreateAction(track: AnimationModel.KeyframeTrackModel, type: string) {
+  CreateAction(track: AnimationModel.KeyframeTrackModel, type: string, valueTypeName: string) {
     let action: AnimationModel.KeyframeActionModel;
-    action = { keyframes: [], length: 0, start: 0, trackDOM: track, type: type, active: false };
+    action = { keyframes: [], valueTypeName: valueTypeName, length: 0, start: 0, trackDOM: track, type: type, active: false };
     track.actions.push(action);
     return action;
   }
-  UpdateAction(action: AnimationModel.KeyframeActionModel) {
+  UpdateActionDuration(action: AnimationModel.KeyframeActionModel) {
     if (action.track != undefined) {
       action.start = action.track!.times[0];
       action.length = action.track!.times[action.track!.times.length - 1] - action.start;
@@ -183,13 +183,10 @@ export class AnimationService {
     for (let i = action.keyframes.length - 1; i >= 0; i--) {
       this.DeleteKeyframe(action.keyframes[i]);
     }
-    action.keyframes = [];
-    action.trackDOM.actions.find((item, index) => {
-      if (item == action) {
-        action.trackDOM.actions.splice(index, 1);
-        return;
-      }
-    })
+    let index = action.trackDOM.actions.findIndex(item => item == action);
+    if (index != -1) {
+      action.trackDOM.actions.splice(index, 1);
+    }
   }
   CreateKeyframe(action: AnimationModel.KeyframeActionModel, type: string, time: number, value: any) {
     let clip: THREE.AnimationClip;
@@ -202,7 +199,7 @@ export class AnimationService {
     this.ChangeKeyframe(keyframe);
     action.keyframes.push(keyframe);
     action.track = clip.tracks.find(tr => tr.name == type);
-    this.UpdateAction(action);
+    this.UpdateActionDuration(action);
   }
   ChangeKeyframe(keyframe: AnimationModel.KeyframeModel) {
     let track = keyframe.clip.tracks.find(track => (track.name == keyframe.action.type))
@@ -236,43 +233,31 @@ export class AnimationService {
     keyframe.clip.resetDuration()
   }
   AddTrackToClip(keyframe: AnimationModel.KeyframeModel) {
-    let track = this.CreateKeyframeTrack(keyframe.action.type, [keyframe.time], keyframe.value);
+    let track = this.CreateKeyframeTrack(keyframe.action.type, keyframe.action.valueTypeName, [keyframe.time], keyframe.value);
     keyframe.clip.tracks.push(track);
     keyframe.clip.resetDuration();
     this.UpdateAnimationAction(keyframe);
   }
-  CreateKeyframeTrack(type: string, times: number[], values: any[]): THREE.KeyframeTrack {
+  CreateKeyframeTrack(name: string, type: string, times: number[], values: any[]): THREE.KeyframeTrack {
     let newTrack: any;
     switch (type) {
-      case ".position":
-        newTrack = new THREE.VectorKeyframeTrack(type, times, values);
+      case "vector":
+        newTrack = new THREE.VectorKeyframeTrack(name, times, values);
         break;
-      case ".quaternion":
-        newTrack = new THREE.QuaternionKeyframeTrack(type, times, values);
+      case "quaternion":
+        newTrack = new THREE.QuaternionKeyframeTrack(name, times, values);
         break;
-      case ".material.opacity":
-        newTrack = new THREE.NumberKeyframeTrack(type, times, values);
+      case "number":
+        newTrack = new THREE.NumberKeyframeTrack(name, times, values);
         break;
-      case ".visible":
-        newTrack = new THREE.BooleanKeyframeTrack(type, times, values);
+      case "bool":
+        newTrack = new THREE.BooleanKeyframeTrack(name, times, values);
         break;
-      case ".color":
-        newTrack = new THREE.ColorKeyframeTrack(type, times, values);
+      case "color":
+        newTrack = new THREE.ColorKeyframeTrack(name, times, values);
         break;
-      case ".intensity":
-        newTrack = new THREE.NumberKeyframeTrack(type, times, values);
-        break;
-      case ".angle":
-        newTrack = new THREE.NumberKeyframeTrack(type, times, values);
-        break;
-      case ".plane.constant":
-        newTrack = new THREE.NumberKeyframeTrack(type, times, values);
-        break;
-      case ".element.innerHTML":
-        newTrack = new THREE.StringKeyframeTrack(type, times, values);
-        break;
-      case ".userData.angle":
-        newTrack = new THREE.NumberKeyframeTrack(type, times, values);
+      case "string":
+        newTrack = new THREE.StringKeyframeTrack(name, times, values);
         break;
     }
     return newTrack;
@@ -307,7 +292,7 @@ export class AnimationService {
           values.push(keyframe.value[j]);
         }
       }
-      let newTrack = this.CreateKeyframeTrack(track.name, times, values);
+      let newTrack = this.CreateKeyframeTrack(track.name, keyframe.action.valueTypeName, times, values);
       keyframe.clip.tracks.find((tr, index) => {
         if (tr.name == newTrack.name)
           keyframe.clip.tracks.splice(index, 1, newTrack);
@@ -379,7 +364,7 @@ export class AnimationService {
 
   DeleteKeyframe(keyframe: AnimationModel.KeyframeModel) {
     let i = keyframe.clip.tracks.findIndex(track => track.name == keyframe.action.type);
-    if (i != undefined) {
+    if (i != -1) {
       let times: any[] = [];
       let values: any[] = [];
       for (let j = 0; j < keyframe.clip.tracks[i].times.length; j++) {
@@ -392,7 +377,7 @@ export class AnimationService {
         }
       }
       if (times.length != 0) {
-        let newTrack = this.CreateKeyframeTrack(keyframe.action.type, times, values);
+        let newTrack = this.CreateKeyframeTrack(keyframe.action.type, keyframe.action.valueTypeName, times, values);
         keyframe.clip.tracks.splice(i, 1, newTrack);
         keyframe.action.track = newTrack;
       }
@@ -400,12 +385,23 @@ export class AnimationService {
         keyframe.clip.tracks.splice(i, 1);
         keyframe.action.track = undefined;
       }
-      keyframe.clip.resetDuration();
-      this.UpdateAnimationAction(keyframe);
+      if (keyframe.clip.tracks.length != 0) {
+        keyframe.clip.resetDuration();
+        this.UpdateAnimationAction(keyframe);
+      }
+      else {
+        keyframe.action.trackDOM.object.animations = [];
+        let index = this.actions.findIndex(action => action.getClip() == keyframe.clip);
+        if (index != -1) {
+          this.actions.splice(index, 1);
+        }
+      }
       let index = keyframe.action.keyframes.findIndex(key => key == keyframe);
       keyframe.action.keyframes.splice(index, 1);
-      this.UpdateAction(keyframe.action);
+      this.UpdateActionDuration(keyframe.action);
     }
+    console.log(this.actions);
+    console.log(this.mixers);
   }
 
   FindMixer(mixers: THREE.AnimationMixer[], obj: any, mix: any[]) {
@@ -513,7 +509,7 @@ export class AnimationService {
         animTrack = this.timeLine.tracks.find(track => track.name == item.name);
       }
       clip.tracks.forEach(track => {
-        let action = this.CreateAction(animTrack!, track.name);
+        let action = this.CreateAction(animTrack!, track.name, track.ValueTypeName);
         let n = track.getValueSize();
         track.times.forEach((time, i) => {
           let values: any[] = [];
@@ -614,7 +610,7 @@ export class AnimationService {
                       let track = this.timeLine.tracks.find(track => track.object == mesh);
                       let action = AnimationModel.FindActionByType(track!, ".position");
                       if (action == undefined) {
-                        action = this.CreateAction(track!, ".position");
+                        action = this.CreateAction(track!, '.position', 'vector');
                       }
                       this.CreateKeyframe(action, ".position", stepTime, startPos.toArray());
                       this.CreateKeyframe(action, ".position", stepTime + par, finalPos.toArray());
@@ -624,14 +620,14 @@ export class AnimationService {
                       let track = this.timeLine.tracks.find(track => track.object == mesh);
                       let action = AnimationModel.FindActionByType(track!, ".material.opacity");
                       if (action == undefined) {
-                        action = this.CreateAction(track!, ".material.opacity");
+                        action = this.CreateAction(track!, '.material.opacity', 'number');
                       }
                       this.CreateKeyframe(action, ".material.opacity", stepTime, [start]);
                       this.CreateKeyframe(action, ".material.opacity", stepTime + par, [stop]);
 
                       let action2 = AnimationModel.FindActionByType(track!, ".visible");
                       if (action2 == undefined) {
-                        action2 = this.CreateAction(track!, ".visible");
+                        action2 = this.CreateAction(track!, '.visible', 'bool');
                       }
                       if (stop == 1) {
                         this.CreateKeyframe(action2, ".visible", stepTime, [true]);
