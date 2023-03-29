@@ -174,18 +174,11 @@ export class AnimationService {
       action.start = action.track!.times[0];
       action.length = action.track!.times[action.track!.times.length - 1] - action.start;
     }
-    else {
-      this.DeleteAction(action);
-    }
     this.ignore = false;
   }
   DeleteAction(action: AnimationModel.KeyframeActionModel) {
     for (let i = action.keyframes.length - 1; i >= 0; i--) {
       this.DeleteKeyframe(action.keyframes[i]);
-    }
-    let index = action.trackDOM.actions.findIndex(item => item == action);
-    if (index != -1) {
-      action.trackDOM.actions.splice(index, 1);
     }
   }
   CreateKeyframe(action: AnimationModel.KeyframeActionModel, type: string, time: number, value: any) {
@@ -384,6 +377,10 @@ export class AnimationService {
       else {
         keyframe.clip.tracks.splice(i, 1);
         keyframe.action.track = undefined;
+        let index = keyframe.action.trackDOM.actions.findIndex(action => action == keyframe.action);
+        if (index != -1) {
+          keyframe.action.trackDOM.actions.splice(index, 1);
+        }
       }
       if (keyframe.clip.tracks.length != 0) {
         keyframe.clip.resetDuration();
@@ -400,8 +397,6 @@ export class AnimationService {
       keyframe.action.keyframes.splice(index, 1);
       this.UpdateActionDuration(keyframe.action);
     }
-    console.log(this.actions);
-    console.log(this.mixers);
   }
 
   FindMixer(mixers: THREE.AnimationMixer[], obj: any, mix: any[]) {
@@ -701,23 +696,11 @@ export class AnimationService {
   }
 
   ClearAnimation(clearTree: boolean = false) {
-    if (this.SceneUtilsService.model != undefined) {
-      this.SceneUtilsService.model.traverse(item => {
-        item.animations = [];
-      })
-    }
     this.timeLine.tracks.forEach(track => {
-      track.actions.forEach(action => {
-        action.keyframes = [];
-      })
-      track.actions = [];
+      this.ClearTrack(track);
     })
     this.timeLine.tracks = [];
-    this.actions.forEach(action => {
-      action.stop();
-      let mixer = action.getMixer();
-      mixer.uncacheRoot(mixer.getRoot());
-    })
+    console.log(this.actions);
     this.actions = [];
     this.mixers = [];
     this.timeLine.array = [];

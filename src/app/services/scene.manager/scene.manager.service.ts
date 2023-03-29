@@ -142,7 +142,7 @@ export class SceneManagerService {
     let track = AnimationModel.FindKeyframeTrack(this.SceneUtilsService.AnimationService.timeLine, this.SceneUtilsService.axisGroup.name);
     this.SceneUtilsService.AnimationService.CreateTreeViewElement(line, track);
     AnimationModel.GetArrayTimeLine(this.SceneUtilsService.AnimationService.timeLine);
-    return line
+    return line;
   }
 
   DeleteObject(obj: any) {
@@ -171,6 +171,24 @@ export class SceneManagerService {
         if (i != -1)
           this.SceneUtilsService.AnimationService.mixers.splice(i, 1);
       }
+      else if (obj.type == "Axis") {
+        let axis = obj as THREE.Line;
+        axis.removeFromParent();
+        axis.geometry.dispose();
+        (axis.material as THREE.Material).dispose();
+        let index = this.SceneUtilsService.axisArray.findIndex(item => item == axis);
+        if (index != -1) {
+          this.SceneUtilsService.axisArray.splice(index, 1);
+        }
+        console.log(this.SceneUtilsService.axisArray);
+        let track = this.SceneUtilsService.AnimationService.timeLine.tracks.find(item => item.name == axis.name);
+        if (track != undefined)
+          this.SceneUtilsService.AnimationService.DeleteTrack(track);
+        let i = this.SceneUtilsService.AnimationService.mixers.findIndex(mixer => mixer.getRoot() == axis);
+        if (i != -1)
+          this.SceneUtilsService.AnimationService.mixers.splice(i, 1);
+      }
+      console.log(obj);
     }
   }
 }
