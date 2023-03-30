@@ -488,8 +488,10 @@ export class AnimationService {
           let axis = this.SceneUtilsService.SceneManagerService.AddAxis(item.name);
           if (item.parent != "") {
             let track = this.timeLine.tracks.find(track => track.name == item.parent);
-            if (track != undefined)
+            if (track != undefined) {
               track.object.attach(axis);
+              axis.rotation.set(0, 0, 0);
+            }
           }
           axis.position.set(item.position.x, item.position.y, item.position.z);
           axis.userData["direction"] = new THREE.Vector3(item.direction.x, item.direction.y, item.direction.z);

@@ -15,7 +15,8 @@ export class SceneManagerService {
 
   AddDirectionalLight(name?: string): THREE.DirectionalLight {
     let light = new THREE.DirectionalLight(0xffffff, 2.2);
-    name != undefined ? light.name = name : light.name = light.type + `_${++this.id}`;
+    name != undefined ? light.name = name : light.name = light.type + `_${this.id}`;
+    this.id++;
     let lightHelper = new THREE.DirectionalLightHelper(light, 10, light.color);
     light.add(lightHelper);
     lightHelper.matrixWorld = light.matrixWorld;
@@ -34,7 +35,8 @@ export class SceneManagerService {
   }
   AddPointLight(name?: string): THREE.PointLight {
     let light = new THREE.PointLight(0xffffff, 2.2, 10000);
-    name != undefined ? light.name = name : light.name = light.type + `_${++this.id}`;
+    name != undefined ? light.name = name : light.name = light.type + `_${this.id}`;
+    this.id++;
     let lightHelper = new THREE.PointLightHelper(light, 5, light.color);
     lightHelper.matrixWorld = light.matrixWorld;
     light.add(lightHelper);
@@ -47,7 +49,8 @@ export class SceneManagerService {
   }
   AddSpotLight(name?: string): THREE.SpotLight {
     let light = new THREE.SpotLight(0xffffff, 2.2, 0, 0.5, 1);
-    name != undefined ? light.name = name : light.name = light.type + `_${++this.id}`;
+    name != undefined ? light.name = name : light.name = light.type + `_${this.id}`;
+    this.id++;
     let lightHelper = new THREE.SpotLightHelper(light, light.color);
     lightHelper.matrixWorld = light.matrixWorld;
     lightHelper.children[0].onBeforeRender = function () {
@@ -68,7 +71,8 @@ export class SceneManagerService {
     annDiv.innerText = "Text";
     let annotation = new CSS2DObject(annDiv);
     annotation.type = "Annotation";
-    name != undefined ? annotation.name = name : annotation.name = `Annotation_${++this.id}`;
+    name != undefined ? annotation.name = name : annotation.name = `Annotation_${this.id}`;
+    this.id++;
     this.SceneUtilsService.annotationGroup.add(annotation);
     annotation.position.set(10, -10, 30);
     let pts = [];
@@ -106,7 +110,8 @@ export class SceneManagerService {
     let line = new THREE.Line(geom, mat);
     this.SceneUtilsService.scene.add(line);
     this.SceneUtilsService.axisArray.push(line);
-    name != undefined ? line.name = name : line.name = `Axis_${++this.id}`;
+    name != undefined ? line.name = name : line.name = `Axis_${this.id}`;
+    this.id++;
     line.type = "Axis";
     line.userData['direction'] = new THREE.Vector3(0);
     line.userData['objects'] = new Array<THREE.Object3D>(0);
