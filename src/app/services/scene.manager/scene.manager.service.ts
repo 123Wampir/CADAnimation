@@ -112,6 +112,7 @@ export class SceneManagerService {
     line.userData['objects'] = new Array<THREE.Object3D>(0);
     line.userData['angle'] = 0;
     line.userData['oldAngle'] = 0;
+    let scope = this;
     line.onAfterRender = function (renderer, scene, camera, geometry) {
       let offset = Number(this.userData['angle'].toFixed(3)) - Number(this.userData['oldAngle'].toFixed(3));
       if (offset != 0) {
@@ -122,15 +123,16 @@ export class SceneManagerService {
         let q = new THREE.Quaternion().setFromRotationMatrix(this.matrixWorld);
         dir.applyQuaternion(q);
         dir.normalize();
-        let rot = dir.clone().multiplyScalar(offset * Math.PI / 180);
+        let globalQ = scope.SceneUtilsService.model.quaternion.clone().invert();
         (this.userData['objects'] as Array<THREE.Object3D>).forEach(item => {
           item.updateMatrixWorld(true);
           let pos = new THREE.Vector3().setFromMatrixPosition(item.matrixWorld);
           let diff = pos.clone().sub(axisPos!);
           diff.applyAxisAngle(dir, offset * Math.PI / 180);
           diff.add(axisPos!);
+          item.rotateOnWorldAxis(dir.clone().applyQuaternion(globalQ), offset * Math.PI / 180);
+          diff.applyQuaternion(globalQ);
           item.position.set(diff.x, diff.y, diff.z);
-          item.rotateOnWorldAxis(dir, offset * Math.PI / 180);
           item.updateMatrixWorld(true);
         })
         this.updateMatrixWorld(true);

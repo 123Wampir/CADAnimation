@@ -81,6 +81,14 @@ export class ViewcubeComponent implements AfterViewInit, AfterViewChecked {
     switch (type) {
       case 0:
         this.SceneUtilsService.model.quaternion.copy(this.SceneUtilsService.perspectiveCamera.quaternion.clone());
+        let quaternion = this.SceneUtilsService.perspectiveCamera.quaternion.clone();
+        this.SceneUtilsService.model.updateMatrixWorld(true);
+        // let dir = new THREE.Vector3(0, 0, 1);
+        // let dir=this.SceneUtilsService.perspectiveCamera.up.clone();
+        // dir.normalize();
+        // let arr: any[] = [];
+        // this.SceneUtilsService.FindMeshes(this.SceneUtilsService.model, arr);
+        // this.SceneUtilsService.RotateOnAxis(arr, new THREE.Vector3(0), dir, -90);
         this.SceneUtilsService.CalculateBounding(this.SceneUtilsService.model);
         this.SceneUtilsService.SetZeroPlane();
         break;

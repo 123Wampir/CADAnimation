@@ -83,8 +83,9 @@ export class SceneUtilsService {
 
   constructor() { }
 
-  LoadModelFile(event: Event) {
-    this.AppComponent.LoadModelFile(event);
+  async LoadModelFile(event: Event) {
+    await this.AppComponent.LoadModelFile(event);
+    this.ViewcubeComponent.setView(1, 1, 1);
   }
   SaveModelAsGLTF(event: Event) {
     this.AppComponent.SaveFile(event);
@@ -156,6 +157,20 @@ export class SceneUtilsService {
       };
     }
     return {};
+  }
+
+  RotateOnAxis(objects: THREE.Object3D[], position: THREE.Vector3, direction: THREE.Vector3, angle: number) {
+    let dir = direction.clone();
+    objects.forEach(item => {
+      item.updateMatrixWorld(true);
+      let pos = new THREE.Vector3().setFromMatrixPosition(item.matrixWorld);
+      let diff = pos.clone().sub(position);
+      diff.applyAxisAngle(dir, angle * Math.PI / 180);
+      diff.add(position);
+      item.position.set(diff.x, diff.y, diff.z);
+      item.rotateOnWorldAxis(dir, angle * Math.PI / 180);
+      item.updateMatrixWorld(true);
+    })
   }
 
   createPlaneStencilGroup(geometry: any, plane: THREE.Plane, renderOrder: number) {
@@ -484,12 +499,12 @@ export class SceneUtilsService {
         this.DisposeObject(obj);
       });
       this.planeHelpers.clear();
-      
+
       this.annotationGroup.traverse(obj => {
         this.DisposeObject(obj);
       });
       this.annotationGroup.clear();
-      
+
       // this.stencilGroups.traverse(obj => {
       //   this.DisposeObject(obj);
       // });
