@@ -141,6 +141,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
           this.propertiesObject.name = "Group";
           this.group = true;
           this.posParam = true;
+          this.rotParam = false;
           this.opacityParam = true;
           this.cutPlane = false;
           this.light = false;
@@ -231,6 +232,31 @@ export class PropertiesComponent implements OnInit, OnChanges {
   MatMetalnessSet(event: Event) {
     this.SceneUtilsService.selected.forEach(item => {
       (item as any).material.metalness = (event as any).target.value;
+    })
+  }
+  MatReflectivitySet(event: Event) {
+    this.SceneUtilsService.selected.forEach(item => {
+      (item as any).material.reflectivity = (event as any).target.value;
+    })
+  }
+  MatClearcoatSet(event: Event) {
+    this.SceneUtilsService.selected.forEach(item => {
+      (item as any).material.clearcoat = (event as any).target.value;
+    })
+  }
+  MatClearcoatRoughnessSet(event: Event) {
+    this.SceneUtilsService.selected.forEach(item => {
+      (item as any).material.clearcoatRoughness = (event as any).target.value;
+    })
+  }
+  MatIORSet(event: Event) {
+    this.SceneUtilsService.selected.forEach(item => {
+      (item as any).material.ior = (event as any).target.value;
+    })
+  }
+  MatTransmissionSet(event: Event) {
+    this.SceneUtilsService.selected.forEach(item => {
+      (item as any).material.transmission = (event as any).target.value;
     })
   }
   MatVertColorSet(event: Event) {

@@ -419,6 +419,68 @@
             </div>
             <div class="line">
                 <div class="param">
+                    <div class="label">Полировка</div>
+                    <div class="inputs">
+                        <input type="range" min="0" max="1" step="0.01" class="input-range"
+                            [(ngModel)]="propertiesObject.material.clearcoat" placeholder="clearcoat"
+                            (change)="MatClearcoatSet($event)">
+                        <input type="number" class="input-number" [(ngModel)]="propertiesObject.material.clearcoat"
+                            min="0" max="1" step="0.01" placeholder="clearcoat" (change)="MatClearcoatSet($event)">
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">Степень полировки</div>
+                    <div class="inputs">
+                        <input type="range" min="0" max="1" step="0.01" class="input-range"
+                            [(ngModel)]="propertiesObject.material.clearcoatRoughness" placeholder="clearcoatRoughness"
+                            (change)="MatClearcoatRoughnessSet($event)">
+                        <input type="number" class="input-number"
+                            [(ngModel)]="propertiesObject.material.clearcoatRoughness" min="0" max="1" step="0.01"
+                            placeholder="clearcoatRoughness" (change)="MatClearcoatRoughnessSet($event)">
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">Отражение</div>
+                    <div class="inputs">
+                        <input type="range" min="0" max="1" step="0.01" class="input-range"
+                            [(ngModel)]="propertiesObject.material.reflectivity" placeholder="reflectivity"
+                            (change)="MatReflectivitySet($event)">
+                        <input type="number" class="input-number" [(ngModel)]="propertiesObject.material.reflectivity"
+                            min="0" max="1" step="0.01" placeholder="reflectivity"
+                            (change)="MatReflectivitySet($event)">
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">Преломление</div>
+                    <div class="inputs">
+                        <input type="range" min="1" max="2.3" step="0.01" class="input-range"
+                            [(ngModel)]="propertiesObject.material.ior" placeholder="ior" (change)="MatIORSet($event)">
+                        <input type="number" class="input-number" [(ngModel)]="propertiesObject.material.ior" min="1"
+                            max="2.3" step="0.01" placeholder="ior" (change)="MatIORSet($event)">
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">Пропускание</div>
+                    <div class="inputs">
+                        <input type="range" min="0" max="1" step="0.01" class="input-range"
+                            [(ngModel)]="propertiesObject.material.transmission" placeholder="transmission"
+                            (change)="MatTransmissionSet($event)">
+                        <input type="number" class="input-number" [(ngModel)]="propertiesObject.material.transmission"
+                            min="0" max="1" step="0.01" placeholder="transmission"
+                            (change)="MatTransmissionSet($event)">
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
                     <div class="label">Цвет вершин</div>
                     <div class="inputs">
                         <input type="checkbox" [(ngModel)]="propertiesObject.material.vertexColors"

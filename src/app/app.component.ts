@@ -359,15 +359,24 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.SceneUtilsService.FindMeshes(obj, arr);
     if (arr.length != 0) {
       arr.forEach(mesh => {
-        mesh.material = mesh.material.clone();
-        //mesh.material = new THREE.MeshToonMaterial({ color: mesh.material.color });
+        let material = new THREE.MeshPhysicalMaterial({
+          color: mesh.material.color,
+          metalness: mesh.material.metalness,
+          roughness: mesh.material.roughness,
+          opacity: mesh.material.opacity,
+          transparent: mesh.material.transparent,
+          side: THREE.DoubleSide,
+          shadowSide: THREE.BackSide,
+          clipIntersection: true
+        });
+        mesh.material = material;
         if (mesh.geometry.hasAttribute('color')) {
           mesh.material.vertexColors = true;
         }
-        mesh.material.side = THREE.DoubleSide;
-        mesh.material.shadowSide = THREE.BackSide;
-        mesh.material.clipIntersection = true;
-        mesh.material.forceSinglePass = true;
+        // mesh.material.side = THREE.DoubleSide;
+        // mesh.material.shadowSide = THREE.BackSide;
+        // mesh.material.clipIntersection = true;
+        // mesh.material.forceSinglePass = true;
         mesh.receiveShadow = true;
         mesh.castShadow = true;
         (mesh as THREE.Mesh).onBeforeRender = function (renderer, scene, camera, geometry, material) {

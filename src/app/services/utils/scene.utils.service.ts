@@ -167,8 +167,10 @@ export class SceneUtilsService {
       let diff = pos.clone().sub(position);
       diff.applyAxisAngle(dir, angle * Math.PI / 180);
       diff.add(position);
+      let globalQ = this.model.quaternion.clone().invert();
+      item.rotateOnWorldAxis(dir.clone().applyQuaternion(globalQ), angle * Math.PI / 180);
+      diff.applyQuaternion(globalQ);
       item.position.set(diff.x, diff.y, diff.z);
-      item.rotateOnWorldAxis(dir, angle * Math.PI / 180);
       item.updateMatrixWorld(true);
     })
   }
