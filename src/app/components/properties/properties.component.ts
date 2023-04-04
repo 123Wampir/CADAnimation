@@ -211,7 +211,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
     this.SceneUtilsService.OnExplode(this.SceneUtilsService.selected, this.explodeOffset);
   }
   ApplyExplode() {
-    this.AnimationCreatorService.OnPositionChange(this.propertiesObject);
+    this.AnimationCreatorService.OnPositionChange(this.propertiesObject, false);
     this.editExplode = false;
   }
   DiscardExplode() {

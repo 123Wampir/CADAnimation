@@ -12,7 +12,8 @@
                         <div class="basic-line" (click)="NewProject()">Новый</div>
                         <label class="basic-line" for="fileUpload">
                             <input class="file" type="file" name="file" id="fileUpload"
-                                accept=".step,.stp,.gltf,.brep,.igs" (change)="SceneUtilsService.LoadModelFile($event)">
+                                accept=".step,.stp,.gltf,.glb,.brep,.igs"
+                                (change)="SceneUtilsService.LoadModelFile($event)">
                             Загрузить модель
                         </label>
                         <div class="basic-line"
@@ -135,7 +136,7 @@
                         <div class="basic-line" (click)="AnimationService.ClearAnimation(true)">Очистить</div>
                         <label class="basic-line" for="animUpload"
                             [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.model!=undefined && SceneUtilsService.model.children.length!=0)">
-                            <input class="file" type="file" name="file" id="animUpload" accept=".xml"
+                            <input class="file" type="file" name="file" id="animUpload" accept=".xml,.json"
                                 (change)="AnimationService.LoadAnimationFile($event)">
                             Открыть
                         </label>
@@ -167,6 +168,10 @@
         </div>
         <div class="toolbar-tool">
             <input type="color" (change)="OnGroundColorChange($event)" id="ground-color">
+        </div>
+        <div class="toolbar-tool">
+            <button class="checkbox" id="enviroment" (click)="SetEnviroment()"></button>
+            <label for="enviroment"><img src="../../../assets/reflection.png" width="19px" height="19px"></label>
         </div>
         <div class="vert-separator"></div>
         <div class="toolbar-tool">

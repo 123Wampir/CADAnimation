@@ -39,33 +39,28 @@ export class ViewcubeComponent implements AfterViewInit, AfterViewChecked {
     );
     const center = new THREE.Vector3();
     let finishPosition = new THREE.Vector3();
-    if (this.SceneUtilsService.boundingSphere != undefined)
+    if (this.SceneUtilsService.boundingSphere != undefined) {
+      this.SceneUtilsService.CalculateBounding(this.SceneUtilsService.model);
       finishPosition = center.copy(offset.normalize().multiplyScalar(this.SceneUtilsService.boundingSphere.radius * 3));
+    }
     else finishPosition = center.copy(offset.normalize().multiplyScalar(this.SceneUtilsService.perspectiveCamera.position.length()));
     this.SceneUtilsService.perspectiveCamera.position.set(finishPosition.x, finishPosition.y, finishPosition.z);
     this.SceneUtilsService.trackball.target.set(0, 0, 0);
-    let rot = this.SceneUtilsService.perspectiveCamera.rotation.clone();
-    // console.log(rot.x * 180 / Math.PI, rot.y * 180 / Math.PI, rot.z * 180 / Math.PI);
-    // console.log(vec);
     let up = this.SceneUtilsService.perspectiveCamera.up.clone();
     const zero = 10e-4;
-    // console.log(rot);
     if (vec.x != 0) {
       (Math.abs(up.y) > Math.abs(up.z)) ? up.z = 0 : up.y = 0;
       (up.x > 0) ? up.x = zero : up.x = -zero;
     }
-    else if (vec.y != 0) {
-      (Math.abs(up.x) > Math.abs(up.z)) ? up.z = 0 : up.x = 0;
-      (up.y > 0) ? up.y = zero : up.y = -zero;
-    }
-    else {
+    else if (vec.z != 0) {
       (Math.abs(up.x) > Math.abs(up.y)) ? up.y = 0 : up.x = 0;
       (up.z > 0) ? up.z = zero : up.z = -zero;
     }
+    else {
+      (Math.abs(up.x) > Math.abs(up.z)) ? up.z = 0 : up.x = 0;
+      (up.y > 0) ? up.y = zero : up.y = -zero;
+    }
     up.normalize()
-    let pts: any[] = [];
-    pts.push(new THREE.Vector3())
-    pts.push(up.clone().normalize().multiplyScalar(50));
     this.SceneUtilsService.perspectiveCamera.up.copy(up);
   }
 
@@ -81,14 +76,7 @@ export class ViewcubeComponent implements AfterViewInit, AfterViewChecked {
     switch (type) {
       case 0:
         this.SceneUtilsService.model.quaternion.copy(this.SceneUtilsService.perspectiveCamera.quaternion.clone());
-        let quaternion = this.SceneUtilsService.perspectiveCamera.quaternion.clone();
         this.SceneUtilsService.model.updateMatrixWorld(true);
-        // let dir = new THREE.Vector3(0, 0, 1);
-        // let dir=this.SceneUtilsService.perspectiveCamera.up.clone();
-        // dir.normalize();
-        // let arr: any[] = [];
-        // this.SceneUtilsService.FindMeshes(this.SceneUtilsService.model, arr);
-        // this.SceneUtilsService.RotateOnAxis(arr, new THREE.Vector3(0), dir, -90);
         this.SceneUtilsService.CalculateBounding(this.SceneUtilsService.model);
         this.SceneUtilsService.SetZeroPlane();
         break;

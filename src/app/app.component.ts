@@ -55,8 +55,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.SceneUtilsService.perspectiveCamera = new THREE.PerspectiveCamera(45, this.getAspectRatio(), 1.0, 50000.0);
     this.SceneUtilsService.perspectiveCamera.layers.enable(1);
     this.SceneUtilsService.perspectiveCamera.name = "Camera";
-    this.SceneUtilsService.perspectiveCamera.position.set(50.0, 150.0, 100.0);
-    this.SceneUtilsService.perspectiveCamera.up.set(0.0, 0.0, 1.0);
+    this.SceneUtilsService.perspectiveCamera.position.set(50.0, 100.0, 150.0);
+    this.SceneUtilsService.perspectiveCamera.up.set(0.0, 1.0, 0.0);
     this.SceneUtilsService.perspectiveCamera.lookAt(new THREE.Vector3(0.0, 0.0, 0.0));
     this.scene.add(this.SceneUtilsService.perspectiveCamera);
     this.SceneUtilsService.currentCamera = this.SceneUtilsService.perspectiveCamera;
@@ -92,10 +92,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     const planeGeometry = new THREE.CircleGeometry(10000);
     const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, metalness: 0 });
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    plane.rotateX(degToRad(-90));
     plane.name = "Zero Plane";
     plane.type = "Ignore";
     const planeHelper = new THREE.GridHelper(2000, 200, 0x000000, 0xaaaaaa);
-    plane.add(planeHelper.rotateX(degToRad(90)));
+    plane.add(planeHelper.rotateX(degToRad(-90)));
     planeHelper.visible = false;
     plane.receiveShadow = true;
     let mirror = new Reflector(planeGeometry, {
@@ -271,6 +272,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.PrepareModel();
       }
     }
+    (event.target as any).value = "";
   }
 
   async SaveFile(event: Event) {
@@ -339,6 +341,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     })
     this.SceneUtilsService.CalculateBounding(obj);
     let modelCenter = this.SceneUtilsService.boundingSphere.center.clone().negate();
+    modelCenter.y = -this.SceneUtilsService.boundingBox.min.y;
     obj.children.forEach(part => {
       let arr: any[] = [];
       this.SceneUtilsService.FindMeshes(part, arr);

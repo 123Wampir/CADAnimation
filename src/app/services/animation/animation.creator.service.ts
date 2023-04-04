@@ -10,7 +10,7 @@ import { SceneUtilsService } from '../utils/scene.utils.service';
 export class AnimationCreatorService {
   constructor(private AnimationService: AnimationService, private SceneUtilsService: SceneUtilsService) { }
 
-  OnPositionChange(obj: THREE.Object3D) {
+  OnPositionChange(obj: THREE.Object3D, transformPos = true) {
     if (obj != undefined) {
       this.SceneUtilsService.selected.forEach((item, index) => {
         let track = AnimationModel.FindKeyframeTrack(this.AnimationService.timeLine, item.name);
@@ -20,13 +20,18 @@ export class AnimationCreatorService {
         }
         let keyframe = AnimationModel.FindKeyframeByTime(action, this.AnimationService.currentTime);
         let position!: THREE.Vector3;
-        if (obj.type != "Group") {
-          position = obj.position;
+        if (transformPos) {
+          if (obj.type != "Group") {
+            position = obj.position;
+          }
+          else {
+            let q = new THREE.Quaternion();
+            item.getWorldQuaternion(q);
+            position = obj.position.clone().applyQuaternion(q.invert()).add(this.SceneUtilsService.startPos[index]);
+          }
         }
         else {
-          let q = new THREE.Quaternion();
-          item.getWorldQuaternion(q);
-          position = obj.position.clone().applyQuaternion(q.invert()).add(this.SceneUtilsService.startPos[index]);
+          position = item.position;
         }
         if (keyframe != undefined) {
           keyframe.value = position.toArray();

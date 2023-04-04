@@ -36,6 +36,7 @@ export class MenubarComponent {
     let target: any = {};
     color.getHSL(target);
     let l = Math.abs(Math.round(target.l) - 1);
+    this.SceneUtilsService.backgroundColor = color;
     this.SceneUtilsService.renderer.setClearColor(color);
     this.SceneUtilsService.scene.fog!.color = color;
     (this.SceneUtilsService.selectBox.material as THREE.LineBasicMaterial).color.setHSL(0, 0, l);
@@ -73,6 +74,10 @@ export class MenubarComponent {
   }
   CreateSnapshot() {
     this.SceneUtilsService.dialogType = "snapshot";
+    this.SceneUtilsService.dialogShow = true;
+  }
+  SetEnviroment() {
+    this.SceneUtilsService.dialogType = "enviroment";
     this.SceneUtilsService.dialogShow = true;
   }
   SetTheme(type: number) {

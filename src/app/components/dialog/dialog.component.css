@@ -1,12 +1,12 @@
 .container {
-    display: grid;
-    grid-template-rows: 50px auto;
+    display: flex;
     top: 200px;
     left: 200px;
     min-width: min-content;
     min-height: min-content;
     visibility: hidden;
     z-index: 5;
+    padding-bottom: 5px;
 }
 
 .header {
@@ -16,12 +16,12 @@
     justify-content: space-between;
     border-bottom: 1px solid var(--second-color);
     box-shadow: 0 2px 3px 0 var(--second-color);
-    padding: 10px 5px;
+    padding: 2px 5px;
     cursor: move;
 }
 
 .param {
-    grid-template-columns: 1fr 100px;
+    grid-template-columns: 1fr auto;
 }
 
 .form {
@@ -61,4 +61,18 @@
 
 .progress-label {
     position: absolute;
+}
+
+.text-img-label {
+    display: flex;
+    align-items: center;
+}
+
+.controls {
+    display: flex;
+    width: 100%;
+}
+
+button {
+    margin-top: 5px;
 }

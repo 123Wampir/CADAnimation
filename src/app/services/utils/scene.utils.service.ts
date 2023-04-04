@@ -12,6 +12,7 @@ import { SceneManagerService } from '../scene.manager/scene.manager.service';
 import { ContextmenuComponent } from 'src/app/components/contextmenu/contextmenu.component';
 import { ViewcubeComponent } from 'src/app/components/viewcube/viewcube.component';
 import * as AnimationModel from 'src/app/shared/animation.model';
+import { GroundProjectedEnv } from 'three/examples/jsm/objects/GroundProjectedEnv';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +29,8 @@ export class SceneUtilsService {
   angRenderer!: Renderer2;
 
   zeroPlane: THREE.Mesh = new THREE.Mesh();
+  skybox!: GroundProjectedEnv;
+  backgroundColor = new THREE.Color();
 
   lightGroup!: THREE.Group;
   annotationGroup!: THREE.Group;
@@ -86,6 +89,11 @@ export class SceneUtilsService {
   async LoadModelFile(event: Event) {
     await this.AppComponent.LoadModelFile(event);
     this.ViewcubeComponent.setView(1, 1, 1);
+    if (this.skybox != undefined) {
+      let x = (this.boundingBox.max.x + this.boundingBox.min.x) / 2;
+      let z = (this.boundingBox.max.z + this.boundingBox.min.z) / 2;
+      this.skybox.position.set(x, 0, z);
+    }
   }
   SaveModelAsGLTF(event: Event) {
     this.AppComponent.SaveFile(event);
@@ -362,7 +370,7 @@ export class SceneUtilsService {
     }
   }
   SetZeroPlane() {
-    this.zeroPlane.position.set(this.zeroPlane.position.x, this.zeroPlane.position.y, this.boundingBox.min.z);
+    this.zeroPlane.position.set(this.zeroPlane.position.x, this.boundingBox.min.y, this.zeroPlane.position.z);
   }
 
   ClearSelection(target: THREE.Object3D[]) {

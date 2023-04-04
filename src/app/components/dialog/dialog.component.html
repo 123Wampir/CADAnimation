@@ -5,8 +5,8 @@
             <img src="../../../assets/cancel.png" class="no-filter" alt="button-icon" width="19px" height="19px">
         </button>
     </div>
-    <div class="form" [ngSwitch]="type">
-        <div *ngSwitchCase="'cameraRotation'">
+    <div [ngSwitch]="type">
+        <div class="form" *ngSwitchCase="'cameraRotation'">
             <!--Лучше вывести в отдельный компонент-->
             <div class="line">
                 <div class="param">
@@ -44,7 +44,7 @@
             </div>
             <button (click)="OnCameraRotationCreate($event)">Создать</button>
         </div>
-        <div *ngSwitchCase="'snapshot'">
+        <div class="form" *ngSwitchCase="'snapshot'">
             <div class="line">
                 <div class="param">
                     <div class="label">Соотношение сторон</div>
@@ -165,6 +165,71 @@
                 <canvas class="snapshot" #canvas width="300" height="300" [style]="SetCanvasStyle()"></canvas>
             </div>
         </div>
-        <div *ngSwitchCase="'settings'"></div>
+        <div class="form" *ngSwitchCase="'enviroment'">
+            <button>
+                <label for="env" class="text-img-label">
+                    Загрузить изображение
+                    <input type="file" class="file" name="file" id="env" accept=".exr,.hdr"
+                        (change)="LoadEnviroment($event)">
+                    <img src="../../../assets/reflection.png" width="19px" height="19px">
+                </label>
+            </button>
+            <div class="line" *ngIf="SceneUtilsService.skybox!=undefined">
+                <div class="param">
+                    <div class="label">Показать окружение</div>
+                    <div class="inputs">
+                        <label class="toggle-control">
+                            <input type="checkbox" class="toggle" checked (change)="OnEnviromentDisplayChange($event)">
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="line" *ngIf="SceneUtilsService.skybox!=undefined">
+                <div class="param">
+                    <div class="label">Показать землю</div>
+                    <div class="inputs">
+                        <label class="toggle-control">
+                            <input type="checkbox" class="toggle" (change)="OnEnviromentGroundChange()"
+                                [(ngModel)]="SceneUtilsService.skybox.visible">
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="line" *ngIf="SceneUtilsService.skybox!=undefined"
+                [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.skybox.visible)">
+                <div class="param">
+                    <div class="label">Радиус</div>
+                    <div class="inputs">
+                        <input type="range" min="0" max="2000" [(ngModel)]="SceneUtilsService.skybox.radius">
+                        <input type="number" class="input-number" [min]="0" [max]="2000" placeholder="radius"
+                            [(ngModel)]="SceneUtilsService.skybox.radius">
+                    </div>
+                </div>
+            </div>
+            <div class="line" *ngIf="SceneUtilsService.skybox!=undefined"
+                [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.skybox.visible)">
+                <div class="param">
+                    <div class="label">Высота</div>
+                    <div class="inputs">
+                        <input type="range" min="0" [max]="SceneUtilsService.skybox.radius*0.3"
+                            [(ngModel)]="SceneUtilsService.skybox.height">
+                        <input type="number" class="input-number" [min]="0" [max]="SceneUtilsService.skybox.radius*0.3"
+                            placeholder="height" [(ngModel)]="SceneUtilsService.skybox.height">
+                    </div>
+                </div>
+            </div>
+            <div class="line" *ngIf="SceneUtilsService.skybox!=undefined"
+                [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.skybox.visible)">
+                <div class="param">
+                    <div class="label">Размер модели</div>
+                    <div class="inputs">
+                        <input type="range" min="0.1" step="0.1" [max]="2" [(ngModel)]="scale"
+                            (ngModelChange)="OnModelScaleChange(scale)">
+                        <input type="number" class="input-number" [min]="0.1" step="0.1" [max]="2" placeholder="height"
+                            [(ngModel)]="scale" (ngModelChange)="OnModelScaleChange(scale)">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

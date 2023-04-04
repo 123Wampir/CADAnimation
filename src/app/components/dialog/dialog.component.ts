@@ -2,6 +2,8 @@ import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChi
 import { AnimationCreatorService } from 'src/app/services/animation/animation.creator.service';
 import { AnimationService } from 'src/app/services/animation/animation.service';
 import { SceneUtilsService } from 'src/app/services/utils/scene.utils.service';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
+import { GroundProjectedEnv } from 'three/examples/jsm/objects/GroundProjectedEnv';
 import THREE = require('three');
 
 @Component({
@@ -41,6 +43,9 @@ export class DialogComponent implements OnInit, OnChanges {
   recordStart = 0;
   recordEnd = this.AnimationService.timeLine.duration;
   framerate = 60;
+
+  scale = 1;
+  material = new THREE.Material();
 
   ngOnInit(): void {
   }
@@ -148,6 +153,75 @@ export class DialogComponent implements OnInit, OnChanges {
     console.log(duration, frames);
   }
 
+  async LoadEnviroment(event: Event) {
+    console.log(event);
+    let f = event.target as any;
+    console.log(f.files);
+    let str = window.URL.createObjectURL(f.files[0]);
+    console.log(str);
+    if (str.length != 0) {
+      const hdrLoader = new RGBELoader();
+      let envMap = await hdrLoader.loadAsync(str);
+      if (this.SceneUtilsService.scene.environment != null) {
+        this.SceneUtilsService.scene.environment.dispose();
+        this.SceneUtilsService.scene.environment = null;
+      }
+      envMap.mapping = THREE.EquirectangularReflectionMapping;
+      this.SceneUtilsService.scene.environment = envMap;
+      this.SceneUtilsService.scene.background = envMap;
+      if (this.SceneUtilsService.skybox != undefined) {
+        this.SceneUtilsService.skybox.removeFromParent();
+        (this.SceneUtilsService.skybox.children[0] as THREE.Mesh).geometry.dispose();
+        (this.SceneUtilsService.skybox.children[0] as any).material.dispose();
+        this.SceneUtilsService.skybox.clear();
+        this.SceneUtilsService.skybox.geometry.dispose();
+        this.SceneUtilsService.skybox.material.dispose();
+      }
+      this.SceneUtilsService.skybox = new GroundProjectedEnv(envMap);
+      let r = 100;
+      let x = 0;
+      let z = 0;
+      if (this.SceneUtilsService.boundingSphere != undefined) {
+        r = this.SceneUtilsService.boundingSphere.radius;
+        x = (this.SceneUtilsService.boundingBox.max.x + this.SceneUtilsService.boundingBox.min.x) / 2;
+        z = (this.SceneUtilsService.boundingBox.max.z + this.SceneUtilsService.boundingBox.min.z) / 2;
+      }
+      this.SceneUtilsService.skybox.position.set(x, 0, z);
+      this.SceneUtilsService.zeroPlane.visible = false;
+      this.SceneUtilsService.skybox.scale.setScalar(10000);
+      this.SceneUtilsService.skybox.radius = r * 16;
+      this.SceneUtilsService.skybox.type = "Ignore";
+      this.SceneUtilsService.scene.add(this.SceneUtilsService.skybox);
+      const planeMaterial = new THREE.ShadowMaterial({ color: 0x000000, transparent: true, opacity: 0.5 });
+      const plane = new THREE.Mesh(this.SceneUtilsService.zeroPlane.geometry, planeMaterial);
+      plane.receiveShadow = true;
+      plane.rotateX(-90 * Math.PI / 180);
+      plane.name = "ShadowPlane";
+      plane.type = "Ignore";
+      this.SceneUtilsService.skybox.add(plane);
+    }
+  }
+
+  OnModelScaleChange(scale: number) {
+    this.SceneUtilsService.model.scale.setScalar(scale);
+  }
+  OnEnviromentDisplayChange(event: Event) {
+    let value = (event.target as any).checked;
+    if (value) {
+      this.SceneUtilsService.scene.background = this.SceneUtilsService.scene.environment;
+      this.SceneUtilsService.zeroPlane.visible = false;
+    }
+    else {
+      this.SceneUtilsService.scene.background = null;
+      this.SceneUtilsService.skybox.visible = false;
+      this.SceneUtilsService.zeroPlane.visible = true;
+    }
+  }
+  OnEnviromentGroundChange() {
+    if (this.SceneUtilsService.scene.environment != null)
+      this.SceneUtilsService.zeroPlane.visible = false;
+    else this.SceneUtilsService.zeroPlane.visible = !this.SceneUtilsService.skybox.visible;
+  }
   CloseClick(event: MouseEvent) {
     this.container.style.visibility = "hidden";
     this.show = false;
