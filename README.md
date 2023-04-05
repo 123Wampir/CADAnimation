@@ -50,4 +50,4 @@ This app also support animation import from CAD Kompas3D (but only translation a
 You can see more examples of animations made with this app in this [folder](readme/).
 
 ## Contact
-If you have any questions please email me Dimaworonin@gmail.com.
+If you have any questions please email me Dimaworonin73@gmail.com.
