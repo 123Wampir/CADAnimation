@@ -121,10 +121,13 @@ export class SceneManagerService {
     line.onAfterRender = function (renderer, scene, camera, geometry) {
       let offset = Number(this.userData['angle'].toFixed(3)) - Number(this.userData['oldAngle'].toFixed(3));
       if (offset != 0) {
+        let scale = Number(scope.SceneUtilsService.model.scale.clone().x.toFixed(1));
+        scope.SceneUtilsService.model.scale.setScalar(1);
+        scope.SceneUtilsService.model.updateWorldMatrix(false, true);
         this.updateMatrixWorld(true);
+        console.log(scale)
         let axisPos = new THREE.Vector3().setFromMatrixPosition(this.matrixWorld);
-        let direction: THREE.Vector3 = (this as THREE.Line).userData['direction'];
-        let dir = direction.clone();
+        let dir: THREE.Vector3 = (this as THREE.Line).userData['direction'].clone();
         let q = new THREE.Quaternion().setFromRotationMatrix(this.matrixWorld);
         dir.applyQuaternion(q);
         dir.normalize();
@@ -140,6 +143,8 @@ export class SceneManagerService {
           item.position.set(diff.x, diff.y, diff.z);
           item.updateMatrixWorld(true);
         })
+        scope.SceneUtilsService.model.scale.setScalar(scale);
+        scope.SceneUtilsService.model.updateWorldMatrix(false, true);
         this.updateMatrixWorld(true);
       }
       this.userData['oldAngle'] = this.userData['angle'];
