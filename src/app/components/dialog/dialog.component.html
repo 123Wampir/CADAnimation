@@ -38,7 +38,10 @@
                 <div class="param">
                     <div class="label">По часовой</div>
                     <div class="inputs">
-                        <input type="checkbox" class="input-number" placeholder="direction" [(ngModel)]="rotDirection">
+                        <label class="toggle-control">
+                            <input type="checkbox" class="input-number" placeholder="direction"
+                                [(ngModel)]="rotDirection">
+                        </label>
                     </div>
                 </div>
             </div>
@@ -49,7 +52,7 @@
                 <div class="param">
                     <div class="label">Соотношение сторон</div>
                     <div class="inputs">
-                        <select name="Aspect ration" (change)="OnAspectRatioChange($event)">
+                        <select name="Aspect ratio" (change)="OnAspectRatioChange($event)">
                             <option [value]="16/9" selected>16:9</option>
                             <option [value]="4/3">4:3</option>
                             <option [value]="5/3">5:3</option>
@@ -94,7 +97,7 @@
                 <div class="param">
                     <div class="label">Соотношение сторон</div>
                     <div class="inputs">
-                        <select name="Aspect ration" (change)="OnAspectRatioChange($event)">
+                        <select name="Aspect ratio" (change)="OnAspectRatioChange($event)">
                             <option [value]="16/9" selected>16:9</option>
                             <option [value]="4/3">4:3</option>
                             <option [value]="5/3">5:3</option>
@@ -166,6 +169,31 @@
             </div>
         </div>
         <div class="form" *ngSwitchCase="'enviroment'">
+            <div class="line">
+                <div class="param">
+                    <div class="label">Tone mapping</div>
+                    <div class="inputs">
+                        <select name="toneMapping" (change)="OnToneMappingChange($event)">
+                            <option value="noToneMapping" selected>Нет</option>
+                            <option value="linear">Линейный</option>
+                            <option value="Reinhard">Reinhard</option>
+                            <option value="Cineon">Cineon</option>
+                            <option value="ACESFilmic">ACESFilmic</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="line">
+                <div class="param">
+                    <div class="label">Выдержка</div>
+                    <div class="inputs">
+                        <input type="range" min="0" max="4" step="0.01"
+                            [(ngModel)]="SceneUtilsService.renderer.toneMappingExposure">
+                        <input type="number" class="input-number" min="0" max="4" step="0.01" placeholder="exposure"
+                            [(ngModel)]="SceneUtilsService.renderer.toneMappingExposure">
+                    </div>
+                </div>
+            </div>
             <button>
                 <label for="env" class="text-img-label">
                     Загрузить изображение

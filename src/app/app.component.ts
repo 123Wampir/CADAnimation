@@ -121,6 +121,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   startRenderingLoop() {
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, failIfMajorPerformanceCaveat: true });
     this.SceneUtilsService.renderer = this.renderer;
+    this.renderer.outputEncoding = THREE.sRGBEncoding;
     this.renderer.shadowMap.enabled = true;
     // this.renderer.localClippingEnabled = true;
     this.renderer.physicallyCorrectLights = true;

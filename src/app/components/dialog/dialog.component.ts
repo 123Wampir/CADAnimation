@@ -58,7 +58,10 @@ export class DialogComponent implements OnInit, OnChanges {
   }
 
   OnCameraRotationCreate(event: MouseEvent) {
-    this.SceneUtilsService.perspectiveCamera.lookAt(this.SceneUtilsService.scene.position);
+    this.SceneUtilsService.CalculateBounding(this.SceneUtilsService.model);
+    let center = new THREE.Vector3();
+    this.SceneUtilsService.boundingBox.getCenter(center);
+    this.SceneUtilsService.perspectiveCamera.lookAt(center);
     if (this.endTime == this.AnimationService.currentTime)
       this.endTime += 1;
     this.AnimationCreatorService.OnCameraChange(this.SceneUtilsService.perspectiveCamera);
@@ -86,7 +89,7 @@ export class DialogComponent implements OnInit, OnChanges {
       let pos = this.SceneUtilsService.perspectiveCamera.position;
       pos.applyAxisAngle(this.SceneUtilsService.perspectiveCamera.up, step * Math.PI / 180);
       this.SceneUtilsService.perspectiveCamera.position.set(pos.x, pos.y, pos.z);
-      this.SceneUtilsService.perspectiveCamera.lookAt(this.SceneUtilsService.scene.position);
+      this.SceneUtilsService.perspectiveCamera.lookAt(center);
       this.AnimationCreatorService.OnCameraChange(this.SceneUtilsService.perspectiveCamera);
     }
   }
@@ -199,6 +202,27 @@ export class DialogComponent implements OnInit, OnChanges {
       plane.name = "ShadowPlane";
       plane.type = "Ignore";
       this.SceneUtilsService.skybox.add(plane);
+    }
+  }
+
+  OnToneMappingChange(event: Event) {
+    let value = (event.target as any).value;
+    switch (value) {
+      case "noToneMapping":
+        this.SceneUtilsService.renderer.toneMapping = THREE.NoToneMapping;
+        break;
+      case "linear":
+        this.SceneUtilsService.renderer.toneMapping = THREE.LinearToneMapping;
+        break;
+      case "Reinhard":
+        this.SceneUtilsService.renderer.toneMapping = THREE.ReinhardToneMapping;
+        break;
+      case "Cineon":
+        this.SceneUtilsService.renderer.toneMapping = THREE.CineonToneMapping;
+        break;
+      case "ACESFilmic":
+        this.SceneUtilsService.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        break;
     }
   }
 
