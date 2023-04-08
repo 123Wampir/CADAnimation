@@ -93,8 +93,8 @@ export class DialogComponent implements OnInit, OnChanges {
       this.AnimationCreatorService.OnCameraChange(this.SceneUtilsService.perspectiveCamera);
     }
   }
-  SaveSnapshot() {
-    this.AnimationService.RenderFrame(this.canvas, this.canvasWidth, this.canvasHeight);
+  async SaveSnapshot() {
+    await this.AnimationService.RenderFrame(this.canvas, this.canvasWidth, this.canvasHeight);
     this.canvas.toBlob(function (blob) {
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob!);

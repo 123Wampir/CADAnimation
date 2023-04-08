@@ -67,7 +67,17 @@ export class SceneManagerService {
 
   AddAnnotation(name?: string): CSS2DObject {
     let annDiv = this.SceneUtilsService.angRenderer.createElement('div');
-    this.SceneUtilsService.angRenderer.addClass(annDiv, "annotation-container");
+    // this.SceneUtilsService.angRenderer.setStyle(annDiv, "annotation-container");
+    (annDiv as HTMLElement).style.border = " 1px solid var(--third-color)";
+    (annDiv as HTMLElement).style.borderRadius = " 5px";
+    (annDiv as HTMLElement).style.boxShadow = " 0px 0px 4px 1px var(--second-color)";
+    (annDiv as HTMLElement).style.background = " whitesmoke";
+    (annDiv as HTMLElement).style.height = " min-content";
+    (annDiv as HTMLElement).style.maxWidth = " 20%";
+    (annDiv as HTMLElement).style.textAlign = " justify";
+    (annDiv as HTMLElement).style.overflowWrap = " break-word";
+    (annDiv as HTMLElement).style.transition = " all 0.05s";
+    (annDiv as HTMLElement).style.padding = "0px 5px";
     annDiv.innerText = "Text";
     let annotation = new CSS2DObject(annDiv);
     annotation.type = "Annotation";

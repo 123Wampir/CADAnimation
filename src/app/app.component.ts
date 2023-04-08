@@ -165,7 +165,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.SceneUtilsService.stats.dom.style.left = "";
     this.canvas.parentElement?.appendChild(this.SceneUtilsService.stats.dom);
     let component = this;
-    (function animate() {
+    (async function animate() {
       if (component.mainObject != undefined) {
         if (!component.AnimationService.recorder.isRecording())
           component.FindIntersection();
@@ -220,7 +220,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
       component.SceneUtilsService.CopyCameraPlacement();
       if (component.AnimationService.recorder.isRecording()) {
-        component.AnimationService.RenderFrame(component.AnimationService.targetCanvas, component.AnimationService.targetCanvas.width, component.AnimationService.targetCanvas.height);
+        await component.AnimationService.RenderFrame(component.AnimationService.targetCanvas, component.AnimationService.targetCanvas.width, component.AnimationService.targetCanvas.height);
         if (component.AnimationService.currentFrame < component.AnimationService.duration * component.AnimationService.framerate) {
           component.AnimationService.recorder.recordFrame();
           component.AnimationService.currentFrame++;

@@ -270,7 +270,8 @@ export class PropertiesComponent implements OnInit, OnChanges {
     event.root.innerHTML = (this.SceneUtilsService.selected[0] as any).element.innerHTML;
   }
   OnTextChange(event: any) {
-    (this.SceneUtilsService.selected[0] as any).element.innerHTML = event.html;
+    (this.SceneUtilsService.selected[0] as any).element.innerHTML = (event.html as string);
+    (this.SceneUtilsService.selected[0] as any).element.innerHTML = (this.SceneUtilsService.selected[0] as any).element.innerHTML.replaceAll("<p>", "<p style='margin:5px'>");
   }
   SelectTarget() {
     this.SceneUtilsService.targetArray = this.targetArray;

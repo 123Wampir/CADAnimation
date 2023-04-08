@@ -3,6 +3,7 @@ import THREE = require('three');
 import * as AnimationModel from 'src/app/shared/animation.model';
 import { SceneUtilsService } from '../utils/scene.utils.service';
 import { CanvasCapture } from "canvas-capture"
+import * as rasterizeHTML from 'rasterizehtml';
 
 @Injectable({
   providedIn: 'root'
@@ -58,7 +59,7 @@ export class AnimationService {
     }
   }
 
-  RenderFrame(canvas: HTMLCanvasElement, width: number, height: number, resize = true) {
+  async RenderFrame(canvas: HTMLCanvasElement, width: number, height: number, resize = true) {
     canvas.width = width;
     canvas.height = height
     const aspect = width / height;
@@ -83,8 +84,17 @@ export class AnimationService {
       if (this.SceneUtilsService.model != undefined)
         this.SceneUtilsService.AppComponent.effect.renderOutline(this.SceneUtilsService.scene, this.SceneUtilsService.currentCamera);
     context?.drawImage(this.SceneUtilsService.renderer.domElement, 0, 0, width, height);
+    await this.RenderHTMLToCanvas(canvas, this.SceneUtilsService.CSSRenderer.domElement);
     if (resize)
       this.SceneUtilsService.onResize();
+  }
+
+  async RenderHTMLToCanvas(canvas: HTMLCanvasElement, element: HTMLElement) {
+    let scale = 2 * canvas.height / window.screen.height;
+    if (scale > 1)
+      element.style.fontSize = `${16 * scale}px`;
+    await rasterizeHTML.drawHTML(element.outerHTML, canvas);
+    element.style.fontSize = `${16}px`;
   }
 
   CreateTreeViewElements(obj: THREE.Object3D, tabIndex: number = 0, parent?: AnimationModel.KeyframeTrackModel) {
