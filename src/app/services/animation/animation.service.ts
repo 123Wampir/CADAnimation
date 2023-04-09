@@ -82,7 +82,7 @@ export class AnimationService {
     this.SceneUtilsService.CSSRenderer.render(this.SceneUtilsService.scene, this.SceneUtilsService.currentCamera);
     if (this.SceneUtilsService.outline)
       if (this.SceneUtilsService.model != undefined)
-        this.SceneUtilsService.AppComponent.effect.renderOutline(this.SceneUtilsService.scene, this.SceneUtilsService.currentCamera);
+        this.SceneUtilsService.AppComponent.effect.renderOutline(this.SceneUtilsService.model as any, this.SceneUtilsService.currentCamera);
     context?.drawImage(this.SceneUtilsService.renderer.domElement, 0, 0, width, height);
     await this.RenderHTMLToCanvas(canvas, this.SceneUtilsService.CSSRenderer.domElement);
     if (resize)
