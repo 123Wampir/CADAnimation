@@ -334,7 +334,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         geometry.computeBoundingBox();
         var center = new THREE.Vector3();
         geometry.boundingBox?.getCenter(center);
-        geom.localToWorld(center);
         geometry.center()
         geom.position.set(center.x, center.y, center.z);
         geom.position.add(pos);

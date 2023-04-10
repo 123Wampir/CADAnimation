@@ -115,7 +115,7 @@ export class ModelloaderService {
         if (res.meshes[data.meshes[j]].face_colors != undefined) {
           mat.vertexColors = true;
           geom = geom.toNonIndexed();
-          let faceColorArray = new Array(geom.attributes['position'].array.length).fill(0)
+          let faceColorArray = new Array(geom.attributes['position'].count).fill(0)
           for (let f = 0; f < res.meshes[data.meshes[j]].face_colors.length; f++) {
             let faceColor = res.meshes[data.meshes[j]].face_colors[f];
             for (let n = faceColor.first; n <= faceColor.last; n++) {
