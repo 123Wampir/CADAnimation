@@ -7,7 +7,25 @@
     </div>
     <div [ngSwitch]="type">
         <div class="form" *ngSwitchCase="'cameraRotation'">
-            <!--Лучше вывести в отдельный компонент-->
+            <div class="line">
+                <div class="param">
+                    <div class="label">Цель</div>
+                    <div class="inputs">
+                        <div class="target-name">{{"targetName"}}</div>
+                    </div>
+                </div>
+                <button *ngIf="!targetSelect" class="button-icon" (click)="SelectTarget()">
+                    <img src="../../../assets/cursor.png" alt="button-icon" width="19px" height="19px">
+                </button>
+                <button *ngIf="targetSelect" class="button-icon" (click)="ApplyTargetSelect()">
+                    <img src="../../../assets/accept.png" class="no-filter" alt="button-icon" width="19px"
+                        height="19px">
+                </button>
+                <button *ngIf="targetSelect" class="button-icon" (click)="DiscardTargetSelect()">
+                    <img src="../../../assets/cancel.png" class="no-filter" alt="button-icon" width="19px"
+                        height="19px">
+                </button>
+            </div>
             <div class="line">
                 <div class="param">
                     <div class="label">Начало анимации</div>

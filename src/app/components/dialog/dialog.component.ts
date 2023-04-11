@@ -30,6 +30,8 @@ export class DialogComponent implements OnInit, OnChanges {
   drag = false;
   pointer = new THREE.Vector2();
 
+  targetSelect = false;
+  targetArray: any[] = [];
   endTime = 5;
   rotAngle = 360;
   rotDirection = true;
@@ -57,10 +59,42 @@ export class DialogComponent implements OnInit, OnChanges {
     }
   }
 
-  OnCameraRotationCreate(event: MouseEvent) {
-    this.SceneUtilsService.CalculateBounding(this.SceneUtilsService.model);
+  SelectTarget() {
+    this.targetArray = [];
+    this.SceneUtilsService.targetArray = this.targetArray;
+    this.SceneUtilsService.attachTransform = false;
+    this.targetSelect = true;
+  }
+  DiscardTargetSelect() {
+    this.targetSelect = false;
+    this.SceneUtilsService.attachTransform = true;
+    this.SceneUtilsService.targetArray = this.SceneUtilsService.selected;
+    this.targetArray = [];
+  }
+  ApplyTargetSelect() {
+    this.targetSelect = false;
+    this.SceneUtilsService.attachTransform = true;
+    this.SceneUtilsService.targetArray = this.SceneUtilsService.selected;
+    this.SceneUtilsService.selectionChange = !this.SceneUtilsService.selectionChange;
+    console.log(this.targetArray);
+    let bbox!: THREE.Box3;
+    if (this.targetArray.length == 0)
+      bbox = this.SceneUtilsService.CalculateBounding(this.SceneUtilsService.model);
+    else bbox = this.SceneUtilsService.CalculateCenter(this.targetArray);
     let center = new THREE.Vector3();
-    this.SceneUtilsService.boundingBox.getCenter(center);
+    bbox.getCenter(center);
+    console.log(center);
+    this.SceneUtilsService.trackball.target = center.clone();
+  }
+
+  OnCameraRotationCreate(event: MouseEvent) {
+    let bbox: THREE.Box3;
+    if (this.targetArray.length == 0)
+      bbox = this.SceneUtilsService.CalculateBounding(this.SceneUtilsService.model);
+    else bbox = this.SceneUtilsService.CalculateCenter(this.targetArray);
+    let center = new THREE.Vector3();
+    bbox.getCenter(center);
+    this.SceneUtilsService.trackball.target = center.clone();
     this.SceneUtilsService.perspectiveCamera.lookAt(center);
     if (this.endTime == this.AnimationService.currentTime)
       this.endTime += 1;

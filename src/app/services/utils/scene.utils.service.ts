@@ -121,6 +121,7 @@ export class SceneUtilsService {
   }
 
   CalculateCenter(arr: THREE.Object3D[]) {
+    let bbox = new THREE.Box3();
     let geomArr: THREE.BufferGeometry[] = [];
     for (let i = 0; i < arr.length; i++) {
       arr[i].updateWorldMatrix(true, true);
@@ -133,10 +134,12 @@ export class SceneUtilsService {
         geomArr[i].dispose();
       }
       mergedGeom.computeBoundingBox();
+      bbox = mergedGeom.boundingBox!.clone();
       this.localCenter = new THREE.Vector3();
       mergedGeom.boundingBox?.getCenter(this.localCenter);
       mergedGeom.dispose();
     }
+    return bbox;
   }
   CalculateOffsets(arr: THREE.Object3D[]) {
     this.offsets = [];
@@ -332,6 +335,7 @@ export class SceneUtilsService {
 
   CalculateBounding(object: any) {
     let arr: any[] = [];
+    let bbox = new THREE.Box3();
     this.FindMeshes(object, arr);
     let geomArr: THREE.BufferGeometry[] = [];
     arr.forEach((obj) => {
@@ -346,6 +350,7 @@ export class SceneUtilsService {
     })
     let mergedGeom = BufferGeometryUtils.mergeBufferGeometries(geomArr);
     mergedGeom.computeBoundingBox();
+    bbox = mergedGeom.boundingBox!.clone();
     mergedGeom.computeBoundingSphere();
     this.boundingBox = mergedGeom.boundingBox!;
     this.boundingSphere = mergedGeom.boundingSphere!;
@@ -353,6 +358,7 @@ export class SceneUtilsService {
       geo.dispose();
     })
     mergedGeom.dispose();
+    return bbox;
   }
   FindMeshes(obj: THREE.Object3D, meshes: any[]) {
     if (obj.children.length != 0) {
