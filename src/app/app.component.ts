@@ -259,6 +259,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.SceneUtilsService.model = this.mainObject;
     this.scene.add(this.mainObject)
     console.log(this.scene);
+    let theme = localStorage.getItem("theme");
+    if (theme != null) {
+      this.SceneUtilsService.MenubarComponent.SetTheme(Number(theme));
+    }
   }
 
   async LoadModelFile(event: Event) {

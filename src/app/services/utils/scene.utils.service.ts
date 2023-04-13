@@ -13,6 +13,7 @@ import { ContextmenuComponent } from 'src/app/components/contextmenu/contextmenu
 import { ViewcubeComponent } from 'src/app/components/viewcube/viewcube.component';
 import * as AnimationModel from 'src/app/shared/animation.model';
 import { GroundProjectedEnv } from 'three/examples/jsm/objects/GroundProjectedEnv';
+import { MenubarComponent } from 'src/app/components/menubar/menubar.component';
 
 @Injectable({
   providedIn: 'root'
@@ -76,6 +77,7 @@ export class SceneUtilsService {
   AppComponent!: AppComponent;
   ContextmenuComponent!: ContextmenuComponent;
   ViewcubeComponent!: ViewcubeComponent;
+  MenubarComponent!: MenubarComponent;
 
   dialogType = "";
   dialogShow = false;

@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { AnimationService } from 'src/app/services/animation/animation.service';
 import { SceneManagerService } from 'src/app/services/scene.manager/scene.manager.service';
 import { SceneUtilsService } from 'src/app/services/utils/scene.utils.service';
@@ -9,7 +9,7 @@ import THREE = require('three');
   templateUrl: './menubar.component.html',
   styleUrls: ['./menubar.component.css']
 })
-export class MenubarComponent {
+export class MenubarComponent implements AfterViewInit {
   posX = 0;
   posY = 0;
   @ViewChild('file') fileRef!: ElementRef;
@@ -19,6 +19,9 @@ export class MenubarComponent {
   constructor(public SceneUtilsService: SceneUtilsService,
     public AnimationService: AnimationService,
     public SceneManagerService: SceneManagerService) { }
+  ngAfterViewInit(): void {
+    this.SceneUtilsService.MenubarComponent = this;
+  }
   NewProject() {
     // this.AnimationService.ClearAnimation();
     this.SceneUtilsService.ClearScene();
@@ -111,5 +114,6 @@ export class MenubarComponent {
         document.body.style.setProperty('--invert', '1');
         break;
     }
+    localStorage.setItem("theme", type.toString());
   }
 }
