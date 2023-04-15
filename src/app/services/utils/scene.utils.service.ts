@@ -128,6 +128,10 @@ export class SceneUtilsService {
     for (let i = 0; i < arr.length; i++) {
       arr[i].updateWorldMatrix(true, true);
       let newGeom = (arr[i] as THREE.Mesh).geometry.clone().applyMatrix4(arr[i].matrixWorld);
+      if (newGeom.index != null)
+        newGeom = newGeom.toNonIndexed();
+      if (newGeom.hasAttribute("color"))
+        newGeom.deleteAttribute("color");
       geomArr.push(newGeom);
     }
     if (geomArr.length != 0) {
@@ -228,6 +232,10 @@ export class SceneUtilsService {
         if (arr[i].type == "Mesh") {
           arr[i].updateWorldMatrix(true, true);
           let newGeom = arr[i].geometry.clone().applyMatrix4(arr[i].matrixWorld);
+          if (newGeom.index != null)
+            newGeom = newGeom.toNonIndexed();
+          if (newGeom.hasAttribute("color"))
+            newGeom.deleteAttribute("color");
           geomArr.push(newGeom);
         }
       }
@@ -283,56 +291,6 @@ export class SceneUtilsService {
         item.material.clipShadows = true;
       }
     })
-    let geomArr: THREE.BufferGeometry[] = [];
-    arr.forEach((obj) => {
-      if (obj.type == "Mesh") {
-        if (obj.visible) {
-          let item = (obj as any)
-          item.updateWorldMatrix(true, true);
-          let newGeom = item.geometry.clone().applyMatrix4(item.matrixWorld);
-          geomArr.push(newGeom);
-        }
-      }
-    })
-    let mergedGeom = BufferGeometryUtils.mergeBufferGeometries(geomArr);
-    mergedGeom.computeBoundingBox();
-    mergedGeom.computeBoundingSphere();
-    this.boundingBox = mergedGeom.boundingBox!;
-    this.boundingSphere = mergedGeom.boundingSphere!;
-    geomArr.forEach(geo => {
-      geo.dispose();
-    })
-    let planeGeom = new THREE.PlaneGeometry(1000, 1000);
-    let planeMat =
-      new THREE.MeshBasicMaterial({
-        color: 0x555555,
-        // clippingPlanes: this.planes.filter(p => p !== this.planes[i]),
-        stencilWrite: true,
-        stencilRef: 0,
-        stencilFunc: THREE.NotEqualStencilFunc,
-        stencilFail: THREE.ReplaceStencilOp,
-        stencilZFail: THREE.ReplaceStencilOp,
-        stencilZPass: THREE.ReplaceStencilOp,
-        side: THREE.DoubleSide,
-        clipIntersection: true
-      });
-    for (let i = 0; i < 3; i++) {
-      // let stencil = this.createPlaneStencilGroup(mergedGeom, this.planes[i], i + 1);
-      // let po = new THREE.Mesh(planeGeom, planeMat);
-      // po.layers.set(1);
-      // po.onAfterRender = function (render) {
-      //   render.clearStencil();
-      // };
-      // po.renderOrder = i + 2;
-      // this.stencilGroups.add(stencil);
-      // this.planeHelpers.children[i].add(po);
-    }
-    mergedGeom.dispose();
-    planeGeom.dispose();
-    planeMat.dispose();
-    this.stencilGroups.type = "Ignore";
-    this.scene.add(this.stencilGroups);
-    this.stencilNeedUpdate = true;
   }
 
   CalculateBounding(object: any) {
@@ -346,6 +304,10 @@ export class SceneUtilsService {
           let item = (obj as any)
           item.updateWorldMatrix(true, true);
           let newGeom = item.geometry.clone().applyMatrix4(item.matrixWorld);
+          if (newGeom.index != null)
+            newGeom = newGeom.toNonIndexed();
+          if (newGeom.hasAttribute("color"))
+            newGeom.deleteAttribute("color");
           geomArr.push(newGeom);
         }
       }

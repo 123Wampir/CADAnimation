@@ -10,7 +10,7 @@ let occtimportjs = require("occt-import/occt-import-js.js");
 export class ModelloaderService {
 
   occt: any = undefined;
-  wasmUrl = 'https://cdn.jsdelivr.net/npm/occt-import-js@0.0.15/dist/occt-import-js.wasm';
+  wasmUrl = 'https://cdn.jsdelivr.net/npm/occt-import-js@0.0.18/dist/occt-import-js.wasm';
   constructor(public SceneUtilsService: SceneUtilsService) { }
 
   async LoadModel(url: string, fileName: string, obj: THREE.Object3D): Promise<boolean> {
@@ -107,26 +107,27 @@ export class ModelloaderService {
           geom.setAttribute('normal', new THREE.Float32BufferAttribute(res.meshes[data.meshes[j]].attributes.normal.array, 3));
         let index = Uint32Array.from(res.meshes[data.meshes[j]].index.array);
         geom.setIndex(new THREE.BufferAttribute(index, 1));
-        let mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6, metalness: 0.3 });
+        let mat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.6, metalness: 0.3 });
         if (res.meshes[data.meshes[j]].color != undefined) {
           let color = res.meshes[data.meshes[j]].color;
           mat.color = new THREE.Color(color[0], color[1], color[2]);
         }
-        if (res.meshes[data.meshes[j]].face_colors != undefined) {
-          mat.vertexColors = true;
-          geom = geom.toNonIndexed();
-          let faceColorArray = new Array(geom.attributes['position'].count).fill(0)
-          for (let f = 0; f < res.meshes[data.meshes[j]].face_colors.length; f++) {
-            let faceColor = res.meshes[data.meshes[j]].face_colors[f];
+        let faceColorArray = new Array(geom.attributes['position'].count).fill(0);
+        for (let f = 0; f < res.meshes[data.meshes[j]].brep_faces.length; f++) {
+          let faceColor = res.meshes[data.meshes[j]].brep_faces[f];
+          if (faceColor.color != null) {
+            mat.vertexColors = true;
+            geom = geom.toNonIndexed();
             for (let n = faceColor.first; n <= faceColor.last; n++) {
               faceColorArray.splice(Math.floor(n * 9), 9, ...faceColor.color, ...faceColor.color, ...faceColor.color);
             }
           }
-          geom.setAttribute('color', new THREE.Float32BufferAttribute(faceColorArray, 3))
         }
+        if (mat.vertexColors)
+          geom.setAttribute('color', new THREE.Float32BufferAttribute(faceColorArray, 3));
         let mesh = new THREE.Mesh(geom, mat);
         if (res.meshes[data.meshes[j]].name != "")
-          mesh.name = res.meshes[data.meshes[j]].name + `${mesh.id}`;
+          mesh.name = res.meshes[data.meshes[j]].name;
         else mesh.name = `Mesh_${mesh.id}`;
         obj.add(mesh);
       }

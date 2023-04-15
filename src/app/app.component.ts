@@ -322,6 +322,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     let arr: any[] = [];
     this.SceneUtilsService.FindMeshes(this.mainObject, arr);
     this.SceneUtilsService.CreateClippingPlanes(arr);
+    this.SceneUtilsService.CalculateBounding(this.mainObject);
     this.SceneUtilsService.SetZeroPlane();
     // Создание миксеров(дорожек) для модели
     this.AnimationService.CreateMixers(this.mainObject);
