@@ -37,15 +37,15 @@ export class ViewcubeComponent implements AfterViewInit, AfterViewChecked {
       offsetUnit * vec.y,
       offsetUnit * vec.z
     );
-    const center = new THREE.Vector3();
     let finishPosition = new THREE.Vector3();
+    let center = new THREE.Vector3();
     if (this.SceneUtilsService.boundingSphere != undefined) {
-      this.SceneUtilsService.CalculateBounding(this.SceneUtilsService.model);
-      finishPosition = center.copy(offset.normalize().multiplyScalar(this.SceneUtilsService.boundingSphere.radius * 3));
+      this.SceneUtilsService.CalculateBounding(this.SceneUtilsService.model).getCenter(center);
+      finishPosition = center.clone().add(offset.normalize().multiplyScalar(this.SceneUtilsService.boundingSphere.radius * 3));
     }
-    else finishPosition = center.copy(offset.normalize().multiplyScalar(this.SceneUtilsService.perspectiveCamera.position.length()));
+    else finishPosition = offset.normalize().multiplyScalar(this.SceneUtilsService.perspectiveCamera.position.length());
     this.SceneUtilsService.perspectiveCamera.position.set(finishPosition.x, finishPosition.y, finishPosition.z);
-    this.SceneUtilsService.trackball.target.set(0, 0, 0);
+    this.SceneUtilsService.trackball.target.copy(center);
     let up = this.SceneUtilsService.perspectiveCamera.up.clone();
     const zero = 10e-4;
     if (vec.x != 0) {

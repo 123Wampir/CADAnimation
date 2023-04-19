@@ -30,6 +30,7 @@ export class DialogComponent implements OnInit, OnChanges {
   drag = false;
   pointer = new THREE.Vector2();
 
+  targetName = "Scene";
   targetSelect = false;
   targetArray: any[] = [];
   endTime = 5;
@@ -78,12 +79,18 @@ export class DialogComponent implements OnInit, OnChanges {
     this.SceneUtilsService.selectionChange = !this.SceneUtilsService.selectionChange;
     console.log(this.targetArray);
     let bbox!: THREE.Box3;
-    if (this.targetArray.length == 0)
+    if (this.targetArray.length == 0) {
       bbox = this.SceneUtilsService.CalculateBounding(this.SceneUtilsService.model);
-    else bbox = this.SceneUtilsService.CalculateCenter(this.targetArray);
+      this.targetName = "Scene";
+    }
+    else {
+      bbox = this.SceneUtilsService.CalculateCenter(this.targetArray);
+      if (this.targetArray.length == 1)
+        this.targetName = this.targetArray[0].name;
+      else this.targetName = `${this.targetArray.length} Items`;
+    }
     let center = new THREE.Vector3();
     bbox.getCenter(center);
-    console.log(center);
     this.SceneUtilsService.trackball.target = center.clone();
   }
 
