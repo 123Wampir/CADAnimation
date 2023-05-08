@@ -113,7 +113,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.SceneUtilsService.planeHelpers.name = "CuttingPlanes";
     this.scene.add(this.SceneUtilsService.planeHelpers);
 
-
     this.SceneUtilsService.annotationGroup = new THREE.Group();
     this.SceneUtilsService.annotationGroup.name = "Annotations";
     this.scene.add(this.SceneUtilsService.annotationGroup);
@@ -123,11 +122,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.SceneUtilsService.renderer = this.renderer;
     this.renderer.outputEncoding = THREE.sRGBEncoding;
     this.renderer.shadowMap.enabled = true;
-    // this.renderer.localClippingEnabled = true;
     this.renderer.physicallyCorrectLights = true;
     console.log(this.renderer);
     this.renderer.setSize(window.innerWidth * 0.99, window.innerHeight * 0.99);
-    // this.renderer.sortObjects = false;
     this.renderer.setClearColor(0xffffff);
     let rendererDOM = this.SceneUtilsService.angRenderer.createElement('div');
     this.SceneUtilsService.CSSRenderer = new CSS2DRenderer({ element: rendererDOM });
@@ -169,16 +166,8 @@ export class AppComponent implements OnInit, AfterViewInit {
       if (component.mainObject != undefined) {
         if (!component.AnimationService.recorder.isRecording())
           component.FindIntersection();
-        // if (component.SceneUtilsService.stencilNeedUpdate && component.renderer.localClippingEnabled)
-        //   if (component.meshArr.length != 0) {
-        //     for (let i = 0; i < component.SceneUtilsService.stencilGroups.children.length; i++) {
-        //       component.SceneUtilsService.UpdateStencilGeometry(component.meshArr, component.SceneUtilsService.stencilGroups.children[i])
-        //     }
-        //     component.SceneUtilsService.stencilNeedUpdate = false;
-        //   }
       }
       requestAnimationFrame(animate);
-      //component.renderer.shadowMap.needsUpdate = true;
       component.SceneUtilsService.stats.update();
       component.trackballControls.update()
       if (component.AnimationService.play) {
@@ -221,7 +210,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       component.SceneUtilsService.CopyCameraPlacement();
       if (component.AnimationService.recorder.isRecording()) {
         await component.AnimationService.RenderFrame(component.AnimationService.targetCanvas, component.AnimationService.targetCanvas.width, component.AnimationService.targetCanvas.height);
-        if (component.AnimationService.currentFrame < component.AnimationService.duration * component.AnimationService.framerate) {
+        if (component.AnimationService.currentFrame < component.AnimationService.duration * component.AnimationService.framerate && component.AnimationService.recording) {
           component.AnimationService.recorder.recordFrame();
           component.AnimationService.currentFrame++;
           component.AnimationService.currentTime = component.AnimationService.recordStart + component.AnimationService.currentFrame / component.AnimationService.framerate;
@@ -238,7 +227,6 @@ export class AppComponent implements OnInit, AfterViewInit {
       else {
         component.renderer.render(component.scene, component.SceneUtilsService.currentCamera);
         component.SceneUtilsService.CSSRenderer.render(component.scene, component.SceneUtilsService.currentCamera);
-        //effects
         if (component.SceneUtilsService.outline)
           if (component.SceneUtilsService.model != undefined)
             component.effect.renderOutline(component.SceneUtilsService.model as any, component.SceneUtilsService.currentCamera);
@@ -381,10 +369,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         if (mesh.geometry.hasAttribute('color')) {
           mesh.material.vertexColors = true;
         }
-        // mesh.material.side = THREE.DoubleSide;
-        // mesh.material.shadowSide = THREE.BackSide;
-        // mesh.material.clipIntersection = true;
-        // mesh.material.forceSinglePass = true;
         mesh.receiveShadow = true;
         mesh.castShadow = true;
         (mesh as THREE.Mesh).onBeforeRender = function (renderer, scene, camera, geometry, material) {
@@ -398,7 +382,6 @@ export class AppComponent implements OnInit, AfterViewInit {
             `#ifdef OPAQUE
                diffuseColor.a = 1.0;
                #endif
-               // https://github.com/mrdoob/three.js/pull/22425
                #ifdef USE_TRANSMISSION
                diffuseColor.a *= material.transmissionAlpha + 0.1;
                #endif
@@ -425,20 +408,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.raycaster.setFromCamera(this.pointer, this.SceneUtilsService.currentCamera);
     // Рассчитывается какие объекты пересеклись с лучом
     let intersects = this.raycaster.intersectObjects(this.mainObject.children);
-    // let axis = this.raycaster.intersectObjects(this.SceneUtilsService.axisArray);
-    // intersects.concat(axis);
     if (intersects.length != 0) {
       if (this.intersection != intersects[0].object) {
-        // if (this.intersection) {
-        //   if (this.SceneUtilsService.selected.find((item) => (item == this.intersection)) == undefined)
-        //     if (this.intersection.material.emissive)
-        //       this.intersection.material.emissive.set(0x000000);
-        // }
         this.SceneUtilsService.selectBox.visible = true;
         this.intersection = intersects[0].object;
         this.SceneUtilsService.selectBox.setFromObject(this.intersection);
-        // if (this.intersection.material.emissive)
-        //   this.intersection.material.emissive.set(0x004400);
       }
     }
     else {

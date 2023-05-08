@@ -1,6 +1,6 @@
 <div class="container" #container id="container" (mousemove)="OnMouseMove($event)" (mouseup)="OnMouseUp($event)">
     <div class="header" (mousedown)="OnMouseDown($event)">
-        <div class="label" style="align-self: center;">Диалоговое окно</div>
+        <div class="label" style="align-self: center;">{{title}}</div>
         <button class="button-icon" (click)="CloseClick($event)">
             <img src="../../../assets/cancel.png" class="no-filter" alt="button-icon" width="19px" height="19px">
         </button>
@@ -100,10 +100,12 @@
             <div class="line">
                 <button class="button-icon"
                     (click)="AnimationService.RenderFrame(canvas,canvasPreviewWidth,canvasPreviewHeight)">
-                    <img src="../../../assets/snapshot.png" alt="button-icon" width="19px" height="19px">
+                    <img src="../../../assets/snapshot.png" alt="button-icon" width="19px" height="19px"
+                        title="Рендер изображения">
                 </button>
                 <button class="button-icon" (click)="SaveSnapshot()">
-                    <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px">
+                    <img src="../../../assets/save.png" alt="button-icon" width="19px" height="19px"
+                        title="Сохранить изображение">
                 </button>
             </div>
             <div style="aspect-ratio: 1;">
@@ -163,9 +165,16 @@
                     </div>
                 </div>
             </div>
-            <div class="line">
+            <div class="line" *ngIf="!AnimationService.recording">
                 <button class="button-icon" (click)="OnStartRecord()">
-                    <img src="../../../assets/snapshot.png" alt="button-icon" width="19px" height="19px">
+                    <img src="../../../assets/snapshot.png" alt="button-icon" width="19px" height="19px"
+                        title="Начать рендер анимации">
+                </button>
+            </div>
+            <div class="line" *ngIf="AnimationService.recording">
+                <button class="button-icon" (click)="OnRecordStop()">
+                    <img src="../../../assets/cancel.png" class="no-filter" alt="button-icon" width="19px" height="19px"
+                        title="Прервать рендер">
                 </button>
             </div>
             <div class="progress-line">

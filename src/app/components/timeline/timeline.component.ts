@@ -74,6 +74,7 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   PrepareForRecord() {
+    this.SceneUtilsService.dialogTitle = "Запись анимации";
     this.SceneUtilsService.dialogType = "record";
     this.SceneUtilsService.dialogShow = true;
   }

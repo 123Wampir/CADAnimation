@@ -163,80 +163,89 @@
         </div>
     </div>
     <div class="toolbar-container">
-        <div class="toolbar-tool">
-            <input type="color" (change)="OnSceneColorChange($event)" id="scene-color">
+        <div class=" toolbar-tool">
+            <input type="color" (change)="OnSceneColorChange($event)" id="scene-color" title="Цвет неба">
         </div>
         <div class="toolbar-tool">
-            <input type="color" (change)="OnGroundColorChange($event)" id="ground-color">
-        </div>
-        <div class="toolbar-tool">
-            <button class="checkbox" id="enviroment" (click)="SetEnviroment()"></button>
-            <label for="enviroment"><img src="../../../assets/reflection.png" width="19px" height="19px"></label>
+            <input type="color" (change)="OnGroundColorChange($event)" id="ground-color" title="Цвет нулевой плоскости">
         </div>
         <div class="vert-separator"></div>
         <div class="toolbar-tool">
             <input class="input-number" min="0" max="1000" value="2" step="1" (change)="SetSceneFog($event)"
-                type="number" id="fog">
+                type="number" id="fog" title="Глубина тумана">
         </div>
         <div class="vert-separator"></div>
         <div class="toolbar-tool">
-            <input class="checkbox" (change)="SetZeroPlaneGrid($event)" type="checkbox" id="ground">
-            <label for="ground"><img src="../../../assets/grid.png" width="19px" height="19px"></label>
+            <button class="checkbox" id="enviroment" (click)="SetEnviroment()"></button>
+            <label for="enviroment"><img src="../../../assets/enviroment.png" width="19px" height="19px"
+                    title="Окружение"></label>
+        </div>
+        <div class="toolbar-tool">
+            <input class="checkbox" checked (change)="SetZeroPlaneVisibility($event)" type="checkbox" id="ground">
+            <label for="ground"><img src="../../../assets/ground.png" width="19px" height="19px"
+                    title="Нулевая плоскость"></label>
+        </div>
+        <div class="toolbar-tool">
+            <input class="checkbox" (change)="SetZeroPlaneGrid($event)" type="checkbox" id="grid">
+            <label for="grid"><img src="../../../assets/grid.png" width="19px" height="19px" title="Сетка"></label>
         </div>
         <div class="toolbar-tool">
             <input class="checkbox" (change)="SetReflection($event)" checked type="checkbox" id="reflection">
-            <label for="reflection"><img src="../../../assets/reflection.png" width="19px" height="19px"></label>
+            <label for="reflection"><img src="../../../assets/reflection.png" width="19px" height="19px"
+                    title="Отражение от пола"></label>
         </div>
         <div class="vert-separator"></div>
         <div class="toolbar-tool"
             [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.model!=undefined && SceneUtilsService.model.children.length!=0)">
             <input class="checkbox" type="checkbox" id="cut" (change)="SetClipping($event)">
-            <label for="cut"><img src="../../../assets/cut.png" width="19px" height="19px"></label>
+            <label for="cut"><img src="../../../assets/cut.png" width="19px" height="19px"
+                    title="Включить разрез"></label>
         </div>
         <div class="toolbar-tool"
             [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.model!=undefined && SceneUtilsService.model.children.length!=0)">
             <input class="checkbox" type="checkbox" id="planeX" (change)="ShowPlaneX($event)">
-            <label for="planeX"><img src="../../../assets/planeX.png" class="no-filter" width="19px"
-                    height="19px"></label>
+            <label for="planeX"><img src="../../../assets/planeX.png" class="no-filter" width="19px" height="19px"
+                    title="Плоскость X"></label>
         </div>
         <div class="toolbar-tool"
             [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.model!=undefined && SceneUtilsService.model.children.length!=0)">
             <input class="checkbox" type="checkbox" id="planeY" (change)="ShowPlaneY($event)">
-            <label for="planeY"><img src="../../../assets/planeY.png" class="no-filter" width="19px"
-                    height="19px"></label>
+            <label for="planeY"><img src="../../../assets/planeY.png" class="no-filter" width="19px" height="19px"
+                    title="Плоскость Y"></label>
         </div>
         <div class="toolbar-tool"
             [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.model!=undefined && SceneUtilsService.model.children.length!=0)">
             <input class="checkbox" type="checkbox" id="planeZ" (change)="ShowPlaneZ($event)">
-            <label for="planeZ"><img src="../../../assets/planeZ.png" class="no-filter" width="19px"
-                    height="19px"></label>
+            <label for="planeZ"><img src="../../../assets/planeZ.png" class="no-filter" width="19px" height="19px"
+                    title="Плоскость Z"></label>
         </div>
         <div class="vert-separator"></div>
         <div class="toolbar-tool">
             <input class="checkbox" type="checkbox" id="cameraType" [(ngModel)]="SceneUtilsService.orthographic"
                 (change)="SceneUtilsService.SwitchCamera()">
-            <label for="cameraType"><img src="../../../assets/orthCamera.png" width="19px" height="19px"></label>
+            <label for="cameraType"><img src="../../../assets/orthCamera.png" width="19px" height="19px"
+                    title="Перспективная/Ортогональная камера"></label>
         </div>
         <div class="vert-separator"></div>
         <div class="toolbar-tool"
             [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.model!=undefined && SceneUtilsService.model.children.length!=0)">
             <input class="checkbox" type="checkbox" id="outline" [(ngModel)]="SceneUtilsService.outline">
-            <label for="outline"><img src="../../../assets/outline.png" width="19px" height="19px"></label>
+            <label for="outline"><img src="../../../assets/outline.png" width="19px" height="19px" title="Обводка граней"></label>
         </div>
         <div class="toolbar-tool"
             [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.model!=undefined && SceneUtilsService.model.children.length!=0)">
             <input class="checkbox" type="checkbox" id="wireframe" [(ngModel)]="SceneUtilsService.wireframe"
                 (change)="SetWireframe($event)">
-            <label for="wireframe"><img src="../../../assets/wireframe.png" width="19px" height="19px"></label>
+            <label for="wireframe"><img src="../../../assets/wireframe.png" width="19px" height="19px" title="Просмотр сетки"></label>
         </div>
         <div class="vert-separator"></div>
         <div class="toolbar-tool">
             <input type="range" min="0.1" max="1" step="0.05" [(ngModel)]="SceneUtilsService.renderScale"
-                (change)="SceneUtilsService.onResize($event)">
+                (change)="SceneUtilsService.onResize($event)" title="Разрешение рендера">
         </div>
         <div class="toolbar-tool">
             <button class="checkbox" id="snapShot" (click)="CreateSnapshot()"></button>
-            <label for="snapShot"><img src="../../../assets/snapshot.png" width="19px" height="19px"></label>
+            <label for="snapShot"><img src="../../../assets/snapshot.png" width="19px" height="19px" title="Снимок экрана"></label>
         </div>
     </div>
 </div>

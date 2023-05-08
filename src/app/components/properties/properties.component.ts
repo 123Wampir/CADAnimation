@@ -170,8 +170,6 @@ export class PropertiesComponent implements OnInit, OnChanges {
           this.hex = "#" + this.propertiesObject.color.getHexString();
         }
         else if (this.propertiesObject.material != undefined && !this.cutPlane) {
-          console.log("re");
-
           this.hex = "#" + this.propertiesObject.material.color.getHexString();
         }
       }
@@ -329,7 +327,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
     (this.SceneUtilsService.selected[0] as THREE.Line).userData["direction"].normalize();
     let points = [];
     points.push(new THREE.Vector3(0));
-    points.push((this.SceneUtilsService.selected[0] as THREE.Line).userData["direction"].clone().multiplyScalar(500));
+    points.push((this.SceneUtilsService.selected[0] as THREE.Line).userData["direction"].clone().multiplyScalar(10));
     (this.SceneUtilsService.selected[0] as THREE.Line).geometry.setFromPoints(points);
     (this.SceneUtilsService.selected[0] as THREE.Line).geometry.attributes['position'].needsUpdate = true;
   }
@@ -353,6 +351,7 @@ export class PropertiesComponent implements OnInit, OnChanges {
 
   OnCameraRotation($event: MouseEvent) {
     this.SceneUtilsService.currentCamera.lookAt(this.SceneUtilsService.scene.position);
+    this.SceneUtilsService.dialogTitle = "Поворотный круг камеры";
     this.SceneUtilsService.dialogType = "cameraRotation";
     this.SceneUtilsService.dialogShow = true;
   }

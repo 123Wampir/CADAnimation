@@ -25,7 +25,7 @@ export class DialogComponent implements OnInit, OnChanges {
     return this.canvasRef.nativeElement
   }
   @Input() show = false;
-  @Input() modal = false;
+  @Input() title = "";
   @Input() type = "";
   drag = false;
   pointer = new THREE.Vector2();
@@ -183,6 +183,7 @@ export class DialogComponent implements OnInit, OnChanges {
   OnStartRecord() {
     this.AnimationService.targetCanvas = this.canvas;
     this.AnimationService.recorder.init(this.canvas, { verbose: false });
+    this.AnimationService.recording = true;
     this.AnimationService.recordEnd = this.recordEnd;
     this.AnimationService.recordStart = this.recordStart;
     this.AnimationService.framerate = this.framerate;
@@ -195,6 +196,9 @@ export class DialogComponent implements OnInit, OnChanges {
     });
     let frames = duration * this.framerate;
     console.log(duration, frames);
+  }
+  OnRecordStop() {
+    this.AnimationService.recording = false;
   }
 
   async LoadEnviroment(event: Event) {

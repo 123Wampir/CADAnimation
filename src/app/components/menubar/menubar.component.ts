@@ -26,6 +26,10 @@ export class MenubarComponent implements AfterViewInit {
     // this.AnimationService.ClearAnimation();
     this.SceneUtilsService.ClearScene();
   }
+  SetZeroPlaneVisibility(event: Event) {
+    let e = event?.target as any;
+    (this.SceneUtilsService.zeroPlane as any).material.visible = e.checked;
+  }
   SetZeroPlaneGrid(event: Event) {
     let e = event?.target as any;
     this.SceneUtilsService.zeroPlane.children[0].visible = e.checked;
@@ -76,10 +80,12 @@ export class MenubarComponent implements AfterViewInit {
     })
   }
   CreateSnapshot() {
+    this.SceneUtilsService.dialogTitle = "Создание снимка";
     this.SceneUtilsService.dialogType = "snapshot";
     this.SceneUtilsService.dialogShow = true;
   }
   SetEnviroment() {
+    this.SceneUtilsService.dialogTitle = "Настройка окружения";
     this.SceneUtilsService.dialogType = "enviroment";
     this.SceneUtilsService.dialogShow = true;
   }

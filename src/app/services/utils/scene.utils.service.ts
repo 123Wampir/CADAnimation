@@ -80,8 +80,8 @@ export class SceneUtilsService {
   MenubarComponent!: MenubarComponent;
 
   dialogType = "";
+  dialogTitle = "";
   dialogShow = false;
-  dialogModal = false;
 
   CTRLPressed: boolean = false;
   SHIFTPressed: boolean = false;
