@@ -42,6 +42,7 @@ export class DialogComponent implements OnInit, OnChanges {
   canvasWidth = 1920;
   canvasHeight = 1080;
   aspect = 16 / 9;
+  format = "WEBM";
 
   recordStart = 0;
   recordEnd = this.AnimationService.timeLine.duration;
@@ -180,6 +181,10 @@ export class DialogComponent implements OnInit, OnChanges {
     }
   }
 
+  OnFormatChange(event: Event) {
+    this.format = (event.target as any).value;
+  }
+
   OnStartRecord() {
     this.AnimationService.targetCanvas = this.canvas;
     this.AnimationService.recorder.init(this.canvas, { verbose: false });
@@ -190,10 +195,31 @@ export class DialogComponent implements OnInit, OnChanges {
     let duration = this.recordEnd - this.recordStart;
     this.AnimationService.duration = duration;
     this.AnimationService.RenderFrame(this.canvas, this.canvasWidth, this.canvasHeight, false);
-    this.AnimationService.recorder.beginVideoRecord({
-      format: "webm",
-      fps: this.framerate
-    });
+    switch (this.format) {
+      case "WEBM":
+        this.AnimationService.recorder.beginVideoRecord({
+          format: "webm",
+          fps: this.framerate
+        });
+        break;
+      case "MP4":
+        if (this.AnimationService.MP4Support)
+          this.AnimationService.recorder.beginVideoRecord({
+            format: "mp4",
+            fps: this.framerate
+          });
+        else console.log("browser don't support MP4");
+        break;
+      case "GIF":
+        if (this.AnimationService.GIFSupport)
+          this.AnimationService.recorder.beginGIFRecord({
+            fps: this.framerate
+          });
+        else console.log("browser don't support GIF");
+        break;
+      default:
+        break;
+    }
     let frames = duration * this.framerate;
     console.log(duration, frames);
   }

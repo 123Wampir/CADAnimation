@@ -77,6 +77,8 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     this.SceneUtilsService.dialogTitle = "Запись анимации";
     this.SceneUtilsService.dialogType = "record";
     this.SceneUtilsService.dialogShow = true;
+    this.AnimationService.MP4Support = this.AnimationService.recorder.browserSupportsMP4();
+    this.AnimationService.GIFSupport = this.AnimationService.recorder.browserSupportsGIF();
   }
 
   TrackByFunction(index: number) {

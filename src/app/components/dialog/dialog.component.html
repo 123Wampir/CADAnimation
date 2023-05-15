@@ -165,6 +165,20 @@
                     </div>
                 </div>
             </div>
+            <div class="line">
+                <div class="param">
+                    <div class="inputs">
+                        <div class="label">Формат файла</div>
+                        <div class="inputs">
+                            <select name="OutputFormat" (change)="OnFormatChange($event)">
+                                <option value="WEBM" selected>WEBM</option>
+                                <option value="MP4" *ngIf="AnimationService.MP4Support">MP4</option>
+                                <option value="GIF" *ngIf="AnimationService.GIFSupport">GIF</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="line" *ngIf="!AnimationService.recording">
                 <button class="button-icon" (click)="OnStartRecord()">
                     <img src="../../../assets/snapshot.png" alt="button-icon" width="19px" height="19px"

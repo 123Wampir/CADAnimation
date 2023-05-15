@@ -27,6 +27,8 @@ export class AnimationService {
   recordStart = 0;
   recordEnd = this.timeLine.duration;
   framerate = 60;
+  MP4Support = true;
+  GIFSupport = true;
   currentFrame = 0;
   duration = this.recordEnd - this.recordStart;
   targetCanvas!: HTMLCanvasElement;

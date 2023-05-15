@@ -268,14 +268,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     (event.target as any).value = "";
   }
 
-  async SaveFile(event: Event) {
+  SaveFile(event: Event) {
     const exporter = new GLTFExporter();
-    console.log('save');
     this.mainObject.updateWorldMatrix(false, true);
-    // Parse the input and generate the glTF output
     exporter.parse(
       this.mainObject.children[0],
-      // called when the gltf has been generated
       function (gltf) {
         console.log(gltf);
         const output = JSON.stringify(gltf, null, 2);
@@ -286,7 +283,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         link.download = "model.gltf";
         link.click();
       },
-      // called when there is an error in the generation
       function (error) {
         console.log('An error happened');
       },
