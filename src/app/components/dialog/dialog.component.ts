@@ -228,11 +228,8 @@ export class DialogComponent implements OnInit, OnChanges {
   }
 
   async LoadEnviroment(event: Event) {
-    console.log(event);
     let f = event.target as any;
-    console.log(f.files);
     let str = window.URL.createObjectURL(f.files[0]);
-    console.log(str);
     if (str.length != 0) {
       const hdrLoader = new RGBELoader();
       let envMap = await hdrLoader.loadAsync(str);
@@ -252,9 +249,7 @@ export class DialogComponent implements OnInit, OnChanges {
         this.SceneUtilsService.skybox.material.dispose();
       }
       this.SceneUtilsService.skybox = new GroundProjectedEnv(envMap);
-      let r = 100;
-      let x = 0;
-      let z = 0;
+      let r = 100, x = 0, z = 0;
       if (this.SceneUtilsService.boundingSphere != undefined) {
         r = this.SceneUtilsService.boundingSphere.radius;
         x = (this.SceneUtilsService.boundingBox.max.x + this.SceneUtilsService.boundingBox.min.x) / 2;

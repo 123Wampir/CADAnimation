@@ -62,7 +62,6 @@ export class ModelloaderService {
     let stp = this.CreateModel(result, result.root);
     obj.add(stp);
     console.log(obj);
-
   }
   async LoadIgesModel(url: string, obj: THREE.Object3D) {
     this.SceneUtilsService.ClearScene();

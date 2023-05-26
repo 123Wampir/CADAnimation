@@ -107,13 +107,30 @@ export class AnimationService {
         }
         let keyframeTrack: AnimationModel.KeyframeTrackModel;
         if (parent != undefined) {
-          keyframeTrack = { id: this.id, children: [], object: item, name: item.name, type: "Part", actions: [], level: tabIndex, parent: parent!.id };
+          keyframeTrack = {
+            id: this.id,
+            children: [],
+            object: item,
+            name: item.name,
+            type: "Part",
+            actions: [],
+            level: tabIndex,
+            parent: parent!.id
+          };
           parent.children.push(keyframeTrack.id);
         }
-        else keyframeTrack = { id: this.id, children: [], object: item, name: item.name, type: "Part", actions: [], level: tabIndex, parent: -1 };
+        else keyframeTrack = {
+          id: this.id,
+          children: [],
+          object: item,
+          name: item.name,
+          type: "Part",
+          actions: [],
+          level: tabIndex,
+          parent: -1
+        };
         this.id++;
         this.timeLine.tracks.push(keyframeTrack);
-
         if (item.type == "Object3D" || item.type == "Group") {
           if (item.children.length != 0) {
             tabIndex++;
@@ -143,8 +160,16 @@ export class AnimationService {
     }
   }
   CreateTreeViewElement(obj: THREE.Object3D, parent: AnimationModel.KeyframeTrackModel) {
-
-    let keyframeTrack: AnimationModel.KeyframeTrackModel = { id: this.id, children: [], object: obj, name: obj.name, type: "Part", actions: [], level: parent.level + 1, parent: parent.id };
+    let keyframeTrack: AnimationModel.KeyframeTrackModel = {
+      id: this.id,
+      children: [],
+      object: obj,
+      name: obj.name,
+      type: "Part",
+      actions: [],
+      level: parent.level + 1,
+      parent: parent.id
+    };
     this.id++;
     parent.children.push(keyframeTrack.id);
     this.timeLine.tracks.push(keyframeTrack);
@@ -207,7 +232,7 @@ export class AnimationService {
     this.UpdateActionDuration(action);
   }
   ChangeKeyframe(keyframe: AnimationModel.KeyframeModel) {
-    let track = keyframe.clip.tracks.find(track => (track.name == keyframe.action.type))
+    let track = keyframe.clip.tracks.find(track => (track.name == keyframe.action.type));
     if (track != undefined) {
       let updateTrack = true;
       for (let i = 0; i < track.times.length; i++) {

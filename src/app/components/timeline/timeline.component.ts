@@ -34,6 +34,8 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
   posX = 0;
   posY = 0;
   contextObject: any;
+  contextMenuType = "";
+  contextKeyframe = false;
 
   ngOnInit(): void {
   }
@@ -135,11 +137,38 @@ export class TimelineComponent implements OnInit, OnChanges, AfterViewInit {
     this.keyframeClick = false;
     this.actionClick = false;
   }
-  ShowContextMenu(event: MouseEvent, id: number) {
+  ShowTrackContextMenu(event: MouseEvent, id: number) {
     event.preventDefault();
     if (this.SceneUtilsService.ContextmenuComponent != undefined)
       this.SceneUtilsService.ContextmenuComponent.component.contextMenu = false;
+    this.contextMenuType = "timeline-track";
     this.contextObject = this.AnimationService.timeLine.tracks.find(track => track.id == id)!;
+    this.posX = event.clientX - 5;
+    this.posY = event.clientY - 5;
+    console.log(this.posX, this.posY);
+    this.contextMenu = true;
+  }
+  ShowActionContextMenu(event: MouseEvent, action: AnimationModel.KeyframeActionModel) {
+    event.preventDefault();
+    if (!this.contextKeyframe) {
+      if (this.SceneUtilsService.ContextmenuComponent != undefined)
+        this.SceneUtilsService.ContextmenuComponent.component.contextMenu = false;
+      this.contextMenuType = "timeline-action";
+      this.contextObject = action;
+      this.posX = event.clientX - 5;
+      this.posY = event.clientY - 5;
+      console.log(this.posX, this.posY);
+      this.contextMenu = true;
+    }
+    this.contextKeyframe = false;
+  }
+  ShowKeyframeContextMenu(event: MouseEvent, keyframe: AnimationModel.KeyframeModel) {
+    event.preventDefault();
+    this.contextKeyframe = true;
+    if (this.SceneUtilsService.ContextmenuComponent != undefined)
+      this.SceneUtilsService.ContextmenuComponent.component.contextMenu = false;
+    this.contextMenuType = "timeline-keyframe";
+    this.contextObject = keyframe;
     this.posX = event.clientX - 5;
     this.posY = event.clientY - 5;
     console.log(this.posX, this.posY);
