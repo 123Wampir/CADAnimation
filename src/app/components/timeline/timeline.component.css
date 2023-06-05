@@ -7,7 +7,7 @@
     transition: height 1s;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    z-index: 3;
+    z-index: 4;
     border-top: 1px solid var(--second-color);
 }
 

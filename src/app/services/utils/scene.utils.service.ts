@@ -160,7 +160,10 @@ export class SceneUtilsService {
     arr.forEach((item, index) => {
       let ps = new THREE.Vector3();
       item.getWorldPosition(ps);
-      let pos = item.worldToLocal(ps.clone().add(this.offsets[index].clone().multiplyScalar(length))).add(this.startPos[index])
+      let pos = item.worldToLocal(ps
+        .clone()
+        .add(this.offsets[index].clone().multiplyScalar(length)))
+        .add(this.startPos[index]);
       item.position.set(pos.x, pos.y, pos.z);
       item.updateMatrixWorld(true);
     })

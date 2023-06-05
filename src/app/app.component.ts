@@ -436,7 +436,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     else { this.firstClick = false }
   }
   onPointerMove(event: MouseEvent) {
-    // console.log(event)
     this.pointer.x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1;
     this.pointer.y = - (event.clientY / this.renderer.domElement.clientHeight) * 2 + 1;
   }
