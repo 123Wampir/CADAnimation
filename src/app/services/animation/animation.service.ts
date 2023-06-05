@@ -92,9 +92,12 @@ export class AnimationService {
   }
 
   async RenderHTMLToCanvas(canvas: HTMLCanvasElement, element: HTMLElement) {
-    let scale = 2 * canvas.height / window.screen.height;
-    if (scale > 1)
-      element.style.fontSize = `${16 * scale}px`;
+    let scale = 1.15 * canvas.height / window.screen.height;
+    // if (scale > 1)
+    element.style.fontSize = `${16 * scale}px`;
+    element.style.fontFamily = "Roboto, 'Helvetica Neue', sans-serif;";
+    console.log(element.style.fontSize);
+
     await rasterizeHTML.drawHTML(element.outerHTML, canvas);
     element.style.fontSize = `${16}px`;
   }
@@ -519,7 +522,12 @@ export class AnimationService {
           }
         }
         else if (item.type == "Annotation") {
-          this.SceneUtilsService.SceneManagerService.AddAnnotation(item.name);
+          let annotation = this.SceneUtilsService.SceneManagerService.AddAnnotation(item.name);
+          let track = this.timeLine.tracks.find(track => track.name == item.target);
+          if (track) {
+            annotation.children[0].userData["target"] = track.object;
+          }
+
         }
         else if (item.type == "Axis") {
           let axis = this.SceneUtilsService.SceneManagerService.AddAxis(item.name);

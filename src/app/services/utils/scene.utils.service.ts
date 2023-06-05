@@ -121,6 +121,14 @@ export class SceneUtilsService {
     this.orthographicCamera.updateProjectionMatrix();
     this.orthographicCamera.up = this.perspectiveCamera.up;
   }
+  UpdateCameraUpVector() {
+    this.perspectiveCamera.updateProjectionMatrix();
+    this.perspectiveCamera.updateMatrixWorld();
+    let dir = new THREE.Vector3();
+    this.perspectiveCamera.getWorldDirection(dir);
+    let right = new THREE.Vector3().crossVectors(dir, new THREE.Vector3(0, 1, 0));
+    this.perspectiveCamera.up.crossVectors(right, dir).normalize();
+  }
 
   CalculateCenter(arr: THREE.Object3D[]) {
     let bbox = new THREE.Box3();

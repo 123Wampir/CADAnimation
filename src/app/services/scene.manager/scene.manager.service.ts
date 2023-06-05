@@ -73,7 +73,7 @@ export class SceneManagerService {
     (annDiv as HTMLElement).style.boxShadow = " 0px 0px 4px 1px var(--second-color)";
     (annDiv as HTMLElement).style.background = " whitesmoke";
     (annDiv as HTMLElement).style.height = " min-content";
-    (annDiv as HTMLElement).style.maxWidth = " 20%";
+    (annDiv as HTMLElement).style.maxWidth = " 40%";
     (annDiv as HTMLElement).style.textAlign = " justify";
     (annDiv as HTMLElement).style.overflowWrap = " break-word";
     (annDiv as HTMLElement).style.transition = " all 0.05s";

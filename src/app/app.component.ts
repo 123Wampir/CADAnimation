@@ -169,7 +169,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
       requestAnimationFrame(animate);
       component.SceneUtilsService.stats.update();
-      component.trackballControls.update()
+      component.trackballControls.update();
       if (component.AnimationService.play) {
         component.AnimationService.currentTime += component.delta;
         if (component.AnimationService.currentTime > component.AnimationService.timeLine.duration) {
@@ -181,6 +181,7 @@ export class AppComponent implements OnInit, AfterViewInit {
           mixer.setTime(0);
           mixer.update(component.AnimationService.currentTime);
         })
+        component.SceneUtilsService.UpdateCameraUpVector();
       }
       else {
         if (component.AnimationService.currentTimeChange) {
@@ -189,6 +190,12 @@ export class AppComponent implements OnInit, AfterViewInit {
             mixer.setTime(0);
             mixer.update(component.AnimationService.currentTime);
           })
+          component.SceneUtilsService.UpdateCameraUpVector();
+          let dir = new THREE.Vector3();
+          component.SceneUtilsService.perspectiveCamera.getWorldDirection(dir);
+          let len = component.trackballControls.target.clone().sub(component.SceneUtilsService.perspectiveCamera.position).length();
+          component.trackballControls.target = component.SceneUtilsService.perspectiveCamera.position.clone().add(dir.multiplyScalar(len));
+          component.trackballControls.update();
           component.AnimationService.currentTimeChange = false;
         }
       }
@@ -200,6 +207,7 @@ export class AppComponent implements OnInit, AfterViewInit {
           mixer.setTime(0);
           action.reset();
         })
+        component.SceneUtilsService.UpdateCameraUpVector();
         component.AnimationService.stop = false;
       }
       component.counter++;
@@ -219,6 +227,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         else {
           component.AnimationService.recorder.stopRecord();
           component.AnimationService.currentFrame = 0;
+          component.AnimationService.recording = false;
           console.log("capture finished!");
           component.SceneUtilsService.onResize();
           requestAnimationFrame(animate);
