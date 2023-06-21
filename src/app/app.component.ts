@@ -132,6 +132,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.SceneUtilsService.CSSRenderer.domElement.style.position = 'absolute';
     this.SceneUtilsService.CSSRenderer.domElement.style.top = '0px';
     this.SceneUtilsService.CSSRenderer.domElement.style.pointerEvents = 'none';
+    this.SceneUtilsService.CSSRenderer.domElement.style.zIndex = '1';
     this.SceneUtilsService.angRenderer.addClass(this.SceneUtilsService.CSSRenderer.domElement, "annotation-renderer");
     document.body.appendChild(this.SceneUtilsService.CSSRenderer.domElement);
 
