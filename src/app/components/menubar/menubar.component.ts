@@ -26,6 +26,167 @@ export class MenubarComponent implements AfterViewInit {
     // this.AnimationService.ClearAnimation();
     this.SceneUtilsService.ClearScene();
   }
+
+  async LoadExample(type: number) {
+    this.SceneUtilsService.EnableClipping(true);
+    this.SceneUtilsService.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    switch (type) {
+      case 0: {
+        let str = "../../../assets/Models/eSeries_UR16e.gltf";
+        let filename = "eSeries_UR16e.gltf";
+        console.log(str);
+        let res: boolean = await this.SceneUtilsService.ModelloaderService.LoadModel(str, filename, this.SceneUtilsService.model);
+        if (res) {
+          this.SceneUtilsService.AppComponent.PrepareModel();
+        }
+
+        if (this.SceneUtilsService.skybox != undefined) {
+          let x = (this.SceneUtilsService.boundingBox.max.x + this.SceneUtilsService.boundingBox.min.x) / 2;
+          let z = (this.SceneUtilsService.boundingBox.max.z + this.SceneUtilsService.boundingBox.min.z) / 2;
+          this.SceneUtilsService.skybox.position.set(x, 0, z);
+        }
+        str = "../../../assets/Anim/First.json";
+        filename = "First.json";
+        this.AnimationService.ClearAnimation();
+        await this.AnimationService.LoadAnimation(str, filename);
+        str = "../../../assets/Env/First.hdr";
+        await this.SceneUtilsService.DialogComponent.LoadEnviroment(new Event(""), str);
+        this.SceneUtilsService.DialogComponent.OnModelScaleChange(0.4);
+        this.SceneUtilsService.ViewcubeComponent.setView(1, 1, 1);
+        this.SceneUtilsService.skybox.height = 1500;
+        break;
+      }
+      case 1: {
+        let str = "../../../assets/Models/Gearbox Final Assembly.gltf";
+        let filename = "Gearbox Final Assembly.gltf";
+        console.log(str);
+        let res: boolean = await this.SceneUtilsService.ModelloaderService.LoadModel(str, filename, this.SceneUtilsService.model);
+        if (res) {
+          this.SceneUtilsService.AppComponent.PrepareModel();
+        }
+        this.SceneUtilsService.ViewcubeComponent.setView(1, 1, 1);
+        if (this.SceneUtilsService.skybox != undefined) {
+          let x = (this.SceneUtilsService.boundingBox.max.x + this.SceneUtilsService.boundingBox.min.x) / 2;
+          let z = (this.SceneUtilsService.boundingBox.max.z + this.SceneUtilsService.boundingBox.min.z) / 2;
+          this.SceneUtilsService.skybox.position.set(x, 0, z);
+        }
+        str = "../../../assets/Anim/Second.json";
+        filename = "Second.json";
+        this.AnimationService.ClearAnimation();
+        await this.AnimationService.LoadAnimation(str, filename);
+        str = "../../../assets/Env/Second.hdr";
+        await this.SceneUtilsService.DialogComponent.LoadEnviroment(new Event(""), str);
+        this.SceneUtilsService.skybox.height = 500;
+        break;
+      }
+      case 2: {
+        let str = "../../../assets/Models/Ball Valve.gltf";
+        let filename = "Ball Valve.gltf";
+        console.log(str);
+        let res: boolean = await this.SceneUtilsService.ModelloaderService.LoadModel(str, filename, this.SceneUtilsService.model);
+        if (res) {
+          this.SceneUtilsService.AppComponent.PrepareModel();
+        }
+        this.SceneUtilsService.ViewcubeComponent.setView(1, 1, 1);
+        if (this.SceneUtilsService.skybox != undefined) {
+          let x = (this.SceneUtilsService.boundingBox.max.x + this.SceneUtilsService.boundingBox.min.x) / 2;
+          let z = (this.SceneUtilsService.boundingBox.max.z + this.SceneUtilsService.boundingBox.min.z) / 2;
+          this.SceneUtilsService.skybox.position.set(x, 0, z);
+        }
+        str = "../../../assets/Anim/Third.json";
+        filename = "Third.json";
+        this.AnimationService.ClearAnimation();
+        await this.AnimationService.LoadAnimation(str, filename);
+        str = "../../../assets/Env/Third.hdr";
+        await this.SceneUtilsService.DialogComponent.LoadEnviroment(new Event(""), str);
+        this.SceneUtilsService.skybox.height = 305;
+        break;
+      }
+      case 3: {
+        let str = "../../../assets/Models/Coupling.gltf";
+        let filename = "Coupling.gltf";
+        console.log(str);
+        let res: boolean = await this.SceneUtilsService.ModelloaderService.LoadModel(str, filename, this.SceneUtilsService.model);
+        if (res) {
+          this.SceneUtilsService.AppComponent.PrepareModel();
+        }
+        this.SceneUtilsService.ViewcubeComponent.setView(1, 1, 1);
+        if (this.SceneUtilsService.skybox != undefined) {
+          let x = (this.SceneUtilsService.boundingBox.max.x + this.SceneUtilsService.boundingBox.min.x) / 2;
+          let z = (this.SceneUtilsService.boundingBox.max.z + this.SceneUtilsService.boundingBox.min.z) / 2;
+          this.SceneUtilsService.skybox.position.set(x, 0, z);
+        }
+        str = "../../../assets/Anim/Fourth.xml";
+        filename = "Fourth.xml";
+        // this.AnimationService.ClearAnimation();
+        await this.AnimationService.LoadAnimation(str, filename);
+        str = "../../../assets/Env/Fourth.hdr";
+        await this.SceneUtilsService.DialogComponent.LoadEnviroment(new Event(""), str);
+        this.SceneUtilsService.DialogComponent.OnModelScaleChange(0.3);
+        this.SceneUtilsService.skybox.radius = 2000;
+        this.SceneUtilsService.skybox.height = 250;
+        break;
+      }
+      case 4: {
+        let str = "../../../assets/Models/Coupling.gltf";
+        let filename = "Coupling.gltf";
+        console.log(str);
+        let res: boolean = await this.SceneUtilsService.ModelloaderService.LoadModel(str, filename, this.SceneUtilsService.model);
+        if (res) {
+          this.SceneUtilsService.AppComponent.PrepareModel();
+        }
+        this.SceneUtilsService.ViewcubeComponent.setView(1, 1, 1);
+        if (this.SceneUtilsService.skybox != undefined) {
+          let x = (this.SceneUtilsService.boundingBox.max.x + this.SceneUtilsService.boundingBox.min.x) / 2;
+          let z = (this.SceneUtilsService.boundingBox.max.z + this.SceneUtilsService.boundingBox.min.z) / 2;
+          this.SceneUtilsService.skybox.position.set(x, 0, z);
+        }
+        str = "../../../assets/Anim/Five.xml";
+        filename = "Five.xml";
+        // this.AnimationService.ClearAnimation();
+        await this.AnimationService.LoadAnimation(str, filename);
+        str = "../../../assets/Env/Fourth.hdr";
+        await this.SceneUtilsService.DialogComponent.LoadEnviroment(new Event(""), str);
+        this.SceneUtilsService.DialogComponent.OnModelScaleChange(0.3);
+        this.SceneUtilsService.skybox.radius = 2000;
+        this.SceneUtilsService.skybox.height = 250;
+        break;
+      }
+      case 5: {
+        let str = "../../../assets/Models/Serter.gltf";
+        let filename = "Serter.gltf";
+        console.log(str);
+        let res: boolean = await this.SceneUtilsService.ModelloaderService.LoadModel(str, filename, this.SceneUtilsService.model);
+        if (res) {
+          this.SceneUtilsService.AppComponent.PrepareModel();
+        }
+        this.SceneUtilsService.ViewcubeComponent.setView(-1, 1, 1);
+        if (this.SceneUtilsService.skybox != undefined) {
+          let x = (this.SceneUtilsService.boundingBox.max.x + this.SceneUtilsService.boundingBox.min.x) / 2;
+          let z = (this.SceneUtilsService.boundingBox.max.z + this.SceneUtilsService.boundingBox.min.z) / 2;
+          this.SceneUtilsService.skybox.position.set(x, 0, z);
+        }
+        str = "../../../assets/Anim/Serter.json";
+        filename = "Serter.json";
+        this.AnimationService.ClearAnimation();
+        await this.AnimationService.LoadAnimation(str, filename);
+        this.SceneUtilsService.scene.environment = null;
+        this.SceneUtilsService.renderer.setClearColor(0x000000);
+        this.SceneUtilsService.scene.fog!.color = new THREE.Color(0x000000);
+        this.SceneUtilsService.scene.background = null;
+        if (this.SceneUtilsService.skybox)
+          this.SceneUtilsService.skybox.visible = false;
+        this.SceneUtilsService.zeroPlane.visible = true;
+        break;
+      }
+      default:
+        break;
+    }
+    this.SceneUtilsService.ClearSelection(this.SceneUtilsService.selected);
+    this.AnimationService.currentTime = 0;
+    this.AnimationService.currentTimeChange = !this.AnimationService.currentTimeChange;
+  }
+
   SetZeroPlaneVisibility(event: Event) {
     let e = event?.target as any;
     (this.SceneUtilsService.zeroPlane as any).material.visible = e.checked;

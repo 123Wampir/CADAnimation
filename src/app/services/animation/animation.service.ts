@@ -479,7 +479,8 @@ export class AnimationService {
     return arr;
   }
 
-  async LoadAnimation(url: string, fileName: string): Promise<boolean> {
+  async   LoadAnimation(url: string, fileName: string): Promise<boolean> {
+    console.log(url);
     console.log(fileName);
 
     if (/(.(xml|xmla)$)/.test(fileName!)) {
