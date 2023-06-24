@@ -65,10 +65,18 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "CADAnimation:build:production"
+              "browserTarget": "CADAnimation:build:production",
+              "headers": {
+                "Cross-Origin-Embedder-Policy": "require-corp",
+                "Cross-Origin-Opener-Policy": "same-origin"
+              }
             },
             "development": {
-              "browserTarget": "CADAnimation:build:development"
+              "browserTarget": "CADAnimation:build:development",
+              "headers": {
+                "Cross-Origin-Embedder-Policy": "require-corp",
+                "Cross-Origin-Opener-Policy": "same-origin"
+              }
             }
           },
           "defaultConfiguration": "development"
