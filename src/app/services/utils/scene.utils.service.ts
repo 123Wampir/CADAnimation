@@ -14,6 +14,7 @@ import { ViewcubeComponent } from 'src/app/components/viewcube/viewcube.componen
 import * as AnimationModel from 'src/app/shared/animation.model';
 import { GroundProjectedEnv } from 'three/examples/jsm/objects/GroundProjectedEnv';
 import { MenubarComponent } from 'src/app/components/menubar/menubar.component';
+import { DialogComponent } from 'src/app/components/dialog/dialog.component';
 
 @Injectable({
   providedIn: 'root'
@@ -78,6 +79,7 @@ export class SceneUtilsService {
   ContextmenuComponent!: ContextmenuComponent;
   ViewcubeComponent!: ViewcubeComponent;
   MenubarComponent!: MenubarComponent;
+  DialogComponent!: DialogComponent;
 
   dialogType = "";
   dialogTitle = "";
@@ -481,6 +483,7 @@ export class SceneUtilsService {
           this.DisposeObject(obj);
       })
       this.model.clear();
+      this.model.scale.set(1, 1, 1);
 
       this.fileName = "";
       this.startPos = [];
@@ -490,21 +493,20 @@ export class SceneUtilsService {
         this.DisposeObject(obj);
       });
       this.planeHelpers.clear();
+      console.log(this.lightGroup);
 
+      let ambient = this.lightGroup.children[0];
+      this.lightGroup.traverse(obj => {
+        if (obj.type != "AmbientLight" && obj != this.lightGroup) {
+          this.DisposeObject(obj);
+        }
+      });
+      this.lightGroup.clear();
+      this.lightGroup.add(ambient);
       this.annotationGroup.traverse(obj => {
         this.DisposeObject(obj);
       });
       this.annotationGroup.clear();
-
-      // this.stencilGroups.traverse(obj => {
-      //   this.DisposeObject(obj);
-      // });
-      // this.stencilGroups.clear();
-      // this.lightGroup.traverse(obj => {
-      //   this.DisposeObject(obj);
-      // });
-      // this.lightGroup.clear();
-
       this.axisArray.forEach(obj => {
         this.DisposeObject(obj);
         obj.removeFromParent();

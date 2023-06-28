@@ -52,6 +52,7 @@ export class DialogComponent implements OnInit, OnChanges {
   material = new THREE.Material();
 
   ngOnInit(): void {
+    this.SceneUtilsService.DialogComponent = this;
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes["show"]) {
@@ -227,9 +228,13 @@ export class DialogComponent implements OnInit, OnChanges {
     this.AnimationService.recording = false;
   }
 
-  async LoadEnviroment(event: Event) {
+  async LoadEnviroment(event: Event, url?: string) {
     let f = event.target as any;
-    let str = window.URL.createObjectURL(f.files[0]);
+    let str = "";
+    if (f != null)
+      str = window.URL.createObjectURL(f.files[0]);
+    if (url != undefined)
+      str = url;
     if (str.length != 0) {
       const hdrLoader = new RGBELoader();
       let envMap = await hdrLoader.loadAsync(str);
