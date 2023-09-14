@@ -12,6 +12,8 @@ import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 import { Reflector } from './shared/Reflector/Reflector';
 import { SceneManagerService } from './services/scene.manager/scene.manager.service';
+import { inject } from '@vercel/analytics';
+inject();
 
 
 @Component({
