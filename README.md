@@ -36,6 +36,34 @@ This app also support animation import from CAD Kompas3D (but only translation a
 
 ![Animation](readme/Анимация%20разлёта%20и%20поворотом%20камеры.gif)
 
+## Run with docker
+- Excute _npm run build_, to get angular packed file _dist/cadanimation_
+- Add a Dockerfile
+```
+FROM nginx
+USER root
+COPY ./dist/cadanimation /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+- Add a docker-compose.yml
+```
+services:
+  cadanimation:
+    user: root
+    container_name: cadanimation
+    build: .
+    image: cadanimation:1.0.0
+    restart: unless-stopped
+    ports:
+      - "1902:80"
+    volumes:
+      - ./dist/cadanimation:/usr/share/nginx/html
+```
+- Excute _docker compose up -d_, to build the docker image and start the container
+- Now you can access the web page through _http://localhost:1902_
+- If you've made some change, excute _npm run build_ and _docker restart cadanimation_ to effectuate it
+
 ## To Do
 - [x] Model explode animation (Select group of objects and them press button for exploded view)
 - [x] Animation saving/loading (Save and Load your animation as a simple JSON file)
