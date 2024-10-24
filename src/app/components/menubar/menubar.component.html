@@ -211,7 +211,7 @@
         <div class="vert-separator"></div>
         <div class="toolbar-tool"
             [ngStyle]="SceneUtilsService.SetDisableStyle(SceneUtilsService.model!=undefined && SceneUtilsService.model.children.length!=0)">
-            <input class="checkbox" type="checkbox" id="cut" (change)="SetClipping($event)">
+            <input #checkboxCutEnable class="checkbox" type="checkbox" id="cut" (change)="SetClipping($event)">
             <label for="cut"><img src="../../../assets/cut.png" width="19px" height="19px"
                     title="Включить разрез"></label>
         </div>

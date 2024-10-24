@@ -214,12 +214,13 @@
                 <div class="param">
                     <div class="label">Tone mapping</div>
                     <div class="inputs">
-                        <select name="toneMapping" (change)="OnToneMappingChange($event)">
-                            <option value="noToneMapping" selected>Нет</option>
-                            <option value="linear">Линейный</option>
-                            <option value="Reinhard">Reinhard</option>
-                            <option value="Cineon">Cineon</option>
-                            <option value="ACESFilmic">ACESFilmic</option>
+                        <select name="toneMapping" (change)="OnToneMappingChange($event)"
+                            [ngModel]="SceneUtilsService.renderer.toneMapping.toString()">
+                            <option value="0" selected>None</option>
+                            <option value="1">Linear</option>
+                            <option value="2">Reinhard</option>
+                            <option value="3">Cineon</option>
+                            <option value="4">ACESFilmic</option>
                         </select>
                     </div>
                 </div>

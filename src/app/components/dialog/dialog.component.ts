@@ -279,19 +279,19 @@ export class DialogComponent implements OnInit, OnChanges {
   OnToneMappingChange(event: Event) {
     let value = (event.target as any).value;
     switch (value) {
-      case "noToneMapping":
+      case "0":
         this.SceneUtilsService.renderer.toneMapping = THREE.NoToneMapping;
         break;
-      case "linear":
+      case "1":
         this.SceneUtilsService.renderer.toneMapping = THREE.LinearToneMapping;
         break;
-      case "Reinhard":
+      case "2":
         this.SceneUtilsService.renderer.toneMapping = THREE.ReinhardToneMapping;
         break;
-      case "Cineon":
+      case "3":
         this.SceneUtilsService.renderer.toneMapping = THREE.CineonToneMapping;
         break;
-      case "ACESFilmic":
+      case "4":
         this.SceneUtilsService.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         break;
     }
