@@ -12,6 +12,7 @@ import THREE = require('three');
 export class MenubarComponent implements AfterViewInit {
   posX = 0;
   posY = 0;
+  @ViewChild('checkboxCutEnable') checkboxCutEnableRef!: ElementRef;
   @ViewChild('file') fileRef!: ElementRef;
   get file(): HTMLCanvasElement {
     return this.fileRef.nativeElement;
@@ -28,6 +29,7 @@ export class MenubarComponent implements AfterViewInit {
   }
 
   async LoadExample(type: number) {
+    this.checkboxCutEnableRef.nativeElement.checked = true;//change toolbar status
     this.SceneUtilsService.EnableClipping(true);
     this.SceneUtilsService.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     switch (type) {
