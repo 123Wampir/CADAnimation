@@ -103,6 +103,10 @@ export class SceneUtilsService {
     this.AppComponent.SaveFile(event);
   }
 
+  SetCutPlaneCheckStutas(plane: string, checked: boolean) {
+    this.MenubarComponent.SetCutPlaneCheckStutas(plane, checked);
+  }
+
   SwitchCamera() {
     if (this.orthographic) {
       this.currentCamera = this.orthographicCamera;
