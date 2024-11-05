@@ -13,6 +13,9 @@ export class MenubarComponent implements AfterViewInit {
   posX = 0;
   posY = 0;
   @ViewChild('checkboxCutEnable') checkboxCutEnableRef!: ElementRef;
+  @ViewChild('checkboxCutX') checkboxCutX!: ElementRef;
+  @ViewChild('checkboxCutY') checkboxCutY!: ElementRef;
+  @ViewChild('checkboxCutZ') checkboxCutZ!: ElementRef;
   @ViewChild('file') fileRef!: ElementRef;
   get file(): HTMLCanvasElement {
     return this.fileRef.nativeElement;
@@ -23,6 +26,25 @@ export class MenubarComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.SceneUtilsService.MenubarComponent = this;
   }
+
+  SetCutPlaneCheckStutas(plane: string, checked: boolean) {
+    console.log("set:", plane, checked)
+    switch (plane) {
+      case "X":
+        this.checkboxCutX.nativeElement.checked = checked;
+        break;
+      case "Y":
+        this.checkboxCutY.nativeElement.checked = checked;
+        break;
+      case "Z":
+        this.checkboxCutZ.nativeElement.checked = checked;
+        break;
+
+      default:
+        break;
+    }
+  }
+
   NewProject() {
     // this.AnimationService.ClearAnimation();
     this.SceneUtilsService.ClearScene();
