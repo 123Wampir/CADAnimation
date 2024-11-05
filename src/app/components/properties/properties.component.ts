@@ -365,7 +365,9 @@ export class PropertiesComponent implements OnInit, OnChanges {
     this.propertiesObject.children[1].update();
   }
   ShowPlane(event: Event) {
-    this.propertiesObject.children[0].material.visible = (event.target as any).checked;
+    let checked = (event.target as any).checked;
+    this.propertiesObject.children[0].material.visible = checked;
+    this.SceneUtilsService.SetCutPlaneCheckStutas(this.propertiesObject.name, checked);
   }
   OnFOVChange($event: Event) {
     this.propertiesObject.updateProjectionMatrix();
